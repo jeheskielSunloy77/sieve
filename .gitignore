@@ -1,0 +1,23 @@
+vet-output.txt
+
+# JetBrains IDE
+.idea/
+
+# macOS
+.DS_Store
+
+# Environment files with secrets
+web/.env.prod
+web/.env.dev
+
+# Node
+node_modules/
+
+# Playwright / test scripts
+.playwright-profile/
+screenshots/
+test-filtered-view.mjs
+
+# Packaged release artifacts
+PostPatrol-*.zip
+web-*.zip
