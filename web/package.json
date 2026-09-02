@@ -1,0 +1,44 @@
+{
+  "name": "postpatrol",
+  "version": "2.0.0",
+  "description": "PostPatrol - Filter unwanted posts from social media feeds using AI",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "build:dev": "node build.js --dev",
+    "build:safari": "node build.js --target=safari",
+    "build:safari:dev": "node build.js --dev --target=safari",
+    "build:firefox": "node build.js --target=firefox",
+    "build:firefox:dev": "node build.js --dev --target=firefox",
+    "gen-manifests": "node generate-manifests.mjs",
+    "watch": "node build.js --watch",
+    "watch:dev": "node build.js --watch --dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . && tsc --noEmit",
+    "lint:fix": "eslint . --fix",
+    "cut-chrome": "node cut.js",
+    "cut-chrome:same": "node cut.js --same-version",
+    "cut-firefox": "node cut.js --firefox",
+    "cut-firefox:same": "node cut.js --firefox --same-version",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/chrome": "^0.1.37",
+    "@types/node": "^25.5.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^10.0.2",
+    "globals": "^17.4.0",
+    "happy-dom": "^20.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.0",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@litert-lm/core": "^0.12.1",
+    "dompurify": "^3.3.1",
+    "html-to-image": "^1.11.13"
+  }
+}
