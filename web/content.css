@@ -1,0 +1,3129 @@
+/* PostPatrol - Content Styles */
+
+:root {
+  --green-border-width: 2px;
+  /* PostPatrol brand accent — stored as raw rgb channels so the same value can
+   * back both `rgb(var(--postpatrol-brand-rgb))` and faded
+   * `rgba(var(--postpatrol-brand-rgb), <alpha>)` usages without duplicating the
+   * literal. Update here to retheme the panel outline, CTA buttons, focus
+   * rings, and per-card cancel icon together. */
+  --postpatrol-brand-rgb: 234, 133, 84;
+}
+
+/* Base font for all PostPatrol UI — applies directly to every child element
+   rather than relying on inheritance, to prevent intermittent font fallback. */
+.filter-phrases-sidebar,
+.filter-phrases-sidebar *,
+.filter-phrases-bottom,
+.filter-phrases-bottom *,
+.filter-phrases-mobile,
+.filter-phrases-mobile *,
+.filtered-view-container,
+.filtered-view-container *,
+.post-verification-bar,
+.post-verification-bar *,
+.ff-missed-link,
+.ff-why-annoying-btn,
+.ff-reasoning-popup,
+.ff-reasoning-popup *,
+.ff-ios-page,
+.ff-ios-page *,
+.ff-ios-filtered-modal,
+.ff-ios-filtered-modal * {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Reasoning Popup */
+.post-filter-reasoning-popup {
+  position: fixed;
+  z-index: 999999;
+  background: #15202b;
+  border: 1px solid #38444d;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  max-width: 320px;
+  min-width: 240px;
+  padding-bottom: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+  overflow: hidden;
+  animation: popup-fade-in 0.15s ease-out;
+}
+
+@keyframes popup-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reasoning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #38444d;
+  background: #192734;
+}
+
+.reasoning-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-show {
+  background: #00ba7c;
+  color: #fff;
+}
+
+.status-hide {
+  background: #f4212e;
+  color: #fff;
+}
+
+.status-pending {
+  background: #536471;
+  color: #fff;
+}
+
+.status-error {
+  background: #f44336;
+  color: #fff;
+}
+
+.reasoning-close {
+  background: none;
+  border: none;
+  color: #8899a6;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.reasoning-close:hover {
+  color: #fff;
+}
+
+.reasoning-text {
+  padding: 12px;
+  line-height: 1.5;
+  color: #e7e9ea;
+}
+
+.reasoning-text-pending { color: #8899a6; font-style: italic; }
+.reasoning-text-error { color: #f4b1b1; }
+
+.reasoning-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 6px 0;
+  border-bottom: 1px solid #38444d;
+  background: #15202b;
+}
+
+.reasoning-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  color: #8899a6;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reasoning-tab:hover { color: #e7e9ea; background: #1c2732; }
+
+.reasoning-tab.active {
+  background: #192734;
+  color: #e7e9ea;
+  border-color: #38444d;
+  border-bottom-color: #192734;
+  margin-bottom: -1px;
+}
+
+.reasoning-tab-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #71767b;
+}
+.reasoning-tab-dot-pending { background: #71767b; animation: reasoning-tab-pulse 1.2s ease-in-out infinite; }
+.reasoning-tab-dot-keep { background: #00ba7c; }
+.reasoning-tab-dot-hide { background: #f4212e; }
+.reasoning-tab-dot-error { background: #ffad1f; }
+.reasoning-tab-dot-skipped { background: #555f66; }
+
+@keyframes reasoning-tab-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.reasoning-tab-body { background: #192734; }
+
+.reasoning-tab-verdict {
+  display: inline-block;
+  margin: 10px 12px 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.reasoning-tab-verdict.verdict-hide { background: #4a1a20; color: #f4212e; }
+.reasoning-tab-verdict.verdict-keep { background: #14322a; color: #00ba7c; }
+.reasoning-tab-verdict.verdict-skipped { background: #2a3138; color: #8899a6; }
+.reasoning-text-skipped { color: #8899a6; font-style: italic; }
+
+.reasoning-post {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #8899a6;
+  background: #192734;
+  border-top: 1px solid #38444d;
+  font-style: italic;
+}
+
+.reasoning-debug {
+  padding: 8px 12px;
+  border-top: 1px solid #38444d;
+  font-size: 11px;
+}
+
+.reasoning-debug summary {
+  cursor: pointer;
+  color: #8899a6;
+  user-select: none;
+}
+
+.reasoning-debug summary:hover {
+  color: #1d9bf0;
+}
+
+.reasoning-debug-html {
+  margin-top: 8px;
+  padding: 8px;
+  background: #0d1117;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 10px;
+  color: #7ee787;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Toast Notifications */
+.post-filter-toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999998;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.post-filter-toast {
+  background: #15202b;
+  border: 1px solid #38444d;
+  border-left: 4px solid #f4212e;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  width: 320px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: #e7e9ea;
+  overflow: hidden;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.post-filter-toast.toast-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.post-filter-toast.toast-hiding {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #192734;
+  border-bottom: 1px solid #38444d;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f4212e;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #8899a6;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.toast-close:hover {
+  color: #fff;
+}
+
+.toast-content {
+  padding: 10px 12px;
+  line-height: 1.4;
+  color: #e7e9ea;
+  word-break: break-word;
+}
+
+.toast-reason {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #8899a6;
+  background: #192734;
+  border-top: 1px solid #38444d;
+  font-style: italic;
+}
+
+/* Warning toast (e.g., missing API key) */
+.post-filter-toast.post-filter-warning {
+  border-left-color: #ffad1f;
+}
+
+.post-filter-toast.post-filter-warning .toast-title {
+  color: #ffad1f;
+}
+
+/* Slop Tab Styles */
+.slop-posts-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.slop-post-wrapper {
+  border-bottom: 1px solid rgb(47, 51, 54);
+  position: relative;
+  overflow: hidden;
+}
+
+
+.slop-post-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.slop-post-link:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.slop-post {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px 0;
+}
+
+.slop-post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #333;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.slop-post-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slop-avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  font-weight: 700;
+  color: #8899a6;
+}
+
+.slop-post-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.slop-post-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.slop-post-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.slop-post-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #e7e9ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slop-post-handle {
+  font-size: 15px;
+  color: #71767b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slop-category-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.slop-post-text {
+  font-size: 15px;
+  color: #e7e9ea;
+  line-height: 1.4;
+  word-wrap: break-word;
+  margin-bottom: 4px;
+}
+
+.slop-quote-box {
+  border: 1px solid rgb(47, 51, 54);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.slop-quote-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.slop-quote-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.slop-quote-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e7e9ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slop-quote-handle {
+  font-size: 13px;
+  color: #71767b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slop-quote-text {
+  font-size: 14px;
+  color: #e7e9ea;
+  line-height: 1.4;
+}
+
+.slop-quote-text a {
+  color: rgb(29, 155, 240);
+  text-decoration: none;
+}
+
+.slop-post-text a {
+  color: rgb(29, 155, 240);
+  text-decoration: none;
+}
+
+.slop-post-reasoning {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #8899a6;
+  line-height: 1.4;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+
+.slop-post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 0 10px;
+}
+
+.slop-restore {
+  font-size: 13px;
+  font-weight: 500;
+  color: #71767b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.slop-restore:hover {
+  color: #e7e9ea;
+}
+
+/* Media container for filtered posts */
+.slop-media-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 12px 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.slop-media-image {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  background: rgb(32, 35, 39);
+}
+
+/* Grid layout for multiple images */
+.slop-media-container:has(.slop-media-image:nth-child(2)) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.slop-media-container:has(.slop-media-image:nth-child(2)) .slop-media-image {
+  max-height: 300px;
+}
+
+/* Verification bar styles */
+@keyframes pulse-pending {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.post-verification-bar {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  bottom: -1px;
+  width: var(--green-border-width);
+  pointer-events: none;
+  /* Above the post's own content, but well below page chrome (YT masthead
+     ~2030, our popover 2300). Previously 9999, which punched through the
+     YouTube masthead and chip rail when a pending post scrolled under them. */
+  z-index: 1;
+  transition: background-color 0.3s ease;
+}
+
+/* Ensure verification bar isn't clipped */
+/*article:has(.post-verification-bar) {*/
+/*  overflow: visible;*/
+/*}*/
+
+.post-verification-bar.pending {
+  background-color: #888;
+  animation: pulse-pending 1.5s ease-in-out infinite;
+}
+
+/* Dim posts while they're being processed (but not the verification bar).
+   Exclude the filtered tab where posts are displayed after being removed. */
+[data-ff-pending]:not(.slop-post-wrapper [data-ff-pending]) > *:not(.post-verification-bar) {
+  opacity: 0.25;
+}
+
+.post-verification-bar.verified {
+  display: none;
+}
+
+.post-verification-bar.surprise-hide {
+  display: none;
+}
+
+.reasoning-reeval-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #1d9bf0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.reasoning-reeval-btn:hover {
+  background: #1a8cd8;
+}
+
+.reasoning-reeval-btn:disabled {
+  background: #9ec2e0;
+  cursor: not-allowed;
+}
+
+.reasoning-suggest-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 6px 12px 0;
+  padding: 8px 12px;
+  background: transparent;
+  color: #8899a6;
+  border: 1px solid #38444d;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reasoning-suggest-btn:hover {
+  color: #e7e9ea;
+  border-color: #8899a6;
+}
+
+.reasoning-suggest-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.reasoning-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 12px 0;
+}
+
+.reasoning-suggestion-chip {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: #192734;
+  color: #e7e9ea;
+  border: 1px solid #38444d;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.reasoning-suggestion-chip:hover {
+  background: #1d9bf0;
+  border-color: #1d9bf0;
+  color: #fff;
+}
+
+.reasoning-suggestion-chip.suggestion-added {
+  background: #00ba7c;
+  border-color: #00ba7c;
+  color: #fff;
+  cursor: default;
+}
+
+/* Inline "why annoying" button */
+.ff-why-annoying-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  border: none;
+  background: transparent;
+  color: rgb(var(--postpatrol-brand-rgb));
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  transition: background 0.2s;
+  position: relative;
+  vertical-align: middle;
+}
+
+.ff-why-annoying-btn.ff-unfilter-btn {
+  width: unset;
+  background-color: rgb(27 147 228);
+  color: white;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+
+.ff-why-annoying-btn.ff-unfilter-btn:hover {
+  background: rgba(var(--postpatrol-brand-rgb), 0.1);
+}
+
+.ff-why-annoying-btn svg {
+  pointer-events: none;
+}
+
+/* Prevent article from clipping the tooltip */
+article {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+/* Tooltip for annoying reasons — fixed positioning set inline by JS */
+.ff-annoying-tooltip {
+  min-width: 220px;
+  max-width: 300px;
+  background: rgb(0, 0, 0);
+  border: 1px solid rgb(47, 51, 54);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: popup-fade-in 0.15s ease-out;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  .ff-annoying-tooltip {
+    background: #ffffff;
+    border-color: #cfd9de;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Tooltip arrow (default: pointing down, tooltip above button) */
+.ff-annoying-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 12px;
+  width: 10px;
+  height: 10px;
+  background: rgb(0, 0, 0);
+  border-right: 1px solid rgb(47, 51, 54);
+  border-bottom: 1px solid rgb(47, 51, 54);
+  transform: rotate(45deg);
+}
+
+/* Flipped arrow (pointing up, tooltip below button) */
+.ff-annoying-tooltip--flipped::after {
+  bottom: auto;
+  top: -6px;
+  border-right: none;
+  border-bottom: none;
+  border-left: 1px solid rgb(47, 51, 54);
+  border-top: 1px solid rgb(47, 51, 54);
+}
+
+/* Left-aligned: tooltip extends rightward from the button, so move the arrow
+ * to the left edge to keep it pointing at the button. */
+.ff-annoying-tooltip--align-left::after {
+  right: auto;
+  left: 12px;
+}
+
+/* Center-aligned: notch x set inline by JS via --ff-notch-x, measured from
+ * the tooltip's own left edge to the notch's left edge. Used when the button
+ * is in the middle of a narrow viewport and neither directional placement
+ * fits without spilling off-screen. */
+.ff-annoying-tooltip--align-center::after {
+  right: auto;
+  left: var(--ff-notch-x, 12px);
+}
+
+@media (prefers-color-scheme: light) {
+  .ff-annoying-tooltip::after {
+    background: #ffffff;
+    border-right-color: #cfd9de;
+    border-bottom-color: #cfd9de;
+  }
+}
+
+/* Spinner */
+.ff-annoying-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 0;
+}
+
+.ff-spinner-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--postpatrol-brand-rgb));
+  animation: ff-bounce 1.2s infinite ease-in-out;
+}
+
+.ff-spinner-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ff-spinner-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes ff-bounce {
+  0%, 60%, 100% { transform: scale(0.6); opacity: 0.4; }
+  30% { transform: scale(1); opacity: 1; }
+}
+
+.ff-annoying-thinking {
+  display: block;
+  text-align: center;
+  color: #8899a6;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ff-progress-bar {
+  padding: 8px 12px 4px;
+}
+
+.ff-progress-track {
+  width: 100%;
+  height: 4px;
+  background: #38444d;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ff-progress-fill {
+  height: 100%;
+  width: 5%;
+  background: rgb(var(--postpatrol-brand-rgb));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.twitter-light .ff-progress-track {
+  background: #cfd9de;
+}
+
+
+.ff-annoying-label {
+  padding-left: 3px;
+  display: block;
+  font-size: 12px;
+  color: #8b98a5;
+  margin-bottom: 6px;
+}
+
+/* Suggestion chips in tooltip */
+.ff-annoying-chip {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: rgb(22, 24, 28);
+  color: #e7e9ea;
+  border: 1px solid #38444d;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.ff-annoying-chip:hover {
+  background: rgb(var(--postpatrol-brand-rgb));
+  border-color: rgb(var(--postpatrol-brand-rgb));
+  color: #fff;
+}
+
+.ff-annoying-chip.ff-chip-added {
+  background: #00ba7c;
+  border-color: #00ba7c;
+  color: #fff;
+  cursor: default;
+}
+
+.ff-img-badge {
+  margin-left: 6px;
+  font-size: 10px;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+/* "Something else" custom input wrapper in tooltip */
+.ff-annoying-custom-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: 1px solid #38444d;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.ff-annoying-custom-wrapper:focus-within {
+  border-color: rgb(var(--postpatrol-brand-rgb));
+}
+
+.ff-annoying-custom-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #e7e9ea;
+  font-size: 13px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.ff-annoying-custom-input::placeholder {
+  color: #8b98a5;
+  font-weight: 400;
+}
+.ff-annoying-custom-input:focus {
+  border-color: #1d9bf0;
+}
+
+.ff-annoying-send-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  padding: 0;
+  background: rgb(var(--postpatrol-brand-rgb));
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.ff-annoying-send-btn:hover {
+  opacity: 0.85;
+}
+
+.ff-annoying-send-btn svg {
+  width: 11px;
+  height: 11px;
+  fill: #fff;
+}
+
+.ff-annoying-custom-wrapper.has-text .ff-annoying-send-btn {
+  display: flex;
+}
+
+.ff-missed-link {
+  display: none; /* originally block */
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #38444d;
+  font-size: 12px;
+  color: #1d9bf0;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.ff-missed-link:hover {
+  text-decoration: underline;
+}
+
+.twitter-light .ff-missed-link {
+  border-top-color: #cfd9de;
+}
+
+.ff-annoying-empty {
+  color: #8899a6;
+  font-size: 13px;
+  text-align: center;
+  padding: 4px 0;
+}
+
+/* Theme-aware tooltip colors */
+.twitter-light .ff-annoying-tooltip {
+  background: #ffffff;
+  border-color: #cfd9de;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.twitter-light .ff-annoying-tooltip::after {
+  background: #ffffff;
+  border-right-color: #cfd9de;
+  border-bottom-color: #cfd9de;
+}
+.twitter-light .ff-annoying-tooltip--flipped::after {
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: #cfd9de;
+  border-top-color: #cfd9de;
+}
+.twitter-light .ff-annoying-chip {
+  background: #eff3f4;
+  color: #0f1419;
+  border-color: #cfd9de;
+}
+.twitter-light .ff-annoying-chip:hover {
+  background: rgb(var(--postpatrol-brand-rgb));
+  color: #fff;
+  border-color: rgb(var(--postpatrol-brand-rgb));
+}
+.twitter-light .ff-annoying-thinking {
+  color: #536471;
+}
+.twitter-light .ff-annoying-empty {
+  color: #536471;
+}
+.twitter-light .ff-annoying-label {
+  color: #536471;
+}
+.twitter-light .ff-annoying-custom-wrapper {
+  border-color: #cfd9de;
+}
+.twitter-light .ff-annoying-custom-wrapper:focus-within {
+  border-color: rgb(var(--postpatrol-brand-rgb));
+}
+.twitter-light .ff-annoying-custom-input {
+  color: #0f1419;
+}
+.twitter-light .ff-annoying-custom-input::placeholder {
+  color: #536471;
+}
+.twitter-light .ff-annoying-custom-input:focus {
+  border-color: #1d9bf0;
+}
+
+/* System-level light mode fallback (for iOS Safari where .twitter-light may not be set) */
+@media (prefers-color-scheme: light) {
+  .ff-annoying-chip {
+    background: #eff3f4;
+    color: #0f1419;
+    border-color: #cfd9de;
+  }
+  .ff-annoying-chip:hover {
+    background: #1d9bf0;
+    color: #fff;
+    border-color: #1d9bf0;
+  }
+  .ff-annoying-thinking {
+    color: #536471;
+  }
+  .ff-annoying-empty {
+    color: #536471;
+  }
+  .ff-annoying-label {
+    color: #536471;
+  }
+  .ff-progress-track {
+    background: #cfd9de;
+  }
+  .ff-missed-link {
+    border-top-color: #cfd9de;
+  }
+  .ff-annoying-custom-input {
+    background: transparent;
+    color: #0f1419;
+    border-color: #cfd9de;
+  }
+  .ff-annoying-custom-input::placeholder {
+    color: #536471;
+  }
+  .ff-annoying-custom-input:focus {
+    border-color: #1d9bf0;
+  }
+}
+
+/* Filtered posts view */
+.filtered-posts-container {
+  padding: 0;
+}
+
+.filtered-post-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgb(47, 51, 54);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.filtered-post-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.filtered-post-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.filtered-post-reason {
+  font-size: 13px;
+  color: rgb(249, 24, 128);
+  font-weight: 500;
+}
+
+.filtered-post-time {
+  font-size: 13px;
+  color: rgb(113, 118, 123);
+}
+
+.filtered-post-content {
+  font-size: 15px;
+  color: rgb(231, 233, 234);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.filtered-posts-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: rgb(113, 118, 123);
+  font-size: 15px;
+}
+
+/* Filtered modal backdrop */
+.filtered-modal-backdrop {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(91, 112, 131, 0.4);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.filtered-modal-backdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Filtered modal container */
+.filtered-view-container {
+  position: relative;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background-color: rgb(0, 0, 0);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transform: scale(0.95);
+  transition: transform 0.2s ease;
+}
+
+.filtered-modal-backdrop.visible .filtered-view-container {
+  transform: scale(1);
+}
+
+/* Modal header */
+.filtered-modal-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 53px;
+  border-bottom: 1px solid rgb(47, 51, 54);
+  flex-shrink: 0;
+}
+
+.filtered-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  color: rgb(239, 243, 244);
+}
+
+.filtered-modal-close:hover {
+  background-color: rgba(239, 243, 244, 0.1);
+}
+
+.filtered-modal-close svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.filtered-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgb(231, 233, 234);
+}
+
+/* Modal content area */
+.filtered-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.filter-phrases-box-name {
+  padding-bottom: 10px;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.filter-phrases-sidebar {
+  margin-top: 70px;
+  position: sticky;
+  top: 70px;
+  z-index: 100;
+  /* position:relative for ::before pseudo-element positioning (sticky provides this) */
+}
+
+/* In-wrapper variant: filter box is `position: fixed` (like Twitter's own
+   search bar), with `width` and `left` set inline by JS to match the sidebar
+   wrapper. A sibling .filter-phrases-sidebar-spacer reserves flow space so
+   Premium/News don't scroll under us at scroll=0. z=1 sits between Twitter's
+   fixed search bar (z=2) and scrolling content (z=0). */
+.filter-phrases-sidebar--in-wrapper {
+  position: fixed;
+  top: 70px;
+  margin-top: 0;
+  z-index: 1;
+}
+
+.filter-phrases-sidebar-spacer {
+  flex-shrink: 0;
+}
+
+/* Background fill above the filter box to cover scrolling content (e.g., "Subscribe to Premium") */
+.filter-phrases-sidebar::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-color: rgb(0, 0, 0);
+  z-index: -1;
+}
+
+/* In-wrapper: stacking handles search-bar overlap (we're below z=2), so the fill can extend tall. */
+.filter-phrases-sidebar--in-wrapper::before {
+  top: -100px;
+  height: 100px;
+}
+
+/* Theme-specific backgrounds for the gap cover */
+.light-mode.filter-phrases-sidebar::before {
+  background-color: rgb(255, 255, 255);
+}
+
+.dark-mode.filter-phrases-sidebar::before {
+  background-color: rgb(0, 0, 0);
+}
+
+.filter-phrases-container {
+  padding: 12px 16px;
+  background-color: rgb(0, 0, 0);
+  border: var(--green-border-width) solid rgb(var(--postpatrol-brand-rgb));
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column
+}
+
+.filter-phrases-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 4px;
+}
+
+.filter-phrases-label {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(231, 233, 234);
+  white-space: nowrap;
+}
+
+.filter-phrases-and-input {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  min-width: 80px;
+  gap: 4px;
+}
+
+.filter-phrases-and {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(231, 233, 234);
+  white-space: nowrap;
+}
+
+/* Hide "and" when there are no phrases */
+.filter-phrases-list:empty ~ .filter-phrases-and-input .filter-phrases-and {
+  display: none;
+}
+
+.filter-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-phrases-container .filter-phrases-input {
+  width: 100%;
+  padding: 0 4px 2px 4px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid rgb(113, 118, 123) !important;
+  border-radius: 0 !important;
+  color: rgb(231, 233, 234);
+  font-size: 15px;
+  font-weight: 600;
+  outline: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none !important;
+  transition: border-color 0.2s;
+}
+
+.filter-phrases-container .filter-phrases-input:focus {
+  border-bottom-color: rgb(var(--postpatrol-brand-rgb)) !important;
+  box-shadow: none !important;
+}
+
+/* Animated cycling placeholder */
+.filter-placeholder-cycle {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  /* `1.2em` would resolve against whatever font-size the parent inherits
+     (16px on Twitter, 14px on YouTube), but the spans inside are sized to
+     1.2 × 15px = 18px. Pin font-size to 15px so the container height
+     matches the span height regardless of platform — otherwise the bottom
+     of the text gets clipped (e.g. on YT). */
+  font-size: 15px;
+  height: 1.2em;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.filter-placeholder-cycle.hidden {
+  opacity: 0;
+}
+
+.filter-placeholder-track {
+  display: flex;
+  flex-direction: column;
+  animation: ff-placeholder-scroll 10s ease-in-out infinite; /* duration overridden by content.js */
+}
+
+.filter-placeholder-track > span {
+  display: block;
+  height: 1.2em;
+  line-height: 1.2em;
+  color: rgb(80, 85, 90);
+  font-weight: 400;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* @keyframes ff-placeholder-scroll is injected by content.js based on PLACEHOLDER_PHRASES */
+
+.filter-phrases-list {
+  display: contents;
+}
+
+.filter-phrase-inline {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(160, 165, 170);
+  cursor: pointer;
+  transition: color 0.2s;
+  hyphens: auto;
+}
+
+.filter-phrase-inline:hover {
+  color: #ef4444;
+  text-decoration: line-through;
+}
+
+.filter-phrase-separator {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(231, 233, 234);
+  margin-left: -4px;
+}
+
+/* Wrapper that keeps the last phrase + oxford comma as a single flex item so
+   the comma never wraps onto a new line by itself. */
+.filter-phrase-with-oxford {
+  display: inline;
+}
+
+.filter-phrase-with-oxford .filter-phrase-separator {
+  margin-left: 0;
+}
+
+/* Model loading progress display */
+.filter-model-loading {
+  padding: 8px 0;
+  margin: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.model-loading-text {
+  font-size: 12px;
+  color: rgb(29, 155, 240);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-loading-progress {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.model-loading-progress-fill {
+  height: 100%;
+  background: rgb(29, 155, 240);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+/* Light mode model loading */
+.light-mode .filter-model-loading {
+  border-top-color: rgba(0, 0, 0, 0.1);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .model-loading-progress {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Filtered toggle button */
+.filter-phrases-container .filtered-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: rgb(231, 233, 234);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.filtered-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.filtered-toggle-btn.active {
+  background: rgba(29, 155, 240, 0.15);
+  border-color: rgba(29, 155, 240, 0.4);
+  color: rgb(29, 155, 240);
+}
+
+.filtered-toggle-btn.active:hover {
+  background: rgba(29, 155, 240, 0.2);
+}
+
+.filtered-toggle-count {
+  color: rgb(231, 233, 234);
+  font-weight: 600;
+  display: inline-block;
+}
+
+.filtered-toggle-btn.active .filtered-toggle-count {
+  color: rgb(29, 155, 240);
+}
+
+/* Animation for count increment */
+@keyframes count-bump {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.filtered-toggle-count.bump {
+  animation: count-bump 0.3s ease-out;
+}
+
+/* ==============================================
+   Theme-specific styles for light/dark modes
+   (platform-specific themes like Twitter's dim
+    mode live in adapters/{platform}/{platform}.css)
+   ============================================== */
+
+/* Light mode styles */
+.light-mode .filter-phrases-container {
+  background-color: rgb(255, 255, 255);
+  border-color: rgb(200, 110, 65);
+}
+
+.light-mode .filter-phrases-label,
+.light-mode .filter-phrases-and {
+  color: rgb(15, 20, 25);
+}
+
+.light-mode .filter-phrases-input {
+  color: rgb(15, 20, 25);
+  border-bottom-color: rgb(207, 217, 222);
+}
+
+.light-mode .filter-placeholder-track > span {
+  color: rgb(139, 152, 165);
+}
+
+.light-mode .filter-phrase-inline {
+  color: rgb(83, 100, 113);
+}
+
+.light-mode .filter-phrase-separator {
+  color: rgb(15, 20, 25);
+}
+
+.light-mode .filtered-toggle-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgb(15, 20, 25);
+}
+
+.light-mode .filtered-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .filtered-toggle-btn.active {
+  background: rgba(29, 155, 240, 0.1);
+  border-color: rgba(29, 155, 240, 0.3);
+  color: rgb(29, 155, 240);
+}
+
+.light-mode .filtered-toggle-btn.active:hover {
+  background: rgba(29, 155, 240, 0.15);
+}
+
+.light-mode .filtered-toggle-count {
+  color: rgb(15, 20, 25);
+}
+
+.light-mode .filtered-toggle-btn.active .filtered-toggle-count {
+  color: rgb(29, 155, 240);
+}
+
+/* Dark mode styles (default, same as current) */
+.dark-mode .filter-phrases-container {
+  background-color: rgb(0, 0, 0);
+}
+
+/* Light mode for filtered modal */
+.filtered-view-container.light-mode {
+  background-color: rgb(255, 255, 255);
+}
+
+.filtered-view-container.light-mode .filtered-modal-header {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+.filtered-view-container.light-mode .filtered-modal-close {
+  color: rgb(15, 20, 25);
+}
+
+.filtered-view-container.light-mode .filtered-modal-close:hover {
+  background-color: rgba(15, 20, 25, 0.1);
+}
+
+.filtered-view-container.light-mode .filtered-modal-title {
+  color: rgb(15, 20, 25);
+}
+
+/* Light mode overrides for structured post fields */
+.filtered-view-container.light-mode .slop-post-name {
+  color: rgb(15, 20, 25);
+}
+.filtered-view-container.light-mode .slop-post-handle {
+  color: rgb(83, 100, 113);
+}
+.filtered-view-container.light-mode .slop-post-text {
+  color: rgb(15, 20, 25);
+}
+.filtered-view-container.light-mode .slop-post-avatar {
+  background: #cfd9de;
+}
+
+/* Dark mode for filtered modal */
+.filtered-view-container.dark-mode {
+  background-color: rgb(0, 0, 0);
+}
+
+.filtered-view-container.dark-mode .filtered-modal-header {
+  border-bottom-color: rgb(47, 51, 54);
+}
+
+/* Theme-specific post wrapper borders */
+.filtered-view-container.light-mode .slop-post-wrapper {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+.filtered-view-container.light-mode .slop-post-reasoning {
+  background: rgba(0, 0, 0, 0.03);
+  color: #536471;
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+.filtered-view-container.light-mode .slop-quote-box {
+  border-color: rgb(239, 243, 244);
+}
+
+.filtered-view-container.light-mode .slop-quote-name {
+  color: rgb(15, 20, 25);
+}
+
+.filtered-view-container.light-mode .slop-quote-handle {
+  color: rgb(83, 100, 113);
+}
+
+.filtered-view-container.light-mode .slop-quote-text {
+  color: rgb(15, 20, 25);
+}
+
+.filtered-view-container.light-mode .slop-restore:hover {
+  color: #0f1419;
+}
+
+/* ======================================
+   Responsive styles for narrow windows
+   ====================================== */
+
+/* Bottom-positioned filter box - the pill itself */
+.filter-phrases-bottom {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  z-index: 10000;
+  background-color: rgb(0, 0, 0);
+  border: 2px solid rgb(var(--postpatrol-brand-rgb));
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Collapse handle - chevron inside the pill */
+.filter-collapse-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgb(47, 51, 54);
+}
+
+.filter-collapse-chevron {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgb(var(--postpatrol-brand-rgb));
+  transition: transform 0.2s;
+}
+
+/* When collapsed, chevron points up */
+.filter-phrases-bottom.collapsed .filter-collapse-chevron {
+  transform: rotate(180deg);
+}
+
+/* Main content container - collapses when minimized */
+.filter-phrases-bottom .filter-phrases-container {
+  padding: 12px 16px 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+  max-height: min(70vh, 560px);
+  opacity: 1;
+  /* Remove the inner border - outer pill already has border */
+  border: none;
+  border-radius: 0;
+}
+
+.filter-phrases-bottom.collapsed .filter-phrases-container {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+}
+
+/* Light mode for bottom filter box */
+.filter-phrases-bottom.light-mode {
+  background-color: rgb(255, 255, 255);
+}
+
+.filter-phrases-bottom.light-mode .filter-collapse-handle {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+/* Dark mode for bottom filter box */
+.filter-phrases-bottom.dark-mode {
+  background-color: rgb(0, 0, 0);
+}
+
+.filter-phrases-bottom.dark-mode .filter-collapse-handle {
+  border-bottom-color: rgb(47, 51, 54);
+}
+
+/* ======================================
+   Mobile filter box (inserted before nav)
+   ====================================== */
+
+.filter-phrases-mobile {
+  display: none;
+  padding: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.filter-phrases-mobile .filter-phrases-container {
+  background-color: rgb(0, 0, 0);
+  border: 2px solid rgb(var(--postpatrol-brand-rgb));
+  border-radius: 16px;
+  padding: 12px 16px;
+}
+
+/* Light mode for mobile filter box */
+.filter-phrases-mobile.light-mode .filter-phrases-container {
+  background-color: rgb(255, 255, 255);
+}
+
+/* Dark mode for mobile filter box */
+.filter-phrases-mobile.dark-mode .filter-phrases-container {
+  background-color: rgb(0, 0, 0);
+}
+
+/* ======================================
+   Responsive breakpoints:
+   - > 1024px: sidebar filter only
+   - 500px - 1024px: bottom fixed filter
+   - < 500px: mobile filter (before nav)
+   ====================================== */
+
+/* Wide window (> 1024px) - show sidebar filter only */
+@media (min-width: 1025px) {
+  .filter-phrases-bottom {
+    display: none !important;
+  }
+
+  .filter-phrases-mobile {
+    display: none !important;
+  }
+}
+
+/* Medium window (500px - 1024px) - show bottom fixed filter */
+@media (min-width: 500px) and (max-width: 1024px) {
+  .filter-phrases-sidebar {
+    display: none !important;
+  }
+
+  .filter-phrases-bottom {
+    display: block !important;
+  }
+
+  .filter-phrases-mobile {
+    display: none !important;
+  }
+}
+
+/* Mobile window (< 500px) - show mobile filter before nav */
+@media (max-width: 499px) {
+  .filter-phrases-sidebar {
+    display: none !important;
+  }
+
+  .filter-phrases-bottom {
+    display: none !important;
+  }
+
+  .filter-phrases-mobile {
+    display: block !important;
+  }
+}
+
+/* Filter phrases actions row */
+.ff-category-limit-warning {
+  font-size: 11px;
+  color: #f4212e;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.filter-phrases-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 12px;
+}
+
+/* Left side of the actions row: Filter packs + View filtered sit side by side
+   with comfortable spacing; Settings stays on the right via the outer row's
+   justify-content: space-between. */
+.filter-phrases-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* Per-platform filtering switch in the filter box title row. */
+.filter-platform-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgb(83, 100, 113);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filter-platform-switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.filter-platform-switch-track {
+  display: inline-flex;
+  align-items: center;
+  width: 32px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgb(113, 118, 123);
+  transition: background 0.18s ease;
+}
+
+.filter-platform-switch-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease;
+}
+
+.filter-platform-switch-input:checked + .filter-platform-switch-track {
+  background: rgb(var(--postpatrol-brand-rgb));
+}
+
+.filter-platform-switch-input:checked + .filter-platform-switch-track .filter-platform-switch-thumb {
+  transform: translateX(14px);
+}
+
+.filter-platform-switch-input:focus-visible + .filter-platform-switch-track {
+  outline: 2px solid rgb(var(--postpatrol-brand-rgb));
+  outline-offset: 2px;
+}
+
+.filter-phrases-container.filtering-disabled {
+  opacity: 0.62;
+}
+
+/* Legacy AI indicator styles retained for the native bridges. */
+/* AI-detection indicator, top-right of the filter box title row: a single
+   sparkle icon. Plain gray sparkle = AI content allowed; brand-orange
+   sparkle = AI content being removed. Click toggles via the phrase
+   mechanism (see toggleAiDetectionViaPhrases); the `.on` class is kept in
+   sync by refreshAiIndicatorUI. `.pending` bridges the backend round trip
+   after a click. */
+.filter-ai-indicator {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  color: rgb(113, 118, 123);
+  user-select: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  /* The padding gives the hover circle breathing room without letting the
+     button grow the title row: negative vertical margin cancels it out, so
+     the row stays exactly as tall as the "PostPatrol" title. */
+  padding: 4px;
+  margin: -4px 0;
+  border-radius: 50%;
+  /* Beyond hover feedback, these let the first-run "REMOVE AI" badge melt
+     gracefully into the plain sparkle when `with-badge` is removed. */
+  transition: background 0.3s ease, color 0.3s ease, padding 0.3s ease,
+    margin 0.3s ease, border-radius 0.3s ease, gap 0.3s ease;
+  outline: none;
+}
+
+.filter-ai-indicator:hover {
+  background: rgba(113, 118, 123, 0.12);
+}
+.filter-ai-indicator.on:hover {
+  background: rgba(var(--postpatrol-brand-rgb), 0.1);
+}
+/* Keyboard focus only — no lingering ring after a mouse click. */
+.filter-ai-indicator:focus-visible {
+  outline: 2px solid rgb(var(--postpatrol-brand-rgb));
+  outline-offset: 1px;
+}
+
+.filter-ai-indicator.pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.filter-ai-indicator-icon {
+  flex-shrink: 0;
+  opacity: 0.65;
+  /* On the base rule (not .with-badge) so the sparkle grows back smoothly
+     when the first-run badge collapses and the class is removed. */
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+}
+
+.filter-ai-indicator.on {
+  /* Brand orange — matches the filter box outline. */
+  color: rgb(var(--postpatrol-brand-rgb));
+}
+/* Light mode darkens the box outline (see .light-mode
+   .filter-phrases-container) — keep the badge identical to it. */
+.light-mode .filter-ai-indicator.on {
+  color: rgb(200, 110, 65);
+}
+.filter-ai-indicator.on .filter-ai-indicator-icon {
+  opacity: 1;
+}
+
+/* First-run "REMOVE AI" badge: until AI detection turns on for the first
+   time, the sparkle wears a brand-orange pill with a label (see the
+   `with-badge` class toggled by refreshAiIndicatorUI). Once detection has
+   been on once, the indicator permanently reverts to the plain sparkle. */
+/* Always rendered (never display:none) so the collapse can animate: without
+   the badge it occupies zero width; with it, max-width opens up. */
+.filter-ai-indicator-label {
+  display: inline-block;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: max-width 0.3s ease, opacity 0.2s ease;
+}
+
+.filter-ai-indicator.with-badge {
+  gap: 4px;
+  padding: 3px 8px;
+  /* Cancel the pill's extra height so the title row stays as tall as the
+     "PostPatrol" title, mirroring the plain icon's padding/margin trick. */
+  margin: -3px 0;
+  border-radius: 8px;
+  background: rgb(var(--postpatrol-brand-rgb));
+  color: #fff;
+}
+
+.filter-ai-indicator.with-badge .filter-ai-indicator-label {
+  /* Comfortably fits "REMOVE AI SLOP?" at 11px; keeps the collapse animation snappy. */
+  max-width: 120px;
+  opacity: 1;
+}
+
+.filter-ai-indicator.with-badge .filter-ai-indicator-icon {
+  opacity: 1;
+  width: 15px;
+  height: 15px;
+}
+
+.filter-ai-indicator.with-badge:hover {
+  background: rgba(var(--postpatrol-brand-rgb), 0.85);
+}
+
+/* Light mode uses the darker brand orange everywhere else (box outline,
+   `.on` sparkle) — keep the badge consistent with it. */
+.light-mode .filter-ai-indicator.with-badge {
+  background: rgb(200, 110, 65);
+  color: #fff;
+}
+.light-mode .filter-ai-indicator.with-badge:hover {
+  background: rgba(200, 110, 65, 0.85);
+}
+
+/* Right side of the actions row: circular Share and Settings icon buttons. */
+.filter-phrases-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Circular share button on the actions row, sitting just to the left of
+   Settings. Sized to match X's own icon-button affordances. */
+.filter-pack-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: rgb(113, 118, 123);
+  line-height: 0;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.filter-pack-share-btn:hover {
+  background: rgba(29, 155, 240, 0.1);
+  color: rgb(29, 155, 240);
+}
+
+.filter-pack-share-btn:active {
+  opacity: 0.7;
+}
+
+.filter-pack-share-btn svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.light-mode .filter-pack-share-btn {
+  color: rgb(83, 100, 113);
+}
+
+.light-mode .filter-pack-share-btn:hover {
+  background: rgba(29, 155, 240, 0.1);
+  color: rgb(29, 155, 240);
+}
+
+.filter-phrases-mobile .filter-pack-share-btn {
+  width: 24px;
+  height: 24px;
+}
+
+.filter-phrases-mobile .filter-pack-share-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Settings button — circular icon button (horizontal ellipsis), matches the
+   share button's footprint so the two read as a pair on the right of the row. */
+.filter-phrases-container .filter-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: 9999px;
+  color: rgb(113, 118, 123);
+  line-height: 0;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.filter-settings-btn:hover {
+  background: rgba(29, 155, 240, 0.1);
+  color: rgb(29, 155, 240);
+}
+
+.filter-settings-btn svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.light-mode .filter-settings-btn {
+  color: rgb(83, 100, 113);
+}
+
+.light-mode .filter-settings-btn:hover {
+  background: rgba(29, 155, 240, 0.1);
+  color: rgb(29, 155, 240);
+}
+
+.filter-phrases-mobile .filter-settings-btn {
+  width: 24px;
+  height: 24px;
+}
+
+.filter-phrases-mobile .filter-settings-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ======================================
+   Settings Modal (iframe-based)
+   ====================================== */
+
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(91, 112, 131, 0.4);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.settings-modal-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-modal-iframe {
+  width: 320px;
+  height: 470px;
+  max-width: 90vw;
+  max-height: 85vh;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.2s ease, height 0.2s ease;
+}
+
+.settings-modal-overlay.visible .settings-modal-iframe {
+  transform: scale(1);
+}
+
+/* In-app popup (div instead of iframe) needs its own background */
+div.settings-modal-iframe {
+  background: #fff;
+  color: #0f1419;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  padding: 0;
+}
+div.settings-modal-iframe.dark-mode {
+  background: rgb(0, 0, 0);
+  color: rgb(231, 233, 234);
+}
+div.settings-modal-iframe.dim-mode {
+  background: rgb(21, 32, 43);
+  color: rgb(247, 249, 249);
+}
+
+/* ======================================
+   iOS Safari BottomBar Tab & Full Page Overlay
+   All styles scoped under body.ff-ios
+   ====================================== */
+
+/* On iOS, suppress the desktop sidebar, bottom, and mobile filter boxes */
+body.ff-ios .filter-phrases-sidebar,
+body.ff-ios .filter-phrases-bottom,
+body.ff-ios .filter-phrases-mobile {
+  display: none !important;
+}
+
+/* PostPatrol full-screen overlay — true full-screen modal triggered by FAB */
+/* Lock body scroll while iOS overlay is open */
+body.ff-scroll-locked {
+  position: fixed;
+  top: var(--ff-scroll-y, 0px);
+  width: 100%;
+  overscroll-behavior-y: contain;
+}
+
+@keyframes ff-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes ff-slide-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes ff-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.ff-ios .ff-ios-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgb(0, 0, 0);
+  padding-bottom: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  animation: ff-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body.ff-ios .ff-ios-page.closing {
+  animation: ff-slide-down 0.28s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+/* Page header */
+body.ff-ios .ff-ios-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 53px;
+  padding: 0 8px;
+  border-bottom: 1px solid rgb(47, 51, 54);
+  background-color: rgb(0, 0, 0);
+  flex-shrink: 0;
+}
+
+/* Close (X) button in header */
+body.ff-ios .ff-ios-close-btn {
+  background: none;
+  border: none;
+  color: rgb(231, 233, 234);
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.ff-ios .ff-ios-close-btn:hover {
+  background-color: rgba(239, 243, 244, 0.1);
+}
+
+body.ff-ios .ff-ios-page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgb(231, 233, 234);
+}
+
+body.ff-ios .ff-ios-settings-btn {
+  background: none;
+  border: none;
+  color: rgb(113, 118, 123);
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.ff-ios .ff-ios-settings-btn:hover {
+  background-color: rgba(239, 243, 244, 0.1);
+  color: rgb(231, 233, 234);
+}
+
+/* Subtitle */
+body.ff-ios .ff-ios-subtitle {
+  padding: 16px 16px 10px;
+  font-size: 25px;
+  /*font-style: italic;*/
+  font-weight: 500;
+  /*text-transform: uppercase;*/
+  color: rgb(113, 118, 123);
+}
+
+body.ff-ios .ff-ios-page.entering .ff-ios-subtitle {
+  animation: ff-row-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.08s;
+}
+
+/* Category list */
+body.ff-ios .ff-ios-categories-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+body.ff-ios .ff-ios-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 3px solid rgb(47, 51, 54);
+}
+
+body.ff-ios .ff-ios-page.entering .ff-ios-category-row {
+  animation: ff-row-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--row-index, 0) * 0.05s + 0.15s);
+}
+
+body.ff-ios .ff-ios-category-text {
+  font-size: 35px;
+  /*font-weight: 100;*/
+  color: rgb(231, 233, 234);
+  flex: 1;
+  width: 100%;
+  word-wrap: break-word;
+  margin-right: 12px;
+  hyphens: auto;
+}
+
+body.ff-ios .ff-ios-category-remove {
+  background: none;
+  border: none;
+  color: rgb(113, 118, 123);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+body.ff-ios .ff-ios-category-remove:hover {
+  color: rgb(244, 33, 46);
+  background-color: rgba(244, 33, 46, 0.1);
+}
+
+body.ff-ios .ff-ios-categories-empty {
+  padding: 24px 0;
+  text-align: center;
+  color: rgb(113, 118, 123);
+  font-size: 15px;
+}
+
+/* Bottom bar — always pinned at bottom of overlay, right above Twitter BottomBar */
+body.ff-ios .ff-ios-bottom-bar {
+  flex-shrink: 0;
+  border-top: 1px solid rgb(47, 51, 54);
+  background-color: rgb(0, 0, 0);
+}
+
+/* View filtered button */
+body.ff-ios .ff-ios-view-filtered-btn {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 12px 16px;
+  padding: 12px;
+  background-color: rgba(29, 155, 240, 0.1);
+  border: 1px solid rgba(29, 155, 240, 0.3);
+  border-radius: 9999px;
+  color: rgb(29, 155, 240);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+body.ff-ios .ff-ios-view-filtered-btn:hover {
+  background-color: rgba(29, 155, 240, 0.15);
+}
+
+/* Input bar */
+body.ff-ios .ff-ios-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+}
+
+body.ff-ios .ff-ios-phrase-input {
+  flex: 1;
+  padding: 10px 14px;
+  background-color: rgb(32, 35, 39);
+  border: 1px solid rgb(47, 51, 54);
+  border-radius: 9999px;
+  color: rgb(231, 233, 234);
+  font-size: 15px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+body.ff-ios .ff-ios-phrase-input::placeholder {
+  color: rgb(113, 118, 123);
+}
+
+body.ff-ios .ff-ios-phrase-input:focus {
+  border-color: rgb(29, 155, 240);
+}
+
+body.ff-ios .ff-ios-send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgb(29, 155, 240);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+body.ff-ios .ff-ios-send-btn svg {
+  pointer-events: none;
+}
+
+body.ff-ios .ff-ios-send-btn:hover {
+  background-color: rgb(26, 140, 216);
+}
+
+/* ======================================
+   iOS Filtered Posts Modal
+   ====================================== */
+
+.ff-ios-filtered-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(91, 112, 131, 0.4);
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.ff-ios-filtered-modal-backdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ff-ios-filtered-modal {
+  width: 100%;
+  max-height: 85vh;
+  max-height: 85svh;
+  background-color: rgb(0, 0, 0);
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ff-ios-filtered-modal-backdrop.visible .ff-ios-filtered-modal {
+  transform: translateY(0);
+}
+
+.ff-ios-filtered-modal-backdrop.closing {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ff-ios-filtered-modal-backdrop.closing .ff-ios-filtered-modal {
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ff-ios-filtered-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgb(47, 51, 54);
+  flex-shrink: 0;
+}
+
+.ff-ios-filtered-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgb(231, 233, 234);
+}
+
+.ff-ios-filtered-modal-close {
+  background: none;
+  border: none;
+  color: rgb(113, 118, 123);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.ff-ios-filtered-modal-close:hover {
+  color: rgb(231, 233, 234);
+  background-color: rgba(239, 243, 244, 0.1);
+}
+
+.ff-ios-filtered-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
+/* ======================================
+   iOS Page — Light mode overrides
+   ====================================== */
+
+body.ff-ios .ff-ios-page.light-mode {
+  background-color: rgb(255, 255, 255);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-page-header {
+  border-bottom-color: rgb(239, 243, 244);
+  background-color: rgb(255, 255, 255);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-page-title {
+  color: rgb(15, 20, 25);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-close-btn {
+  color: rgb(15, 20, 25);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-settings-btn {
+  color: rgb(83, 100, 113);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-subtitle {
+  color: rgb(83, 100, 113);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-category-row {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-category-text {
+  color: rgb(15, 20, 25);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-category-remove {
+  color: rgb(83, 100, 113);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-categories-empty {
+  color: rgb(83, 100, 113);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-bottom-bar {
+  border-top-color: rgb(239, 243, 244);
+  background-color: rgb(255, 255, 255);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-phrase-input {
+  background-color: rgb(239, 243, 244);
+  border-color: rgb(207, 217, 222);
+  color: rgb(15, 20, 25);
+}
+
+body.ff-ios .ff-ios-page.light-mode .ff-ios-phrase-input::placeholder {
+  color: rgb(83, 100, 113);
+}
+
+/* Light mode for iOS filtered modal */
+.ff-ios-filtered-modal-backdrop.light-mode .ff-ios-filtered-modal {
+  background-color: rgb(255, 255, 255);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .ff-ios-filtered-modal-header {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .ff-ios-filtered-modal-title {
+  color: rgb(15, 20, 25);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .ff-ios-filtered-modal-close {
+  color: rgb(83, 100, 113);
+}
+
+/* iOS light mode overrides for structured post fields */
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-name {
+  color: rgb(15, 20, 25);
+}
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-handle {
+  color: rgb(83, 100, 113);
+}
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-text {
+  color: rgb(15, 20, 25);
+}
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-avatar {
+  background: #cfd9de;
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-wrapper {
+  border-bottom-color: rgb(239, 243, 244);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-post-reasoning {
+  background: rgba(0, 0, 0, 0.03);
+  color: #536471;
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-quote-box {
+  border-color: rgb(239, 243, 244);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-quote-name {
+  color: rgb(15, 20, 25);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-quote-handle {
+  color: rgb(83, 100, 113);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-quote-text {
+  color: rgb(15, 20, 25);
+}
+
+.ff-ios-filtered-modal-backdrop.light-mode .slop-restore:hover {
+  color: #0f1419;
+}
+
+/* iOS dark mode - default colors already match, no overrides needed */
+
+.ff-ios-filtered-modal-backdrop.dark-mode .slop-post-wrapper {
+  border-bottom-color: rgb(47, 51, 54);
+}
+
+/* ======================================
+   iOS Page — Dark mode (default/explicit)
+   ====================================== */
+
+body.ff-ios .ff-ios-page.dark-mode {
+  background-color: rgb(0, 0, 0);
+}
+
+body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
+  border-bottom-color: rgb(47, 51, 54);
+  background-color: rgb(0, 0, 0);
+}
+
+.ff-ios-filtered-modal-backdrop.dark-mode .ff-ios-filtered-modal {
+  background-color: rgb(0, 0, 0);
+}
+
+.ff-ios-filtered-modal-backdrop.dark-mode .ff-ios-filtered-modal-header {
+  border-bottom-color: rgb(47, 51, 54);
+}
+
+/* ==================== Filter Pack Badges ==================== */
+
+/* Share the header row with the existing "PostPatrol" box name. Houses
+   the "View filtered" button on the right. */
+.filter-phrases-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.filter-phrases-title-row .filter-phrases-box-name {
+  padding-bottom: 0;
+}
+
+.filter-phrases-mobile .filter-phrases-title-row {
+  padding-bottom: 6px;
+}
+
+/* "What's new" update banner shown inside the filter box once per version. */
+.postpatrol-update-banner {
+  position: relative;
+  margin-bottom: 10px;
+  padding: 10px 32px 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 196, 87, 0.10);
+  border: 1px solid rgba(255, 196, 87, 0.35);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.postpatrol-update-banner-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.postpatrol-update-banner-bullets {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.postpatrol-update-banner-bullets li {
+  margin: 2px 0;
+}
+
+.postpatrol-update-banner-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.postpatrol-update-banner-close:hover {
+  opacity: 1;
+}
+
+.light-mode .postpatrol-update-banner {
+  background: rgba(190, 130, 40, 0.10);
+  border-color: rgba(190, 130, 40, 0.35);
+  color: rgb(80, 50, 0);
+}
+
+.dim-mode .postpatrol-update-banner,
+.dark-mode .postpatrol-update-banner {
+  color: rgb(231, 233, 234);
+}
+
+/* "Import filter pack" CTA injected into tweets that carry a PostPatrol share
+   code. Styled to match Twitter's primary "Post" button — solid blue pill,
+   white text, bold, sized to content, on its own line. */
+.postpatrol-import-btn {
+  display: block;
+  width: fit-content;
+  margin: 8px 0;
+  padding: 8px 16px;
+  background: rgb(29, 155, 240);
+  border: none;
+  border-radius: 9999px;
+  color: rgb(255, 255, 255);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.postpatrol-import-btn:hover {
+  background: rgb(26, 140, 216);
+}
+
+.postpatrol-import-btn:active {
+  transform: translateY(1px);
+}
+
+.postpatrol-import-btn-meta {
+  margin-left: 8px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Brief flash on the PostPatrol box right after a flying screenshot lands during
+   the import-pack animation. Outline (not box-shadow) so it doesn't fight with
+   the box's own resting shadow. */
+.filter-phrases-container.postpatrol-import-landing {
+  animation: postpatrol-import-landing-pulse 700ms ease-out;
+}
+
+@keyframes postpatrol-import-landing-pulse {
+  0%   { outline: 0 solid rgba(29, 155, 240, 0); outline-offset: 0; }
+  20%  { outline: 4px solid rgba(29, 155, 240, 0.55); outline-offset: 2px; }
+  100% { outline: 0 solid rgba(29, 155, 240, 0); outline-offset: 0; }
+}
+
+/* ======================================
+   Screenshot capture overrides (ff-capture)
+   Applied only during html-to-image capture. SVG foreignObject rendering
+   doesn't honour line-height:1 the same way as normal layout — text in
+   flex buttons ends up baseline-anchored instead of centred. Setting
+   line-height:normal here lets flex align-items:center do its job without
+   changing the live button height.
+   ====================================== */
+.ff-capture button {
+  line-height: normal;
+}
+
+/* Hide local-only chrome (share + settings + sign-out icon buttons) during
+   screenshot capture so the shared image only shows filter content, not
+   per-user controls. */
+.ff-capture .filter-pack-share-btn,
+.ff-capture .filter-settings-btn,
+.ff-capture .filter-signout-btn {
+  display: none;
+}
+
+/* ======================================
+   linkedin adaptation: sidebar z-index + filtered-posts card style
+   ====================================== */
+
+/* linkedin adaptation: LinkedIn's promoted cards and "People also viewed" rails
+   can have very high z-index values. Raise the filter sidebar as high as
+   possible so it always floats above them. The Twitter in-wrapper constraint
+   (stay below z=2 search bar) does not apply to LinkedIn. */
+.filter-phrases-sidebar--linkedin {
+  /* linkedin adaptation: 499 beats native LinkedIn ads/modals but stays below
+     the filtered-modal-backdrop (z-index: 10000) so the sidebar appears behind
+     the "View filtered" popup rather than floating on top of it. */
+  z-index: 499;
+}
+
+/* linkedin adaptation: hide the Twitter-specific "Share filters" button. */
+.filter-phrases-sidebar--linkedin .filter-pack-share-btn {
+  display: none;
+}
+
+/* linkedin adaptation: the ::before fill is a Twitter-specific hack that masks
+   "Subscribe to Premium" content scrolling under the fixed box. LinkedIn has
+   no such element and the fill bleeds into the nav bar — disable it entirely. */
+.filter-phrases-sidebar--linkedin::before {
+  display: none;
+}
+
+/* ---- LinkedIn-style filtered posts panel ---- */
+
+/* linkedin adaptation: column layout — header row (avatar+meta) above full-width body. */
+.slop-post--linkedin {
+  flex-direction: column;
+  padding: 0;
+  gap: 0;
+}
+.slop-post-linkedin-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px 6px;
+}
+
+/* linkedin adaptation: pin the category tag to the top-right of the card.
+   The meta column varies in height (1–2 line headlines), so the default
+   `align-items: center` floats the tag to the vertical middle. Anchor it to the
+   top instead so it sits consistently beside the author's name row. */
+.filtered-view-container--linkedin .slop-post-top {
+  align-items: flex-start;
+}
+.filtered-view-container--linkedin .slop-category-tag {
+  margin-top: 2px;
+}
+
+/* Name row: [name] [badge] • [degree] — all inline, centered. */
+.slop-post-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.slop-li-badge-icon {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.slop-post-degree-sep,
+.slop-post-degree {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* Headline: truncate with ellipsis to keep the header compact. */
+.slop-post-linkedin-headline {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal !important;
+}
+
+/* Timestamp row: [time] • [globe] */
+.slop-post-time-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  margin-top: 2px;
+}
+.slop-li-globe-icon {
+  color: rgba(0, 0, 0, 0.55);
+  flex-shrink: 0;
+}
+
+/* linkedin adaptation: feed background matches LinkedIn's off-white (#f3f2ef). */
+.filtered-view-container--linkedin .slop-posts-container {
+  background: #f3f2ef;
+  padding: 8px;
+  gap: 0;
+}
+
+/* linkedin adaptation: each post is a white card with rounded corners and a
+   subtle shadow — identical to LinkedIn's feed card appearance. */
+.filtered-view-container--linkedin .slop-post-wrapper {
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.filtered-view-container--linkedin .slop-post-link {
+  color: inherit;
+}
+.filtered-view-container--linkedin .slop-post-link:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* linkedin adaptation: 48px avatar, no circular crop (LinkedIn uses square with
+   rounded corners for company logos; circular for people). Keep circle. */
+.filtered-view-container--linkedin .slop-post-avatar {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+.filtered-view-container--linkedin .slop-avatar-initial {
+  font-size: 20px;
+}
+
+/* linkedin adaptation: post row padding matches LinkedIn's card inner spacing. */
+.filtered-view-container--linkedin .slop-post {
+  padding: 12px 16px 0;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* linkedin adaptation: author name + timestamp stacked vertically.
+   LinkedIn shows name, then headline, then "Xd •" timestamp — no @handle. */
+.filtered-view-container--linkedin .slop-post-meta {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.filtered-view-container--linkedin .slop-post-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+  line-height: 1.4;
+}
+/* The "handle" slot holds headline + timestamp on LinkedIn. */
+.filtered-view-container--linkedin .slop-post-handle {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* linkedin adaptation: post body text — LinkedIn uses 14px, black, with
+   natural paragraph spacing. */
+.filtered-view-container--linkedin .slop-post-text {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.9);
+  line-height: 1.5;
+  margin-bottom: 0;
+  padding: 8px 16px 0;
+}
+.filtered-view-container--linkedin .slop-post-body {
+  padding-bottom: 0;
+}
+
+/* linkedin adaptation: truncation — collapse to ~5 lines and fade the bottom. */
+.filtered-view-container--linkedin .slop-post-text--collapsible {
+  max-height: 7.5em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+
+/* linkedin adaptation: "...more" expand button styled like LinkedIn's inline link. */
+.slop-post-expand-btn {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 16px 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+}
+.slop-post-expand-btn:hover {
+  color: rgba(0, 0, 0, 0.9);
+  text-decoration: underline;
+}
+
+/* linkedin adaptation: LinkedIn blue links. */
+.filtered-view-container--linkedin .slop-post-text a,
+.filtered-view-container--linkedin .slop-quote-text a {
+  color: #0a66c2;
+}
+
+/* linkedin adaptation: reasoning box inside the card, full-width. */
+.filtered-view-container--linkedin .slop-post-reasoning {
+  margin: 8px 16px 0;
+  border-left-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* linkedin adaptation: actions row padding. */
+.filtered-view-container--linkedin .slop-post-actions {
+  padding: 6px 16px 12px;
+}
+.filtered-view-container--linkedin .slop-restore {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 14px;
+}
+.filtered-view-container--linkedin .slop-restore:hover {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+/* ---- Dark-mode overrides for the LinkedIn panel ---- */
+.filtered-view-container--linkedin.dark-mode .slop-posts-container {
+  background: #1b1f23;
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-wrapper {
+  background: #1d2226;
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-name {
+  color: rgba(255, 255, 255, 0.9);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-handle {
+  color: rgba(255, 255, 255, 0.6);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-reasoning {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  border-left-color: rgba(255, 255, 255, 0.12);
+}
+.filtered-view-container--linkedin.dark-mode .slop-restore {
+  color: rgba(255, 255, 255, 0.55);
+}
+.filtered-view-container--linkedin.dark-mode .slop-restore:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-text a,
+.filtered-view-container--linkedin.dark-mode .slop-quote-text a {
+  color: #70b5f9;
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-expand-btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-expand-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-degree-sep,
+.filtered-view-container--linkedin.dark-mode .slop-post-degree {
+  color: rgba(255, 255, 255, 0.55);
+}
+.filtered-view-container--linkedin.dark-mode .slop-post-time-row {
+  color: rgba(255, 255, 255, 0.55);
+}
+.filtered-view-container--linkedin.dark-mode .slop-li-globe-icon {
+  color: rgba(255, 255, 255, 0.55);
+}
