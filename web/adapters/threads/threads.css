@@ -1,0 +1,95 @@
+/* Threads uses generated class names; keep all overrides scoped to PostPatrol. */
+
+body.postpatrol-disabled .filter-phrases-banner--threads,
+body.postpatrol-disabled .ff-why-annoying-btn--threads {
+  display: none !important;
+}
+
+.filter-phrases-banner.filter-phrases-banner--threads {
+  display: none;
+  /* Threads sometimes exposes a very wide empty right-column wrapper. Keep
+     PostPatrol card-sized within it instead of stretching across the gutter. */
+  width: min(336px, calc(100vw - 32px));
+  max-width: 100%;
+  margin: 0 0 12px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  position: sticky;
+  top: 72px;
+  z-index: 3;
+}
+
+.postpatrol-threads-right-rail {
+  position: fixed;
+  z-index: 20;
+}
+
+.postpatrol-threads-right-rail .filter-phrases-banner--threads {
+  position: static;
+  width: 100%;
+  margin: 0;
+}
+
+.filter-phrases-banner--threads .filter-phrases-container {
+  padding: 14px 16px;
+  border: var(--green-border-width) solid rgb(var(--postpatrol-brand-rgb)) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.filter-phrases-banner--threads.dark-mode .filter-phrases-container {
+  background: #101010 !important;
+  color: #f5f5f5;
+}
+
+.filter-phrases-banner--threads .filter-phrases-box-name {
+  color: inherit;
+  text-transform: none;
+}
+
+.filter-phrases-banner--threads .filter-phrases-header {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.filter-phrases-banner--threads .filter-phrases-and-input {
+  flex-basis: 100%;
+  min-width: 140px;
+  flex: 1;
+}
+
+.filter-phrases-banner--threads .filter-phrases-input {
+  width: 100%;
+}
+
+.ff-why-annoying-btn.ff-why-annoying-btn--threads {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  flex: 0 0 36px;
+  border-radius: 999px;
+}
+
+.ff-why-annoying-btn--threads:hover {
+  background: rgba(var(--postpatrol-brand-rgb), 0.12);
+}
+
+body.site-threads .filter-phrases-mobile {
+  display: none !important;
+}
+
+body.site-threads .filter-phrases-bottom {
+  display: block !important;
+}
+
+@media (min-width: 1280px) {
+  body.site-threads .filter-phrases-bottom.filter-phrases-right-gutter {
+    top: 72px !important;
+    bottom: auto !important;
+    border-bottom: 2px solid rgb(var(--postpatrol-brand-rgb));
+    border-radius: 16px;
+  }
+}
