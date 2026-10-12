@@ -1,0 +1,18 @@
+{
+  "background": {
+    "scripts": [
+      "browser-polyfill.js",
+      "dist/background.js"
+    ]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "postpatrol-store@postpatrol",
+      "data_collection_permissions": {
+        "required": [
+          "websiteContent"
+        ]
+      }
+    }
+  }
+}
