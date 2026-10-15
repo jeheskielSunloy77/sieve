@@ -124,8 +124,8 @@ const placeholderHTML = `<span class="filter-input-wrapper"><input type="text" c
 
 const platformFilterSwitchHTML = `
   <label class="filter-platform-switch">
-    <span class="filter-platform-switch-label">PostPatrol</span>
-    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable PostPatrol filtering on this site" checked>
+    <span class="filter-platform-switch-label">Post Patrol</span>
+    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Post Patrol filtering on this site" checked>
     <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
   </label>
 `;
@@ -226,7 +226,7 @@ function buildFilterContainerHTML(): string {
     <div class="filter-phrases-container">
       <div class="postpatrol-update-banner-slot"></div>
       <div class="filter-phrases-title-row">
-        <span class="filter-phrases-box-name">PostPatrol</span>
+        <span class="filter-phrases-box-name">Post Patrol</span>
         ${platformFilterSwitchHTML}
       </div>
       <div class="filter-phrases-header">
@@ -1022,7 +1022,7 @@ async function attachImageToMobileComposer(file: File): Promise<void> {
 // on any ClipboardEvent whose clipboardData carries a File, which is the same
 // code path as a real Cmd-V of an image — so we just drive that path directly
 // instead of fighting with React-controlled <input type="file"> semantics.
-const SHARE_TWEET_TEXT = 'I use PostPatrol to remove this from my feed.';
+const SHARE_TWEET_TEXT = 'I use Post Patrol to remove this from my feed.';
 
 async function openComposerWithImage(file: File, shareCode: string): Promise<void> {
   // Click the sidebar Post link the same way a user would — this triggers X's

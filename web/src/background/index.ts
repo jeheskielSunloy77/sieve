@@ -333,7 +333,7 @@ async function handleMessage(
         authUrl.searchParams.set('callback_url', redirectUrl);
         authUrl.searchParams.set('code_challenge', codeChallenge);
         authUrl.searchParams.set('code_challenge_method', 'S256');
-        authUrl.searchParams.set('title', 'PostPatrol');
+        authUrl.searchParams.set('title', 'Post Patrol');
 
         const responseUrl = await chrome.identity.launchWebAuthFlow({
           url: authUrl.toString(),

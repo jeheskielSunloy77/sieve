@@ -1,7 +1,7 @@
 {
   "name": "postpatrol",
   "version": "2.0.0",
-  "description": "PostPatrol - Filter unwanted posts from social media feeds using AI",
+  "description": "Post Patrol - Filter unwanted posts from social media feeds using AI",
   "private": true,
   "type": "module",
   "scripts": {

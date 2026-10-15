@@ -21,7 +21,7 @@ export const RELEASE_NOTES: ReleaseNote[] = [
   {
     version: '1.1.1',
     platform: 'desktop',
-    title: "What's new in PostPatrol",
+    title: "What's new in Post Patrol",
     bullets: [
       'Share filters.',
       'Experimental AI Text Detection',
@@ -30,7 +30,7 @@ export const RELEASE_NOTES: ReleaseNote[] = [
   {
     version: '1.1.4',
     platform: 'desktop',
-    title: "What's new in PostPatrol",
+    title: "What's new in Post Patrol",
     bullets: [
       '(Experimental) AI Text and Image Detection',
       'Improved local model: Gemma 4 E4B',
@@ -39,7 +39,7 @@ export const RELEASE_NOTES: ReleaseNote[] = [
   {
     version: '2.0.0',
     platform: 'desktop',
-    title: "What's new in PostPatrol 2.0",
+    title: "What's new in Post Patrol 2.0",
     bullets: [
       'You can now remove AI-generated posts!',
       'On-device mode: nothing leaves your computer. Activate in Settings.',

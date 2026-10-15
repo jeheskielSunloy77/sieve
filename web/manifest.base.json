@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "PostPatrol - Filter X, Threads, and LinkedIn",
+  "name": "Post Patrol - Filter X, Threads, and LinkedIn",
   "version": "2.0.9",
   "description": "Remove what you don’t want to see on X, Threads, and LinkedIn. Filter by concept, person, emotion — anything.",
   "content_security_policy": {

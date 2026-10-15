@@ -228,7 +228,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     logo.setAttribute('aria-hidden', 'true');
     const label = document.createElement('span');
     label.className = 'postpatrol-yt-placeholder-label';
-    label.textContent = 'Filtered by PostPatrol';
+    label.textContent = 'Filtered by Post Patrol';
     thumb.appendChild(logo);
     thumb.appendChild(label);
 
@@ -289,14 +289,14 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     entry = document.createElement('button');
     entry.className = 'postpatrol-mini-guide-entry';
     (entry as HTMLButtonElement).type = 'button';
-    entry.setAttribute('aria-label', 'Open PostPatrol filters');
-    entry.innerHTML = `
+    entry.setAttribute('aria-label', 'Open Post Patrol filters');
+    entry.replaceChildren(DOMPurify.sanitize(`
       <span class="postpatrol-mini-guide-entry__icon-wrap">
         <img class="postpatrol-mini-guide-entry__icon" src="${logoUrl}" alt="" aria-hidden="true">
         <span class="postpatrol-mini-guide-entry__count" aria-hidden="true">0</span>
       </span>
-      <span class="postpatrol-mini-guide-entry__label">PostPatrol</span>
-    `;
+      <span class="postpatrol-mini-guide-entry__label">Post Patrol</span>
+    `, { RETURN_DOM_FRAGMENT: true }));
     entry.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
