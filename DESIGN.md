@@ -120,7 +120,7 @@ Clean, high-legibility system sans stack (`-apple-system, BlinkMacSystemFont, "S
 - Code / Debug: `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`.
 
 ## Layout
-- Extension Popup: Fixed 320px width standalone; fluid width in modal iframe mode with dynamic height reporting via ResizeObserver.
+- Extension Popup: 400px width standalone; 400px modal iframe container with dynamic height reporting via ResizeObserver.
 - Spacing Rhythm: 4px base grid (4px, 6px, 8px, 10px, 14px, 16px). Tight group spacing with clear structural margins.
 - In-Feed Filter Box: Sticky/fixed sidebar container with hairline border and frosted glass backdrop blur (`backdrop-filter: blur(16px)`).
 

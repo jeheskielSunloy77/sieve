@@ -123,8 +123,7 @@ const placeholderItemsHTML = [...PLACEHOLDER_PHRASES, PLACEHOLDER_PHRASES[0]]
 const placeholderHTML = `<span class="filter-input-wrapper"><input type="text" class="filter-phrases-input"><span class="filter-placeholder-cycle" aria-hidden="true"><span class="filter-placeholder-track">${placeholderItemsHTML}</span></span></span>`;
 
 const platformFilterSwitchHTML = `
-  <label class="filter-platform-switch">
-    <span class="filter-platform-switch-label">Post Patrol</span>
+  <label class="filter-platform-switch" title="Enable Post Patrol filtering on this site">
     <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Post Patrol filtering on this site" checked>
     <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
   </label>

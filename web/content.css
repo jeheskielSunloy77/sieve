@@ -1942,11 +1942,8 @@ article {
 .filter-platform-switch {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: rgb(83, 100, 113);
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
+  user-select: none;
 }
 
 .filter-platform-switch-input {
@@ -2253,8 +2250,8 @@ article {
 }
 
 .settings-modal-iframe {
-  width: 320px;
-  height: 470px;
+  width: 400px;
+  height: 520px;
   max-width: 90vw;
   max-height: 85vh;
   border: none;
@@ -2801,7 +2798,7 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
    the "View filtered" button on the right. */
 .filter-phrases-title-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding-bottom: 10px;
