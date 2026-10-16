@@ -70,10 +70,12 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
 };
 
 const PROVIDER_LOGOS: Record<string, string> = {
-  openrouter: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z"/></svg>',
-  openai: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>',
-  anthropic: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>',
-  gemini: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>'
+  local: '<svg class="provider-logo provider-logo-local" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
+  iosLocal: '<svg class="provider-logo provider-logo-local" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
+  openrouter: '<svg class="provider-logo provider-logo-openrouter" viewBox="0 0 24 24" width="14" height="14" fill="#6366F1" aria-hidden="true"><path d="M18.654 3.87a5.087 5.087 0 1 1 0 10.174L23.7 19.09c.64.641.187 1.737-.72 1.737H8.48a8.479 8.479 0 0 1 0-16.958h10.175zM8.479 7.26a5.087 5.087 0 1 0 0 10.176 5.087 5.087 0 0 0 0-10.175z"/></svg>',
+  openai: '<svg class="provider-logo provider-logo-openai" viewBox="0 0 24 24" width="14" height="14" fill="#10A37F" aria-hidden="true"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>',
+  anthropic: '<svg class="provider-logo provider-logo-anthropic" viewBox="0 0 24 24" width="14" height="14" fill="#D97757" aria-hidden="true"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"/></svg>',
+  gemini: '<svg class="provider-logo provider-logo-gemini" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="url(#ppGeminiGrad)" d="M20.616 10.835a14.147 14.147 0 0 1-4.45-3.001 14.111 14.111 0 0 1-3.678-6.452.503.503 0 0 0-.975 0 14.134 14.134 0 0 1-3.679 6.452 14.155 14.155 0 0 1-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 0 0 0 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 0 1 4.45 3.001 14.112 14.112 0 0 1 3.679 6.453.502.502 0 0 0 .975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 0 1 3.001-4.45 14.113 14.113 0 0 1 6.453-3.678.503.503 0 0 0 0-.975 13.245 13.245 0 0 1-2.003-.678z"/></svg>'
 };
 
 // Track local model statuses (per-model)
@@ -229,8 +231,7 @@ export async function init() {
   // runs the exact same selectModel flow as a user tap; a no-op if already
   // selected (checked radios don't re-fire change).
   if (window.location.hash === '#local') {
-    const localRadio = document.getElementById('modelRadioLocal') as HTMLInputElement | null;
-    if (localRadio && !localRadio.checked) localRadio.click();
+    void selectModel(LOCAL_RADIO_MODEL_KEY);
   }
 
   console.log('[Popup] init() completed successfully');
@@ -866,49 +867,7 @@ function localRadioModelDownloaded(): boolean {
 // classification cache, and shows the download section when a not-yet-
 // downloaded local model is picked — no radio-specific follow-up needed.
 function setupModelRadios() {
-  document.getElementById('modelRadioLocal')?.addEventListener('change', asyncHandler(async () => {
-    // Only switch outright when the model is already on disk (or in the iOS
-    // app, where the native sheet owns the download flow). Otherwise park
-    // the choice: download panel appears below.
-    if (isInAppMode || localRadioModelDownloaded()) {
-      await selectModel(LOCAL_RADIO_MODEL_KEY);
-      return;
-    }
-    pendingLocalSelection = LOCAL_RADIO_MODEL_KEY;
-    await setStorage({ pendingLocalModelSelection: LOCAL_RADIO_MODEL_KEY });
-    updateModelRadioUI();
-    updateLocalModelSectionVisibility();
-    updateLocalModelSectionUI();
-  }));
-
-  document.getElementById('modelRadioApi')?.addEventListener('change', asyncHandler(async () => {
-    // If not already an API model, try to pick the first authenticated API model
-    const isApi = dropdownState.selectedModel &&
-      !dropdownState.selectedModel.startsWith('local:') &&
-      !dropdownState.selectedModel.startsWith('iosLocal:');
-    if (!isApi) {
-      let chosen = '';
-      for (const [api, auth] of Object.entries(dropdownState.authenticatedApis)) {
-        if (!auth || api === 'local' || api === 'iosLocal') continue;
-        const { predefined, custom } = getModelsForProvider(api);
-        const first = predefined[0] || custom[0];
-        if (first) {
-          chosen = `${api}:${first.name}`;
-          break;
-        }
-      }
-      if (chosen) {
-        await selectModel(chosen);
-      } else {
-        // Expand advanced settings so the user can configure a provider
-        const adv = document.getElementById('advancedSettings');
-        if (adv && !adv.classList.contains('expanded')) {
-          adv.classList.add('expanded');
-        }
-        updateModelRadioUI();
-      }
-    }
-  }));
+  // Model selection has moved to the top-level searchable dropdown.
 }
 
 // ==================== Custom Model Dropdown ====================
@@ -1002,39 +961,147 @@ async function refreshDynamicModels(data: Partial<StorageSchema>) {
 }
 
 function setupModelDropdown() {
-  const dropdown = document.getElementById('modelDropdown')!;
-  const selected = document.getElementById('modelDropdownSelected')!;
+  const dropdown = document.getElementById('modelDropdown');
+  const combobox = document.getElementById('modelDropdownCombobox');
+  const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  const menu = document.getElementById('modelDropdownMenu');
+  if (!dropdown || !input || !combobox) return;
 
-  // Toggle dropdown on click
-  selected.addEventListener('click', (e) => {
+  // Clicking combobox focuses input and opens dropdown
+  combobox.addEventListener('click', (e) => {
+    // If clicking arrow specifically, toggle dropdown
+    if ((e.target as HTMLElement)?.closest('.model-dropdown-arrow')) {
+      e.stopPropagation();
+      toggleDropdown();
+      return;
+    }
+    if (!dropdownState.isOpen) {
+      openDropdown();
+    }
+    input.focus();
+  });
+
+  input.addEventListener('focus', () => {
+    openDropdown();
+    requestAnimationFrame(() => {
+      input.select();
+    });
+  });
+
+  // Typing in the input filters models live
+  input.addEventListener('input', () => {
+    if (!dropdownState.isOpen) {
+      openDropdown();
+    }
+    filterModels(input.value);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closeDropdown(true);
+      input.blur();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      // Select the first visible item that is not disabled
+      const list = document.getElementById('modelDropdownList');
+      const firstItem = list?.querySelector<HTMLElement>(
+        '.model-dropdown-item:not([style*="display: none"]):not(.disabled)'
+      );
+      if (firstItem) {
+        firstItem.click();
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (!dropdownState.isOpen) {
+        e.preventDefault();
+        openDropdown();
+      }
+    }
+  });
+
+  // Prevent clicks inside menu from bubbling up to document click listener
+  menu?.addEventListener('click', (e) => {
     e.stopPropagation();
-    toggleDropdown();
   });
 
   // Close dropdown when clicking outside
   document.addEventListener('click', (e) => {
     if (!dropdown.contains(e.target as Node)) {
-      closeDropdown();
+      closeDropdown(true);
     }
   });
 }
 
 function toggleDropdown() {
   if (dropdownState.isOpen) {
-    closeDropdown();
+    closeDropdown(true);
   } else {
     openDropdown();
+    const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+    input?.focus();
   }
 }
 
 function openDropdown() {
+  if (dropdownState.isOpen) return;
   dropdownState.isOpen = true;
-  document.getElementById('modelDropdown')!.classList.add('open');
+  const dropdown = document.getElementById('modelDropdown');
+  const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  dropdown?.classList.add('open');
+  input?.setAttribute('aria-expanded', 'true');
+  if (input) {
+    input.select();
+  }
 }
 
-function closeDropdown() {
+function closeDropdown(revertText = true) {
+  if (!dropdownState.isOpen) return;
   dropdownState.isOpen = false;
-  document.getElementById('modelDropdown')!.classList.remove('open');
+  const dropdown = document.getElementById('modelDropdown');
+  const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  dropdown?.classList.remove('open');
+  input?.setAttribute('aria-expanded', 'false');
+  if (revertText && input) {
+    const label = getModelDisplayLabel(dropdownState.selectedModel, dropdownState.customModels);
+    input.value = dropdownState.selectedModel ? label : '';
+  }
+  filterModels('');
+}
+
+function filterModels(query: string) {
+  const normalized = query.trim().toLowerCase();
+  const list = document.getElementById('modelDropdownList');
+  const noResults = document.getElementById('modelDropdownNoResults');
+  if (!list) return;
+
+  const groups = list.querySelectorAll<HTMLElement>('.model-dropdown-group');
+  let totalVisible = 0;
+
+  groups.forEach(group => {
+    const items = group.querySelectorAll<HTMLElement>('.model-dropdown-item');
+    let groupVisible = 0;
+
+    items.forEach(item => {
+      const searchText = item.dataset.searchText || (item.textContent || '').toLowerCase();
+      const matches = !normalized || searchText.includes(normalized);
+      item.style.display = matches ? 'flex' : 'none';
+      if (matches) {
+        groupVisible++;
+        totalVisible++;
+      }
+    });
+
+    const countEl = group.querySelector<HTMLElement>('.model-dropdown-group-count');
+    if (countEl) {
+      countEl.textContent = String(groupVisible);
+    }
+
+    group.style.display = groupVisible > 0 ? 'flex' : 'none';
+  });
+
+  if (noResults) {
+    noResults.style.display = (totalVisible === 0 && groups.length > 0) ? 'block' : 'none';
+  }
 }
 
 async function selectModel(modelKey: string) {
@@ -1113,8 +1180,6 @@ function getModelsForProvider(api: string) {
 }
 
 // Human-readable label for a selected model key ("api:modelName").
-// Shared by the dropdown's selected text and the radios'
-// "set in Advanced" note.
 function getModelDisplayLabel(selectedModel: string, customModels: ModelDef[]): string {
   if (!selectedModel) return 'Select a model';
   // Parse model key (format: api:modelName)
@@ -1124,8 +1189,7 @@ function getModelDisplayLabel(selectedModel: string, customModels: ModelDef[]): 
   // Check dynamic models first
   const dynamicModel = (dropdownState.dynamicModels?.[api] || []).find(m => m.name === modelName);
   if (dynamicModel) {
-    const apiSuffix = api === 'local' || api === 'iosLocal' ? '' : ` (${getApiDisplayName(api)})`;
-    return `${dynamicModel.display}${apiSuffix}`;
+    return dynamicModel.display;
   }
 
   // Find display name from predefined models
@@ -1139,10 +1203,7 @@ function getModelDisplayLabel(selectedModel: string, customModels: ModelDef[]): 
     const hasKwargs = customModel && customModel.apiKwargs && Object.keys(customModel.apiKwargs).length > 0;
     kwargsIndicator = hasKwargs ? ' \u2699' : '';
   }
-  // Don't append API name for local models since their display names already
-  // make it clear (and "iosLocal" has no user-facing provider name).
-  const apiSuffix = api === 'local' || api === 'iosLocal' ? '' : ` (${getApiDisplayName(api)})`;
-  return `${displayName}${kwargsIndicator}${apiSuffix}`;
+  return `${displayName}${kwargsIndicator}`;
 }
 
 function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
@@ -1150,185 +1211,285 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
   dropdownState.customModels = customModels;
   dropdownState.selectedModel = selectedModel;
 
-  // Update selected display text
-  const selectedText = document.querySelector('.model-dropdown-text')!;
-  selectedText.textContent = getModelDisplayLabel(selectedModel, customModels);
-
-  // Build menu items
-  const menu = document.getElementById('modelDropdownMenu')!;
-  menu.replaceChildren();
-
-
-
-  // Add local models (only where the runtime can actually execute them)
-  if ((webgpuSupported || isIOSDevice) && PREDEFINED_MODELS.local) {
-    // Add predefined local models
-    PREDEFINED_MODELS.local.forEach(model => {
-      const modelKey = `local:${model.name}`;
-      const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
-      const isReady = status.state === 'ready' || status.state === 'cached'; // cached models are available for auto-load
-      const isDownloading = status.state === 'downloading' || status.state === 'initializing';
-
-      const localItem = document.createElement('div');
-      localItem.className = 'model-dropdown-item' + (selectedModel === modelKey ? ' selected' : '');
-
-      // Show different indicators based on status
-      let statusIndicator = '';
-      if (isDownloading) {
-        statusIndicator = '<span class="download-indicator">\u23F3</span>';
-      } else if (!isReady) {
-        statusIndicator = '<span class="download-indicator">\u2B07</span>';
-      }
-
-      localItem.replaceChildren(parseHTML(`<span class="model-dropdown-item-text">${escapeHtml(model.display)} <span class="local-badge">local</span>${statusIndicator}</span>`));
-      localItem.addEventListener('click', asyncHandler(() => selectModel(modelKey)));
-      menu.appendChild(localItem);
-    });
-
-    // Add custom local models (user-added local models)
-    const customLocalModels = customModels.filter(m => m.api === 'local');
-    customLocalModels.forEach(model => {
-      const modelKey = `local:${model.name}`;
-      const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
-      const isReady = status.state === 'ready' || status.state === 'cached'; // cached models are available for auto-load
-      const isDownloading = status.state === 'downloading' || status.state === 'initializing';
-
-      const localItem = document.createElement('div');
-      localItem.className = 'model-dropdown-item' + (selectedModel === modelKey ? ' selected' : '');
-
-      // Show different indicators based on status
-      let statusIndicator = '';
-      if (isDownloading) {
-        statusIndicator = '<span class="download-indicator">\u23F3</span>';
-      } else if (!isReady) {
-        statusIndicator = '<span class="download-indicator">\u2B07</span>';
-      }
-
-      localItem.replaceChildren(parseHTML(`
-        <span class="model-dropdown-item-text">${escapeHtml(model.name)} <span class="local-badge">local</span>${statusIndicator}</span>
-        <button class="model-dropdown-item-remove" title="Remove model">&times;</button>
-      `));
-      localItem.querySelector('.model-dropdown-item-text')!.addEventListener('click', asyncHandler(() => selectModel(modelKey)));
-      localItem.querySelector('.model-dropdown-item-remove')!.addEventListener('click', (e) => { removeModel(modelKey, e).catch(err => console.error('[Popup] removeModel failed:', err)); });
-      menu.appendChild(localItem);
-    });
+  // Update selected trigger display
+  const [selectedApi] = (selectedModel || '').split(':');
+  const selectedLogoEl = document.getElementById('modelDropdownSelectedLogo');
+  if (selectedLogoEl) {
+    const logoSvg = PROVIDER_LOGOS[selectedApi] || '';
+    selectedLogoEl.replaceChildren(parseHTML(logoSvg));
   }
 
-  // Count how many alternative APIs are configured and have models
+  const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  if (input) {
+    const label = getModelDisplayLabel(selectedModel, customModels);
+    input.value = selectedModel ? label : '';
+    input.placeholder = selectedModel ? label : 'Search or select a model...';
+  }
+
+  // Build menu items
+  const list = document.getElementById('modelDropdownList');
+  if (!list) return;
+  list.replaceChildren();
+
+  // Helper to create a single model item
+  const buildItem = (opts: {
+    modelKey: string;
+    displayName: string;
+    modelName: string;
+    providerName: string;
+    isSelected: boolean;
+    badgeHtml?: string;
+    isCustom?: boolean;
+    hasKwargs?: boolean;
+    isDisabled?: boolean;
+  }): HTMLElement => {
+    const item = document.createElement('div');
+    item.className = 'model-dropdown-item' +
+      (opts.isSelected ? ' selected' : '') +
+      (opts.isDisabled ? ' disabled' : '');
+    item.setAttribute('role', 'option');
+    item.setAttribute('aria-selected', opts.isSelected ? 'true' : 'false');
+    if (opts.isDisabled) {
+      item.setAttribute('aria-disabled', 'true');
+      item.title = 'Download required before use';
+    }
+    item.dataset.modelKey = opts.modelKey;
+    item.dataset.searchText = `${opts.displayName} ${opts.modelName} ${opts.providerName}`.toLowerCase();
+
+    const rightParts: string[] = [];
+    if (opts.hasKwargs) {
+      rightParts.push('<button type="button" class="model-dropdown-item-settings has-kwargs" title="Configure provider options">\u2699</button>');
+    } else if (opts.isCustom) {
+      rightParts.push('<button type="button" class="model-dropdown-item-settings" title="Configure provider options">\u2699</button>');
+    }
+    if (opts.isCustom) {
+      rightParts.push('<button type="button" class="model-dropdown-item-remove" title="Remove model">&times;</button>');
+    }
+    if (opts.isSelected) {
+      rightParts.push('<span class="model-dropdown-check">\u2713</span>');
+    }
+
+    item.replaceChildren(parseHTML(`
+      <div class="model-dropdown-item-left">
+        <span class="model-dropdown-item-name">${escapeHtml(opts.displayName)}</span>
+        ${opts.badgeHtml || ''}
+      </div>
+      <div class="model-dropdown-item-right">
+        ${rightParts.join('')}
+      </div>
+    `));
+
+    item.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.model-dropdown-item-remove') || target?.closest('.model-dropdown-item-settings')) {
+        return;
+      }
+      if (opts.isDisabled) {
+        // Disabled because download is required: open local model download panel
+        pendingLocalSelection = opts.modelKey;
+        setStorage({ pendingLocalModelSelection: opts.modelKey }).catch(console.error);
+        updateLocalModelSectionVisibility();
+        updateLocalModelSectionUI();
+        closeDropdown(true);
+        document.getElementById('localModelSection')?.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      selectModel(opts.modelKey).catch(err => console.error('[Popup] selectModel failed:', err));
+    });
+
+    if (opts.isCustom) {
+      item.querySelector('.model-dropdown-item-remove')?.addEventListener('click', (e) => {
+        removeModel(opts.modelKey, e).catch(err => console.error('[Popup] removeModel failed:', err));
+      });
+
+      item.querySelector('.model-dropdown-item-settings')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModelKwargsEditor(opts.modelKey, opts.modelName, false);
+      });
+    }
+
+    return item;
+  };
+
+  // Helper to create a provider group container
+  const buildGroup = (
+    api: string,
+    title: string,
+    logoSvg: string,
+    items: HTMLElement[],
+    groupBadgeHtml?: string
+  ): HTMLElement => {
+    const group = document.createElement('div');
+    group.className = 'model-dropdown-group';
+    group.dataset.provider = api;
+
+    const header = document.createElement('div');
+    header.className = 'model-dropdown-group-header';
+    header.replaceChildren(parseHTML(`
+      <div class="model-dropdown-group-title">
+        ${logoSvg}
+        <span>${escapeHtml(title)}</span>
+        ${groupBadgeHtml || ''}
+      </div>
+      <span class="model-dropdown-group-count">${items.length}</span>
+    `));
+    group.appendChild(header);
+
+    // If download is required, clicking the badge directs to the download panel
+    if (api === 'local' && groupBadgeHtml) {
+      header.querySelector('.model-dropdown-group-badge')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pendingLocalSelection = LOCAL_RADIO_MODEL_KEY;
+        setStorage({ pendingLocalModelSelection: LOCAL_RADIO_MODEL_KEY }).catch(console.error);
+        updateLocalModelSectionVisibility();
+        updateLocalModelSectionUI();
+        closeDropdown(true);
+        document.getElementById('localModelSection')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'model-dropdown-group-items';
+    items.forEach(it => itemsWrap.appendChild(it));
+    group.appendChild(itemsWrap);
+
+    return group;
+  };
+
+  // 1. On-Device / Local models
+  if ((webgpuSupported || isIOSDevice) && (PREDEFINED_MODELS.local || (isInAppMode && PREDEFINED_MODELS.iosLocal))) {
+    const localItems: HTMLElement[] = [];
+    const localPredefined = isInAppMode && IOS_LOCAL_MODEL
+      ? (PREDEFINED_MODELS.iosLocal || [])
+      : (PREDEFINED_MODELS.local || []);
+
+    let hasUndownloaded = false;
+
+    localPredefined.forEach(model => {
+      const modelKey = (isInAppMode && IOS_LOCAL_MODEL ? 'iosLocal:' : 'local:') + model.name;
+      const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
+      const isDownloaded = status.state === 'ready' || status.state === 'cached';
+      if (!isDownloaded) {
+        hasUndownloaded = true;
+      }
+
+      // Local models are free: use free badge, remove local badge & download icon
+      const badgeHtml = '<span class="free-badge">FREE*</span>';
+
+      localItems.push(buildItem({
+        modelKey,
+        displayName: model.display,
+        modelName: model.name,
+        providerName: 'On-Device Local',
+        isSelected: selectedModel === modelKey,
+        badgeHtml,
+        isDisabled: !isDownloaded
+      }));
+    });
+
+    const customLocal = customModels.filter(m => m.api === 'local');
+    customLocal.forEach(model => {
+      const modelKey = `local:${model.name}`;
+      const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
+      const isDownloaded = status.state === 'ready' || status.state === 'cached';
+      if (!isDownloaded) {
+        hasUndownloaded = true;
+      }
+
+      const badgeHtml = '<span class="free-badge">FREE*</span>';
+
+      localItems.push(buildItem({
+        modelKey,
+        displayName: model.name,
+        modelName: model.name,
+        providerName: 'On-Device Local',
+        isSelected: selectedModel === modelKey,
+        badgeHtml,
+        isCustom: true,
+        isDisabled: !isDownloaded
+      }));
+    });
+
+    if (localItems.length > 0) {
+      const groupBadge = hasUndownloaded
+        ? '<span class="model-dropdown-group-badge">Download required</span>'
+        : '';
+      list.appendChild(buildGroup('local', 'On-Device', PROVIDER_LOGOS.local, localItems, groupBadge));
+    }
+  }
+
+  // 2. Cloud Providers
   const providers = ['openai', 'anthropic', 'gemini', 'openrouter'];
-  const configuredProviders = providers.filter(api => {
-    if (!dropdownState.authenticatedApis[api]) return false;
+  providers.forEach(api => {
+    if (!dropdownState.authenticatedApis[api]) return;
     const { predefined, custom } = getModelsForProvider(api);
-    return predefined.length > 0 || custom.length > 0;
-  });
+    const providerItems: HTMLElement[] = [];
 
-  // If only one alternative API is configured, show models directly (flat list)
-  if (configuredProviders.length === 1) {
-    const api = configuredProviders[0];
-    const { predefined, custom } = getModelsForProvider(api);
-
-    // Add predefined models directly
     predefined.forEach(model => {
       const modelKey = `${api}:${model.name}`;
       const freeBadge = model.isFree ? ' <span class="free-badge">FREE*</span>' : '';
-      const modelItem = document.createElement('div');
-      modelItem.className = 'model-dropdown-item' + (selectedModel === modelKey ? ' selected' : '');
-      modelItem.replaceChildren(parseHTML(`
-        <span class="model-dropdown-item-text">${escapeHtml(model.display)}${freeBadge}</span>
-      `));
-      modelItem.querySelector('.model-dropdown-item-text')!.addEventListener('click', asyncHandler(() => selectModel(modelKey)));
-      menu.appendChild(modelItem);
+      providerItems.push(buildItem({
+        modelKey,
+        displayName: model.display,
+        modelName: model.name,
+        providerName: getApiDisplayName(api),
+        isSelected: selectedModel === modelKey,
+        badgeHtml: freeBadge
+      }));
     });
 
-    // Add custom models directly
     custom.forEach(model => {
       const modelKey = `${api}:${model.name}`;
-      const hasKwargs = model.apiKwargs && Object.keys(model.apiKwargs).length > 0;
-      const modelItem = document.createElement('div');
-      modelItem.className = 'model-dropdown-item' + (selectedModel === modelKey ? ' selected' : '');
-      modelItem.replaceChildren(parseHTML(`
-        <span class="model-dropdown-item-text">${escapeHtml(model.name)}</span>
-        <button class="model-dropdown-item-settings${hasKwargs ? ' has-kwargs' : ''}" title="Configure provider options">\u2699</button>
-        <button class="model-dropdown-item-remove" title="Remove model">&times;</button>
-      `));
-      modelItem.querySelector('.model-dropdown-item-text')!.addEventListener('click', asyncHandler(() => selectModel(modelKey)));
-      modelItem.querySelector('.model-dropdown-item-settings')!.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openModelKwargsEditor(modelKey, model.name, false);
-      });
-      modelItem.querySelector('.model-dropdown-item-remove')!.addEventListener('click', (e) => { removeModel(modelKey, e).catch(err => console.error('[Popup] removeModel failed:', err)); });
-      menu.appendChild(modelItem);
+      const hasKwargs = !!(model.apiKwargs && Object.keys(model.apiKwargs).length > 0);
+      providerItems.push(buildItem({
+        modelKey,
+        displayName: model.name,
+        modelName: model.name,
+        providerName: getApiDisplayName(api),
+        isSelected: selectedModel === modelKey,
+        isCustom: true,
+        hasKwargs
+      }));
     });
-  } else if (configuredProviders.length > 1) {
-    // Multiple APIs configured - use nested accordion
-    configuredProviders.forEach(api => {
-      const { predefined, custom } = getModelsForProvider(api);
-      const providerItem = createProviderItem(api, predefined, custom, selectedModel);
-      menu.appendChild(providerItem);
-    });
-  }
 
-  // Empty-state placeholder. Fires for fresh installs where nothing has been
-  // configured yet (no local models enabled, no provider keys, no custom
-  // models) — without this the dropdown opens to a blank panel.
-  if (menu.childElementCount === 0) {
+    if (providerItems.length > 0) {
+      list.appendChild(buildGroup(api, getApiDisplayName(api), PROVIDER_LOGOS[api] || '', providerItems));
+    }
+  });
+
+  // 3. Empty state
+  if (list.childElementCount === 0) {
     const empty = document.createElement('div');
     empty.className = 'model-dropdown-empty';
-    empty.textContent = 'Enable a provider below to start filtering';
-    menu.appendChild(empty);
+    empty.replaceChildren(parseHTML(`
+      <span>No model providers enabled</span>
+      <button type="button" class="model-dropdown-configure-btn" id="modelDropdownConfigureBtn">Configure in Settings</button>
+    `));
+    empty.querySelector('#modelDropdownConfigureBtn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDropdown();
+      const adv = document.getElementById('advancedSettings');
+      if (adv && !adv.classList.contains('expanded')) {
+        adv.classList.add('expanded');
+      }
+      document.getElementById('apiProvidersSection')?.scrollIntoView({ behavior: 'smooth' });
+    });
+    list.appendChild(empty);
   }
 
-  // Keep the headline radios in sync — this is the single funnel every
-  // selection/auth change already flows through.
-  updateModelRadioUI();
+  // Re-apply existing search query if open and user was typing, or reset
+  const inputEl = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  const currentLabel = getModelDisplayLabel(selectedModel, customModels);
+  if (dropdownState.isOpen && inputEl && inputEl.value && inputEl.value !== currentLabel) {
+    filterModels(inputEl.value);
+  } else {
+    const noResults = document.getElementById('modelDropdownNoResults');
+    if (noResults) noResults.style.display = 'none';
+  }
 }
 
-// Sync the headline radios (and their notes) with the current selection.
 function updateModelRadioUI() {
-  const localRadio = document.getElementById('modelRadioLocal') as HTMLInputElement | null;
-  const apiRadio = document.getElementById('modelRadioApi') as HTMLInputElement | null;
-  if (!localRadio || !apiRadio) return;
-
-  const selected = dropdownState.selectedModel;
-  const isLocal = selected.startsWith('local:') || selected.startsWith('iosLocal:');
-  const isApi = !isLocal && selected.length > 0;
-
-  const localPending = !!pendingLocalSelection && selected !== LOCAL_RADIO_MODEL_KEY;
-  localRadio.checked = isLocal;
-  apiRadio.checked = isApi;
-
-  // When an API model is selected, show which one in the note below
-  const advancedNote = document.getElementById('modelRadioAdvancedNote');
-  if (advancedNote) {
-    const showNote = isApi && !!selected;
-    advancedNote.style.display = showNote ? '' : 'none';
-    advancedNote.textContent = showNote
-      ? `Using ${getModelDisplayLabel(selected, dropdownState.customModels)} (set in Advanced Settings)`
-      : '';
-  }
-
-  // The On-Device option is first-class but hardware-gated: WebGPU on desktop, the
-  // native bridge + enough device RAM in the iOS app (the support flag comes
-  // from the Swift registry via the injected catalog). iOS Safari extension
-  // mode has neither.
-  const localSupported = isInAppMode
-    ? (IOS_LOCAL_MODEL?.isSupportedOnThisDevice ?? false)
-    : webgpuSupported;
-  localRadio.disabled = !localSupported;
-  document.getElementById('modelRadioLocalRow')?.classList.toggle('disabled', !localSupported);
-  const localNote = document.getElementById('modelRadioLocalNote');
-  if (localNote) {
-    if (!localSupported) {
-      localNote.style.display = '';
-      localNote.textContent = 'Not supported on this device.';
-    } else if (localPending) {
-      localNote.style.display = '';
-      localNote.textContent = 'Turns on after the download finishes.';
-    } else {
-      localNote.style.display = 'none';
-      localNote.textContent = '';
-    }
-  }
+  // Model selection has moved to the top-level searchable dropdown.
 }
 
 
@@ -1473,87 +1634,6 @@ async function saveModelKwargs(modelKey: string, kwargs: Record<string, unknown>
   await chrome.runtime.sendMessage({ type: 'clearCache' });
 }
 
-function createProviderItem(api: string, predefinedModels: ModelDef[], customModels: ModelDef[], selectedModel: string) {
-  const item = document.createElement('div');
-  item.className = 'model-dropdown-item provider-item';
-  item.dataset.provider = api;
-
-  // Check if any model from this provider is selected
-  const isProviderSelected = selectedModel.startsWith(`${api}:`);
-
-  // Create header (clickable to expand/collapse)
-  const header = document.createElement('div');
-  header.className = 'provider-item-header';
-  const logo = PROVIDER_LOGOS[api] || '';
-  header.replaceChildren(parseHTML(`
-    <span class="model-dropdown-item-text">${logo}${getApiDisplayName(api)}</span>
-    ${isProviderSelected ? '<span class="provider-selected-indicator">&#8226;</span>' : ''}
-    <span class="provider-arrow">&#9656;</span>
-  `));
-
-  // Toggle expand/collapse on header click
-  header.addEventListener('click', (e) => {
-    e.stopPropagation();
-    item.classList.toggle('expanded');
-  });
-
-  item.appendChild(header);
-
-  // Create submenu
-  const submenu = document.createElement('div');
-  submenu.className = 'model-submenu';
-
-  // Add predefined models
-  predefinedModels.forEach(model => {
-    const modelKey = `${api}:${model.name}`;
-    const freeBadge = model.isFree ? ' <span class="free-badge">FREE*</span>' : '';
-    const modelItem = document.createElement('div');
-    modelItem.className = 'model-dropdown-item submenu-item' +
-      (selectedModel === modelKey ? ' selected' : '');
-    modelItem.dataset.model = modelKey;
-    modelItem.replaceChildren(parseHTML(`
-      <span class="model-dropdown-item-text">${escapeHtml(model.display)}${freeBadge}</span>
-    `));
-    modelItem.querySelector('.model-dropdown-item-text')!.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectModel(modelKey).catch(err => console.error('[Popup] selectModel failed:', err));
-    });
-    submenu.appendChild(modelItem);
-  });
-
-  // Add custom models
-  customModels.forEach(model => {
-    const modelKey = `${api}:${model.name}`;
-    const hasKwargs = model.apiKwargs && Object.keys(model.apiKwargs).length > 0;
-    const modelItem = document.createElement('div');
-    modelItem.className = 'model-dropdown-item submenu-item' +
-      (selectedModel === modelKey ? ' selected' : '');
-    modelItem.dataset.model = modelKey;
-    modelItem.replaceChildren(parseHTML(`
-      <span class="model-dropdown-item-text">${escapeHtml(model.name)}</span>
-      <button class="model-dropdown-item-settings${hasKwargs ? ' has-kwargs' : ''}" title="Configure provider options">\u2699</button>
-      <button class="model-dropdown-item-remove" title="Remove model">&times;</button>
-    `));
-
-    modelItem.querySelector('.model-dropdown-item-text')!.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectModel(modelKey).catch(err => console.error('[Popup] selectModel failed:', err));
-    });
-    modelItem.querySelector('.model-dropdown-item-settings')!.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openModelKwargsEditor(modelKey, model.name, false);
-    });
-    modelItem.querySelector('.model-dropdown-item-remove')!.addEventListener('click', (e) => {
-      removeModel(modelKey, e).catch(err => console.error('[Popup] removeModel failed:', err));
-    });
-
-    submenu.appendChild(modelItem);
-  });
-
-  item.appendChild(submenu);
-
-  return item;
-}
 
 // ==================== OpenRouter OAuth ====================
 
@@ -1579,7 +1659,7 @@ async function startOpenRouterOAuth() {
     signInBtn.disabled = false;
     signInBtn.replaceChildren(parseHTML(`
       <svg class="openrouter-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z"/>
+        <path d="M18.654 3.87a5.087 5.087 0 1 1 0 10.174L23.7 19.09c.64.641.187 1.737-.72 1.737H8.48a8.479 8.479 0 0 1 0-16.958h10.175zM8.479 7.26a5.087 5.087 0 1 0 0 10.176 5.087 5.087 0 0 0 0-10.175z"/>
       </svg>
       Sign in with OpenRouter
     `));
