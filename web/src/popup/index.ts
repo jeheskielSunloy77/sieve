@@ -1,4 +1,4 @@
-// PostPatrol - Popup Script
+// Sieve - Popup Script
 
 import type { ModelDef, LocalModelStatus, StorageSchema, SiteId } from '../types';
 import { PREDEFINED_MODELS, DEFAULT_MODEL } from '../shared/models';
@@ -23,7 +23,7 @@ function platformSubContentHTML(id: SiteId): string {
     case 'youtube':
       return '<div class="api-provider-content"><label class="checkbox-label">'
         + '<input type="checkbox" id="enableYoutubePlaceholder">'
-        + '<span>Show "Filtered by Post Patrol" placeholder instead of removing</span>'
+        + '<span>Show "Filtered by Sieve" placeholder instead of removing</span>'
         + '</label></div>';
     default:
       return '';
@@ -43,7 +43,7 @@ function renderPlatformRows(): void {
         <div class="api-provider-header" data-platform="${p.id}">
           <span class="api-provider-name">${escapeHtml(p.displayName)}</span>
           <div class="api-provider-header-right">
-            <label class="ts-inline" title="Enable Post Patrol on ${escapeHtml(p.displayName)}">
+            <label class="ts-inline" title="Enable Sieve on ${escapeHtml(p.displayName)}">
               <input type="checkbox" id="${platformToggleId(p.id)}" checked>
               <span class="ts-inline-slider" aria-hidden="true"></span>
             </label>
@@ -383,7 +383,7 @@ async function loadSettings() {
 
   // Platform master toggles. Default to true for backwards compatibility.
   // The expanded/disabled visual state mirrors the toggle's value so the
-  // row reads as "PostPatrol is/isn't doing anything on this platform".
+  // row reads as "Sieve is/isn't doing anything on this platform".
   // Per-platform master-toggle initial hydration — iterated from the
   // registry. Defaults to "checked" (treat missing as true) for backwards
   // compatibility with installs predating this toggle.
@@ -2140,7 +2140,7 @@ async function handleShareFilters(): Promise<void> {
 
       const shareCode = await encodeFilterPackCode({ phrases });
       const shareUrl = buildFilterPackShareUrl(shareCode);
-      const shareText = `I use Post Patrol to remove this from my feed.\n\n${shareUrl}`;
+      const shareText = `I use Sieve to remove this from my feed.\n\n${shareUrl}`;
       const tweetIntentUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}`;
 
       await chrome.tabs.create({ url: tweetIntentUrl });

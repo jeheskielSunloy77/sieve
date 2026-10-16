@@ -1,5 +1,5 @@
 ---
-name: PostPatrol
+name: Sieve
 description: Clean modern architectural monotone design system for AI feed filtering
 colors:
   primary: "#09090b"
@@ -83,10 +83,10 @@ components:
     padding: "5px 12px"
 ---
 
-# PostPatrol Design System
+# Sieve Design System
 
 ## Overview
-PostPatrol uses a clean, modern, architectural monotone design system inspired by Linear and Vercel. It rejects saturated platform brand blues, greens, and oranges in favor of high-contrast, tactile grayscale utility. The UI recedes quietly into social feeds (Twitter/X, Threads, LinkedIn, YouTube) while providing razor-sharp affordances for configuring local/BYOK AI models, managing filter topics, and inspecting filtered content.
+Sieve uses a clean, modern, architectural monotone design system inspired by Linear and Vercel. It rejects saturated platform brand blues, greens, and oranges in favor of high-contrast, tactile grayscale utility. The UI recedes quietly into social feeds (Twitter/X, Threads, LinkedIn, YouTube) while providing razor-sharp affordances for configuring local/BYOK AI models, managing filter topics, and inspecting filtered content.
 
 ## Colors
 The palette is strictly pure monotone: 100% black, white, and neutral zinc across all components, badges, switches, and states.

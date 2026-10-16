@@ -1,9 +1,10 @@
-/* PostPatrol - Content Styles */
+/* Sieve - Content Styles */
 
 :root {
   --green-border-width: 1px;
-  /* PostPatrol Monotone Design Tokens */
-  --postpatrol-brand-rgb: 9, 9, 11;
+  /* Sieve Monotone Design Tokens */
+  --sieve-brand-rgb: 9, 9, 11;
+  --postpatrol-brand-rgb: var(--sieve-brand-rgb);
   --pp-bg: #ffffff;
   --pp-bg-glass: rgba(255, 255, 255, 0.94);
   --pp-surface: #ffffff;
@@ -23,7 +24,8 @@
 .dark-mode,
 .twitter-dark,
 [data-theme="dark"] {
-  --postpatrol-brand-rgb: 250, 250, 250;
+  --sieve-brand-rgb: 250, 250, 250;
+  --postpatrol-brand-rgb: var(--sieve-brand-rgb);
   --pp-bg: #09090b;
   --pp-bg-glass: rgba(9, 9, 11, 0.94);
   --pp-surface: #141417;
@@ -42,7 +44,8 @@
 
 .dim-mode,
 .twitter-dim {
-  --postpatrol-brand-rgb: 240, 243, 246;
+  --sieve-brand-rgb: 240, 243, 246;
+  --postpatrol-brand-rgb: var(--sieve-brand-rgb);
   --pp-bg: #15191e;
   --pp-bg-glass: rgba(21, 25, 30, 0.94);
   --pp-surface: #1c2128;
@@ -61,7 +64,8 @@
 
 .light-mode,
 .twitter-light {
-  --postpatrol-brand-rgb: 9, 9, 11;
+  --sieve-brand-rgb: 9, 9, 11;
+  --postpatrol-brand-rgb: var(--sieve-brand-rgb);
   --pp-bg: #ffffff;
   --pp-bg-glass: rgba(255, 255, 255, 0.94);
   --pp-surface: #ffffff;
@@ -78,7 +82,7 @@
   --pp-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Base font for all PostPatrol UI — applies directly to every child element
+/* Base font for all Sieve UI — applies directly to every child element
    rather than relying on inheritance, to prevent intermittent font fallback. */
 .filter-phrases-sidebar,
 .filter-phrases-sidebar *,
@@ -764,7 +768,7 @@
   width: 34px;
   border: none;
   background: transparent;
-  color: rgb(var(--postpatrol-brand-rgb));
+  color: rgb(var(--sieve-brand-rgb));
   border-radius: 50%;
   cursor: pointer;
   padding: 0;
@@ -783,7 +787,7 @@
 }
 
 .ff-why-annoying-btn.ff-unfilter-btn:hover {
-  background: rgba(var(--postpatrol-brand-rgb), 0.1);
+  background: rgba(var(--sieve-brand-rgb), 0.1);
 }
 
 .ff-why-annoying-btn svg {
@@ -922,7 +926,7 @@ article {
 .ff-progress-fill {
   height: 100%;
   width: 5%;
-  background: rgb(var(--postpatrol-brand-rgb));
+  background: rgb(var(--sieve-brand-rgb));
   border-radius: 2px;
   transition: width 0.4s ease;
 }
@@ -956,8 +960,8 @@ article {
 }
 
 .ff-annoying-chip:hover {
-  background: rgb(var(--postpatrol-brand-rgb));
-  border-color: rgb(var(--postpatrol-brand-rgb));
+  background: rgb(var(--sieve-brand-rgb));
+  border-color: rgb(var(--sieve-brand-rgb));
   color: #fff;
 }
 
@@ -989,7 +993,7 @@ article {
 }
 
 .ff-annoying-custom-wrapper:focus-within {
-  border-color: rgb(var(--postpatrol-brand-rgb));
+  border-color: rgb(var(--sieve-brand-rgb));
 }
 
 .ff-annoying-custom-input {
@@ -1024,7 +1028,7 @@ article {
   height: 20px;
   margin-right: 5px;
   padding: 0;
-  background: rgb(var(--postpatrol-brand-rgb));
+  background: rgb(var(--sieve-brand-rgb));
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -1974,7 +1978,7 @@ article {
 }
 
 .filter-platform-switch-input:checked + .filter-platform-switch-track {
-  background: rgb(var(--postpatrol-brand-rgb));
+  background: rgb(var(--sieve-brand-rgb));
 }
 
 .filter-platform-switch-input:checked + .filter-platform-switch-track .filter-platform-switch-thumb {
@@ -1982,7 +1986,7 @@ article {
 }
 
 .filter-platform-switch-input:focus-visible + .filter-platform-switch-track {
-  outline: 2px solid rgb(var(--postpatrol-brand-rgb));
+  outline: 2px solid rgb(var(--sieve-brand-rgb));
   outline-offset: 2px;
 }
 
@@ -2008,7 +2012,7 @@ article {
   border: none;
   /* The padding gives the hover circle breathing room without letting the
      button grow the title row: negative vertical margin cancels it out, so
-     the row stays exactly as tall as the "PostPatrol" title. */
+     the row stays exactly as tall as the "Sieve" title. */
   padding: 4px;
   margin: -4px 0;
   border-radius: 50%;
@@ -2023,11 +2027,11 @@ article {
   background: rgba(113, 118, 123, 0.12);
 }
 .filter-ai-indicator.on:hover {
-  background: rgba(var(--postpatrol-brand-rgb), 0.1);
+  background: rgba(var(--sieve-brand-rgb), 0.1);
 }
 /* Keyboard focus only — no lingering ring after a mouse click. */
 .filter-ai-indicator:focus-visible {
-  outline: 2px solid rgb(var(--postpatrol-brand-rgb));
+  outline: 2px solid rgb(var(--sieve-brand-rgb));
   outline-offset: 1px;
 }
 
@@ -2046,7 +2050,7 @@ article {
 
 .filter-ai-indicator.on {
   /* Brand orange — matches the filter box outline. */
-  color: rgb(var(--postpatrol-brand-rgb));
+  color: rgb(var(--sieve-brand-rgb));
 }
 /* Light mode darkens the box outline (see .light-mode
    .filter-phrases-container) — keep the badge identical to it. */
@@ -2079,10 +2083,10 @@ article {
   gap: 4px;
   padding: 3px 8px;
   /* Cancel the pill's extra height so the title row stays as tall as the
-     "PostPatrol" title, mirroring the plain icon's padding/margin trick. */
+     "Sieve" title, mirroring the plain icon's padding/margin trick. */
   margin: -3px 0;
   border-radius: 8px;
-  background: rgb(var(--postpatrol-brand-rgb));
+  background: rgb(var(--sieve-brand-rgb));
   color: #fff;
 }
 
@@ -2099,7 +2103,7 @@ article {
 }
 
 .filter-ai-indicator.with-badge:hover {
-  background: rgba(var(--postpatrol-brand-rgb), 0.85);
+  background: rgba(var(--sieve-brand-rgb), 0.85);
 }
 
 /* Light mode uses the darker brand orange everywhere else (box outline,
@@ -2295,7 +2299,7 @@ body.ff-ios .filter-phrases-mobile {
   display: none !important;
 }
 
-/* PostPatrol full-screen overlay — true full-screen modal triggered by FAB */
+/* Sieve full-screen overlay — true full-screen modal triggered by FAB */
 /* Lock body scroll while iOS overlay is open */
 body.ff-scroll-locked {
   position: fixed;
@@ -2794,7 +2798,7 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
 
 /* ==================== Filter Pack Badges ==================== */
 
-/* Share the header row with the existing "PostPatrol" box name. Houses
+/* Share the header row with the existing "Sieve" box name. Houses
    the "View filtered" button on the right. */
 .filter-phrases-title-row {
   display: flex;
@@ -2813,6 +2817,7 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
 }
 
 /* "What's new" update banner shown inside the filter box once per version. */
+.sieve-update-banner,
 .postpatrol-update-banner {
   position: relative;
   margin-bottom: 10px;
@@ -2824,20 +2829,24 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
   line-height: 1.35;
 }
 
+.sieve-update-banner-title,
 .postpatrol-update-banner-title {
   font-weight: 700;
   margin-bottom: 4px;
 }
 
+.sieve-update-banner-bullets,
 .postpatrol-update-banner-bullets {
   margin: 0;
   padding-left: 18px;
 }
 
+.sieve-update-banner-bullets li,
 .postpatrol-update-banner-bullets li {
   margin: 2px 0;
 }
 
+.sieve-update-banner-close,
 .postpatrol-update-banner-close {
   position: absolute;
   top: 4px;
@@ -2854,24 +2863,29 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
   opacity: 0.7;
 }
 
+.sieve-update-banner-close:hover,
 .postpatrol-update-banner-close:hover {
   opacity: 1;
 }
 
+.light-mode .sieve-update-banner,
 .light-mode .postpatrol-update-banner {
   background: rgba(190, 130, 40, 0.10);
   border-color: rgba(190, 130, 40, 0.35);
   color: rgb(80, 50, 0);
 }
 
+.dim-mode .sieve-update-banner,
+.dark-mode .sieve-update-banner,
 .dim-mode .postpatrol-update-banner,
 .dark-mode .postpatrol-update-banner {
   color: rgb(231, 233, 234);
 }
 
-/* "Import filter pack" CTA injected into tweets that carry a PostPatrol share
+/* "Import filter pack" CTA injected into tweets that carry a Sieve share
    code. Styled to match Twitter's primary "Post" button — solid blue pill,
    white text, bold, sized to content, on its own line. */
+.sieve-import-btn,
 .postpatrol-import-btn {
   display: block;
   width: fit-content;
@@ -2890,25 +2904,35 @@ body.ff-ios .ff-ios-page.dark-mode .ff-ios-page-header {
   transition: background 0.15s ease, transform 0.08s ease;
 }
 
+.sieve-import-btn:hover,
 .postpatrol-import-btn:hover {
   background: rgb(26, 140, 216);
 }
 
+.sieve-import-btn:active,
 .postpatrol-import-btn:active {
   transform: translateY(1px);
 }
 
+.sieve-import-btn-meta,
 .postpatrol-import-btn-meta {
   margin-left: 8px;
   opacity: 0.8;
   font-weight: 500;
 }
 
-/* Brief flash on the PostPatrol box right after a flying screenshot lands during
+/* Brief flash on the Sieve box right after a flying screenshot lands during
    the import-pack animation. Outline (not box-shadow) so it doesn't fight with
    the box's own resting shadow. */
+.filter-phrases-container.sieve-import-landing,
 .filter-phrases-container.postpatrol-import-landing {
-  animation: postpatrol-import-landing-pulse 700ms ease-out;
+  animation: sieve-import-landing-pulse 700ms ease-out;
+}
+
+@keyframes sieve-import-landing-pulse {
+  0%   { outline: 0 solid rgba(29, 155, 240, 0); outline-offset: 0; }
+  20%  { outline: 4px solid rgba(29, 155, 240, 0.55); outline-offset: 2px; }
+  100% { outline: 0 solid rgba(29, 155, 240, 0); outline-offset: 0; }
 }
 
 @keyframes postpatrol-import-landing-pulse {

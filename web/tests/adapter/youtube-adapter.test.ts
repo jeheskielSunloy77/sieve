@@ -46,12 +46,12 @@ beforeEach(async () => {
       (() => ({ matches: false }) as MediaQueryList);
   }
 
-  // The adapter only claims window.PostPatrolAdapter on a youtube.com host (see
+  // The adapter claims window.SieveAdapter (and legacy window.PostPatrolAdapter) on a youtube.com host (see
   // the hostname guard at the bottom of YouTubeAdapter.ts). Point happy-dom at
   // youtube.com before the module's import-time guard runs.
   setURL('https://www.youtube.com/');
   await import('../../adapters/youtube/YouTubeAdapter.js');
-  YouTubeAdapter = window.PostPatrolAdapter;
+  YouTubeAdapter = window.SieveAdapter || window.PostPatrolAdapter;
 });
 
 // A fresh adapter reads `location.hostname` in its constructor to decide
@@ -205,7 +205,7 @@ describe('hidePost', () => {
 
 // ==================== insertActionButton ====================
 
-function makePostPatrolBtn(): HTMLElement {
+function makeSieveBtn(): HTMLElement {
   // Mimic the shared `addWhyAnnoyingButton` output: a div with the trash SVG.
   // The adapter is expected to overwrite the SVG with the cancel glyph.
   const btn = document.createElement('div');
@@ -218,7 +218,7 @@ describe('insertActionButton', () => {
   it('sits immediately before the More actions wrapper and uses ff-yt-next-to-menu', () => {
     const adapter = makeAdapter('https://www.youtube.com/');
     const article = desktopVideoLockupWithMenu();
-    const btn = makePostPatrolBtn();
+    const btn = makeSieveBtn();
 
     adapter.insertActionButton(article, btn);
 
@@ -230,7 +230,7 @@ describe('insertActionButton', () => {
   it('replaces the trash glyph with the cancel SVG when placed on YouTube', () => {
     const adapter = makeAdapter('https://www.youtube.com/');
     const article = desktopVideoLockupWithMenu();
-    const btn = makePostPatrolBtn();
+    const btn = makeSieveBtn();
 
     adapter.insertActionButton(article, btn);
 
@@ -244,7 +244,7 @@ describe('insertActionButton', () => {
   it('clones YT button-shape classes and wrapper so YT styling drives the look', () => {
     const adapter = makeAdapter('https://www.youtube.com/');
     const article = desktopVideoLockupWithMenu();
-    const btn = makePostPatrolBtn();
+    const btn = makeSieveBtn();
 
     adapter.insertActionButton(article, btn);
 
@@ -261,7 +261,7 @@ describe('insertActionButton', () => {
   it('falls back to the metadata-row anchor when no More actions button is present', () => {
     const adapter = makeAdapter('https://www.youtube.com/');
     const article = desktopVideoLockup();
-    const btn = makePostPatrolBtn();
+    const btn = makeSieveBtn();
 
     adapter.insertActionButton(article, btn);
 

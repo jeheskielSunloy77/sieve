@@ -8,7 +8,7 @@ import type {
 
 const POST_PATH_RE = /^\/@([^/]+)\/post\/([^/?#]+)/;
 
-const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
+const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
   siteId = 'threads' as const;
   filterBoxPlacement = 'banner' as const;
 
@@ -29,7 +29,7 @@ const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter
     // Threads streams SSR markup and then hydrates it. Mutating post cards
     // during that hand-off produces React hydration errors, so wait until the
     // app mount has been quiet briefly. The cap prevents a busy feed from
-    // blocking PostPatrol forever.
+    // blocking Sieve forever.
     const mount = document.querySelector<HTMLElement>('div[id^="mount_"]');
     if (!mount) return Promise.resolve();
     return new Promise(resolve => {
@@ -276,7 +276,7 @@ const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter
   }
 
   private _setFallbackRailVisible(visible: boolean): void {
-    const host = document.getElementById('postpatrol-threads-right-rail');
+    const host = document.getElementById('sieve-threads-right-rail') || document.getElementById('postpatrol-threads-right-rail');
     if (host instanceof HTMLElement) host.style.display = visible ? 'block' : 'none';
   }
 
@@ -286,11 +286,11 @@ const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter
     // the scrollbar. This covers Threads layouts with an empty right gutter.
     if (availableWidth < 300) return null;
 
-    let host = document.getElementById('postpatrol-threads-right-rail');
+    let host = document.getElementById('sieve-threads-right-rail') || document.getElementById('postpatrol-threads-right-rail');
     if (!(host instanceof HTMLElement)) {
       host = document.createElement('div');
-      host.id = 'postpatrol-threads-right-rail';
-      host.className = 'postpatrol-threads-right-rail';
+      host.id = 'sieve-threads-right-rail';
+      host.className = 'sieve-threads-right-rail postpatrol-threads-right-rail';
       document.body.appendChild(host);
     }
 
@@ -342,7 +342,7 @@ const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter
           && rect.top <= feedRect.top + 160;
       });
     // Include the whole mount even when the hit-test finds a nested card: we
-    // want the sidebar column itself so PostPatrol remains above native cards.
+    // want the sidebar column itself so Sieve remains above native cards.
     const candidates = Array.from(new Set(eligibleRails([
       ...pointElements,
       ...Array.from(mount.querySelectorAll<HTMLElement>('div')),
@@ -364,5 +364,6 @@ const PostPatrolThreadsAdapter = class ThreadsAdapter implements PlatformAdapter
 };
 
 if (/(^|\.)threads\.com$/i.test(location.hostname)) {
-  window.PostPatrolAdapter = PostPatrolThreadsAdapter;
+  window.SieveAdapter = SieveThreadsAdapter;
+  window.PostPatrolAdapter = SieveThreadsAdapter;
 }

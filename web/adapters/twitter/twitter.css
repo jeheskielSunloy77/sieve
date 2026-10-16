@@ -1,4 +1,4 @@
-/* Twitter-specific styles for PostPatrol */
+/* Twitter-specific styles for Sieve */
 
 /* (Removed: old HTML-injection overrides for .slop-post-content - no longer needed) */
 
@@ -123,7 +123,7 @@ div[data-testid="BottomBar"] {
 }
 
 /* ======================================
-   iOS PostPatrol page — dim mode
+   iOS Sieve page — dim mode
    ====================================== */
 
 body.ff-ios .ff-ios-page.dim-mode {

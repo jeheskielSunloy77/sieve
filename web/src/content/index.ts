@@ -1,4 +1,4 @@
-// PostPatrol - Content Script
+// Sieve - Content Script
 // Entry point: post processing, observers, init, storage/message listeners
 
 import type { PlatformAdapter, PostContent, PipelineResponse, BackgroundToContentMessage, DescriptionKey, AiFilterIntentState } from '../types';
@@ -44,23 +44,29 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
   // an already-loaded tab. Each re-injection has a fresh module scope and
   // would register duplicate listeners + create duplicate UI. Guard with a
   // window-level sentinel so only the first injection per page runs.
-  interface PostPatrolWindow extends Window { __postpatrolContentScriptLoaded?: boolean }
-  const w = window as unknown as PostPatrolWindow;
-  if (w.__postpatrolContentScriptLoaded) {
-    console.log('[PostPatrol] Content script already loaded in this tab — skipping re-init');
+  interface SieveWindow extends Window {
+    __sieveContentScriptLoaded?: boolean;
+    __postpatrolContentScriptLoaded?: boolean;
+  }
+  const w = window as unknown as SieveWindow;
+  if (w.__sieveContentScriptLoaded || w.__postpatrolContentScriptLoaded) {
+    console.log('[Sieve] Content script already loaded in this tab — skipping re-init');
     return;
   }
+  w.__sieveContentScriptLoaded = true;
   w.__postpatrolContentScriptLoaded = true;
 
   // Platform adapter (loaded by manifest before content.js)
-  const AdapterClass = typeof PostPatrolAdapter !== 'undefined' ? PostPatrolAdapter : undefined;
+  const AdapterClass = typeof SieveAdapter !== 'undefined'
+    ? SieveAdapter
+    : (typeof PostPatrolAdapter !== 'undefined' ? PostPatrolAdapter : undefined);
   if (!AdapterClass) {
-    console.error('[PostPatrol] No platform adapter found');
+    console.error('[Sieve] No platform adapter found');
     return;
   }
-  console.log('[PostPatrol] Content script starting, IS_IOS:', IS_IOS);
+  console.log('[Sieve] Content script starting, IS_IOS:', IS_IOS);
   const adapter: PlatformAdapter = new AdapterClass();
-  console.log('[PostPatrol] Adapter loaded:', adapter.siteId);
+  console.log('[Sieve] Adapter loaded:', adapter.siteId);
   document.body.classList.add(`site-${adapter.siteId}`);
 
   if (IS_IOS) document.body.classList.add('ff-ios');
@@ -77,7 +83,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       await setDescriptions(descriptionsKey, syncArr);
       await removeStorage(descriptionsKey);
     }
-  })().catch(err => console.error('[PostPatrol] Migration failed:', err));
+  })().catch(err => console.error('[Sieve] Migration failed:', err));
 
 
   // ==================== Core State ====================
@@ -171,7 +177,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       const model = data.selectedModel || 'cloud';
       isLocalModelActive = model.startsWith('local:');
     } catch (err) {
-      console.debug('[PostPatrol] Failed to check model type:', err);
+      console.debug('[Sieve] Failed to check model type:', err);
       isLocalModelActive = false;
     }
   }
@@ -219,7 +225,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
 
   // Evaluate a post using the background script
   async function evaluatePost(article: HTMLElement) {
-    console.log('[PostPatrol] evaluatePost called, isInApp:', isInApp);
+    console.log('[Sieve] evaluatePost called, isInApp:', isInApp);
 
     let content: PostContent | undefined;
 
@@ -230,7 +236,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
         content = await adapter.extractPostContentFromStore(article) ?? undefined;
       } catch { /* extractor not ready */ }
       if (!content) content = extractPostContent(article);
-      console.log('[PostPatrol] extraction (fromStore=' + (content?.fromStore === true) + '):', content?.text?.substring(0, 80));
+      console.log('[Sieve] extraction (fromStore=' + (content?.fromStore === true) + '):', content?.text?.substring(0, 80));
     } else {
       // Extension: extract post content from platform store (preferred source)
       try {
@@ -241,7 +247,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       if (!content) {
         const retries = parseInt(article.dataset.ffStoreRetries || '0', 10);
         if (retries >= MAX_STORE_RETRIES) {
-          console.warn('[PostPatrol] Store extraction failed after', MAX_STORE_RETRIES, 'retries, skipping post');
+          console.warn('[Sieve] Store extraction failed after', MAX_STORE_RETRIES, 'retries, skipping post');
           postReasonings.set(article, {
             shouldHide: false,
             reasoning: 'Could not extract post data from store.'
@@ -334,7 +340,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
         return;
       }
 
-      // EvaluationResult. Tweets that share a PostPatrol filter pack are exempt
+      // EvaluationResult. Tweets that share a Sieve filter pack are exempt
       // from auto-hiding — otherwise the import button would get filtered
       // before the recipient could click it. The substring check is robust:
       // bncr2_ is the share-code prefix and is unique enough that false
@@ -421,8 +427,8 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
   // Process a single post - sends it to background for evaluation
   function processPost(article: HTMLElement, forceForYou = false) {
     if (!enabled) return;
-    if (getFFPageActive()) { console.log('[PostPatrol] processPost: skipped (FF page active)'); return; }
-    if (!forceForYou && !adapter.shouldProcessCurrentPage()) { console.log('[PostPatrol] processPost: skipped (shouldProcessCurrentPage false, path:', window.location.pathname, ')'); return; }
+    if (getFFPageActive()) { console.log('[Sieve] processPost: skipped (FF page active)'); return; }
+    if (!forceForYou && !adapter.shouldProcessCurrentPage()) { console.log('[Sieve] processPost: skipped (shouldProcessCurrentPage false, path:', window.location.pathname, ')'); return; }
 
     if (adapter.isMainPost(article)) return;
 
@@ -461,7 +467,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     addWhyAnnoyingButton(article);
 
     if (forceForYou || adapter.shouldProcessCurrentPage()) {
-      evaluatePost(article).catch(err => console.error('[PostPatrol] evaluatePost failed:', err));
+      evaluatePost(article).catch(err => console.error('[Sieve] evaluatePost failed:', err));
     }
   }
 
@@ -489,7 +495,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       // still show pending after the short delay.
       const pendingTimer = setTimeout(() => markPostPending(article), 120);
       evaluatePost(article)
-        .catch(err => console.error('[PostPatrol] evaluatePost failed:', err))
+        .catch(err => console.error('[Sieve] evaluatePost failed:', err))
         .finally(() => clearTimeout(pendingTimer));
     });
   }
@@ -561,7 +567,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
 
   function observePosts() {
     const existingPosts = findPosts();
-    console.log('[PostPatrol] observePosts: found', existingPosts.length, 'existing posts, shouldProcess:', adapter.shouldProcessCurrentPage());
+    console.log('[Sieve] observePosts: found', existingPosts.length, 'existing posts, shouldProcess:', adapter.shouldProcessCurrentPage());
     existingPosts.forEach(article => processPost(article));
 
     const observer = new MutationObserver((mutations) => {
@@ -668,7 +674,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     uiObserver.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', handleDOMMutation, { passive: true });
 
-    // Hide PostPatrol sidebar when Twitter's search bar is focused
+    // Hide Sieve sidebar when Twitter's search bar is focused
     setupSearchBarHide();
 
     // Observe for theme changes (platform changes body background color)
@@ -724,7 +730,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
         // aiFilterIntent state doesn't change (e.g. removing "AI slop" here
         // while it still exists on another platform). Re-sync it on every
         // list write; this also clears the toggle's transient `pending`.
-        refreshAiIndicatorUI().catch(err => console.error('[PostPatrol] refreshAiIndicatorUI failed:', err));
+        refreshAiIndicatorUI().catch(err => console.error('[Sieve] refreshAiIndicatorUI failed:', err));
         const oldDescs = (changes[descriptionsKey].oldValue as string[] | undefined) || [];
         const newDescs = (changes[descriptionsKey].newValue as string[] | undefined) || [];
         // Only re-evaluate when a phrase was added, not removed. Planting the
@@ -738,7 +744,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
             if (phraseAddNeedsReEvaluation(oldDescs, newDescs, data.aiFilterIntent?.aiPhrases)) {
               reEvaluateAllPosts();
             }
-          }).catch(err => console.error('[PostPatrol] phrase-add re-evaluation check failed:', err));
+          }).catch(err => console.error('[Sieve] phrase-add re-evaluation check failed:', err));
         } else if (newDescs.length < oldDescs.length) {
           // Phrase removed via an out-of-band editor (iOS native sheet,
           // desktop popup) — mirror removeFilterPhrase's in-feed behavior
@@ -748,7 +754,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       }
       if (changes.aiFilterIntent) {
         // Any write re-syncs the passive AI-detection indicator.
-        refreshAiIndicatorUI().catch(err => console.error('[PostPatrol] refreshAiIndicatorUI failed:', err));
+        refreshAiIndicatorUI().catch(err => console.error('[Sieve] refreshAiIndicatorUI failed:', err));
         // The native iOS sheet's sparkle indicator is the desktop
         // indicator's counterpart: re-push the state so it confirms (and
         // clears its pending dim) on the same writes.
@@ -937,7 +943,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
             skipReason: message.skipReason,
           });
         } else {
-          console.debug('[PostPatrol] detectorResponse: no article for id', message.evaluationId);
+          console.debug('[Sieve] detectorResponse: no article for id', message.evaluationId);
         }
         sendResponse({ received: true });
         break;
@@ -998,8 +1004,8 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
 
   // Start when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { init().catch(err => console.error('[PostPatrol] Init failed:', err)); });
+    document.addEventListener('DOMContentLoaded', () => { init().catch(err => console.error('[Sieve] Init failed:', err)); });
   } else {
-    init().catch(err => console.error('[PostPatrol] Init failed:', err));
+    init().catch(err => console.error('[Sieve] Init failed:', err));
   }
 })();

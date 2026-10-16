@@ -1,4 +1,4 @@
-# PostPatrol
+# Sieve
 
 A browser extension that filters unwanted posts from Twitter/X feeds using AI. Users define filter topics (e.g., "crypto", "engagement bait") and the AI classifies and hides matching posts.
 

@@ -1,6 +1,7 @@
 import type { PlatformAdapter } from './types';
 
 declare global {
+  var SieveAdapter: new () => PlatformAdapter;
   var PostPatrolAdapter: new () => PlatformAdapter;
   var DOMPurify: {
     sanitize(dirty: string, config: { RETURN_DOM_FRAGMENT: true } & Record<string, unknown>): DocumentFragment;
@@ -16,6 +17,7 @@ declare global {
 
   interface Window {
     /** Injected by iOS native host: popup HTML + CSS for in-app settings modal */
+    __sievePopup?: { html: string; css: string };
     __postpatrolPopup?: { html: string; css: string };
     __feedfilterPopup?: { html: string; css: string };
   }

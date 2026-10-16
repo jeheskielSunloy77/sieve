@@ -25,8 +25,8 @@ export async function callDirectAPI(messages: ChatMessage[], apiConfig: APIConfi
 
   // OpenRouter extra headers
   if (apiConfig.apiName === 'openrouter') {
-    headers['HTTP-Referer'] = 'https://github.com/jeheskielSunloy77/post-patrol';
-    headers['X-Title'] = 'Post Patrol';
+    headers['HTTP-Referer'] = 'https://github.com/jeheskielSunloy77/sieve';
+    headers['X-Title'] = 'Sieve';
   }
 
   // Build request body

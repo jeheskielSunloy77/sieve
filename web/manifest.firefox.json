@@ -7,7 +7,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "postpatrol-store@postpatrol",
+      "id": "sieve-store@sieve",
       "data_collection_permissions": {
         "required": [
           "websiteContent"

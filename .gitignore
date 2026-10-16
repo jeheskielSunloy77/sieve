@@ -20,4 +20,5 @@ test-filtered-view.mjs
 
 # Packaged release artifacts
 PostPatrol-*.zip
+Sieve-*.zip
 web-*.zip

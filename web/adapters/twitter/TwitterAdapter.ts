@@ -31,11 +31,11 @@ interface StoreResult {
   error?: string;
 }
 
-// Assigned to `window.PostPatrolAdapter` only when running on an X/Twitter host
+// Assigned to `window.SieveAdapter` only when running on an X/Twitter host
 // (see the guarded assignment at the bottom of this file). On iOS both the
 // Twitter and YouTube adapters are injected into every page, so each must
 // claim the global slot only for its own site or they'd clobber each other.
-const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter {
+const SieveTwitterAdapter = class TwitterAdapter implements PlatformAdapter {
   siteId = 'twitter' as const;
   filterBoxPlacement = 'sidebar' as const;
 
@@ -381,7 +381,7 @@ const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter
 
     // iOS (WKWebView in-app mode) injects fiber-extractor.js as a WKUserScript
     // in the page's main world from the native side — `chrome.runtime.getURL`
-    // would return an unhandled `postpatrol://` URL here, and a `<script src>`
+    // would return an unhandled `sieve://` URL here, and a `<script src>`
     // load would silently fail. The chrome-extension path needs the on-demand
     // injection because manifest.json doesn't list the extractor as a
     // content_script (it has to land in the page world, not the isolated
@@ -406,7 +406,7 @@ const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter
           resolve(result);
         }
       } catch (err) {
-        console.log('[PostPatrol][Store] Parse error:', err);
+        console.log('[Sieve][Store] Parse error:', err);
       }
     });
   }
@@ -432,7 +432,7 @@ const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
         this._pendingStoreRequests.delete(requestId);
-        console.log('[PostPatrol][Store] Request timed out for', requestId);
+        console.log('[Sieve][Store] Request timed out for', requestId);
         resolve(null);
       }, 200);
 
@@ -441,7 +441,7 @@ const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter
         if (result.success && result.data) {
           resolve(result.data);
         } else {
-          console.log('[PostPatrol][Store] Extraction failed:', result.error);
+          console.log('[Sieve][Store] Extraction failed:', result.error);
           resolve(null);
         }
       });
@@ -609,9 +609,9 @@ const PostPatrolTwitterAdapter = class TwitterAdapter implements PlatformAdapter
 };
 
 // Self-guard by hostname so the LinkedIn / YouTube adapter scripts injected
-// alongside this one on iOS don't claim window.PostPatrolAdapter on x.com.
+// alongside this one on iOS don't claim window.SieveAdapter on x.com.
 // Regex mirrors src/shared/platforms.ts PLATFORM_RUNTIME.twitter.hostPattern.
 if (/(^|\.)(x|twitter)\.com$/i.test(location.hostname)) {
-  window.PostPatrolAdapter = PostPatrolTwitterAdapter;
-  window.PostPatrolAdapter = PostPatrolTwitterAdapter;
+  window.SieveAdapter = SieveTwitterAdapter;
+  window.PostPatrolAdapter = SieveTwitterAdapter;
 }

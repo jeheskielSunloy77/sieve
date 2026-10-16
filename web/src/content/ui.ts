@@ -14,7 +14,7 @@ import { enabledStorageKey } from '../shared/platforms';
 import { getReleaseNote } from './release-notes';
 import { runIOSImportAnimation } from './ios';
 
-const IS_DEV_BUILD = (process.env.POSTPATROL_ENV || '').toLowerCase() === 'dev';
+const IS_DEV_BUILD = (process.env.SIEVE_ENV || process.env.POSTPATROL_ENV || '').toLowerCase() === 'dev';
 
 // Dependencies (set by initUI from index.ts)
 let _deps: ContentUIDeps;
@@ -30,7 +30,7 @@ export function initUI(deps: ContentUIDeps) {
   const stale = document.querySelectorAll(
     '.filter-phrases-sidebar, .filter-phrases-bottom, .filter-phrases-mobile, .filter-phrases-banner'
   );
-  console.log('[PostPatrol] initUI: clearing', stale.length, 'stale filter box(es) from prior injection');
+  console.log('[Sieve] initUI: clearing', stale.length, 'stale filter box(es) from prior injection');
   stale.forEach((el) => el.remove());
 
   // Register the single page-wide tooltip-dismissal listener (replaces a
@@ -80,7 +80,7 @@ let apiKeyWarningShown = false;
 // Reads release notes from src/shared/release-notes.ts. Dismissal writes
 // `lastSeenVersion` to chrome.storage.local so the banner stays gone.
 async function maybeRenderUpdateBanner(container: HTMLElement): Promise<void> {
-  const slot = container.querySelector<HTMLElement>('.postpatrol-update-banner-slot');
+  const slot = container.querySelector<HTMLElement>('.sieve-update-banner-slot, .postpatrol-update-banner-slot');
   if (!slot) return;
 
   const current = chrome.runtime.getManifest().version;
@@ -97,18 +97,18 @@ async function maybeRenderUpdateBanner(container: HTMLElement): Promise<void> {
 
   const bulletsHTML = note.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('');
   const html = `
-    <div class="postpatrol-update-banner" role="status">
-      <button type="button" class="postpatrol-update-banner-close" aria-label="Dismiss">×</button>
-      <div class="postpatrol-update-banner-title">${escapeHtml(note.title)}</div>
-      <ul class="postpatrol-update-banner-bullets">${bulletsHTML}</ul>
+    <div class="sieve-update-banner postpatrol-update-banner" role="status">
+      <button type="button" class="sieve-update-banner-close postpatrol-update-banner-close" aria-label="Dismiss">×</button>
+      <div class="sieve-update-banner-title postpatrol-update-banner-title">${escapeHtml(note.title)}</div>
+      <ul class="sieve-update-banner-bullets postpatrol-update-banner-bullets">${bulletsHTML}</ul>
     </div>
   `;
   slot.replaceChildren(parseHTML(html));
 
-  const closeBtn = slot.querySelector<HTMLButtonElement>('.postpatrol-update-banner-close');
+  const closeBtn = slot.querySelector<HTMLButtonElement>('.sieve-update-banner-close, .postpatrol-update-banner-close');
   closeBtn?.addEventListener('click', asyncHandler(async () => {
     await setStorage({ lastSeenVersion: current });
-    document.querySelectorAll('.postpatrol-update-banner').forEach(el => el.remove());
+    document.querySelectorAll('.sieve-update-banner, .postpatrol-update-banner').forEach(el => el.remove());
   }));
 }
 
@@ -123,8 +123,8 @@ const placeholderItemsHTML = [...PLACEHOLDER_PHRASES, PLACEHOLDER_PHRASES[0]]
 const placeholderHTML = `<span class="filter-input-wrapper"><input type="text" class="filter-phrases-input"><span class="filter-placeholder-cycle" aria-hidden="true"><span class="filter-placeholder-track">${placeholderItemsHTML}</span></span></span>`;
 
 const platformFilterSwitchHTML = `
-  <label class="filter-platform-switch" title="Enable Post Patrol filtering on this site">
-    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Post Patrol filtering on this site" checked>
+  <label class="filter-platform-switch" title="Enable Sieve filtering on this site">
+    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Sieve filtering on this site" checked>
     <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
   </label>
 `;
@@ -180,7 +180,7 @@ export function restoreAllFilteredPosts(): void {
     container.style.opacity = '';
     container.style.transition = '';
     delete container.dataset.filteredByExtension;
-    container.querySelectorAll('.postpatrol-yt-placeholder').forEach(placeholder => placeholder.remove());
+    container.querySelectorAll('.sieve-yt-placeholder, .postpatrol-yt-placeholder').forEach(placeholder => placeholder.remove());
   });
   _deps.findPosts().forEach(article => {
     article.style.opacity = '';
@@ -223,9 +223,9 @@ function updateSidebarFilterVisibility() {
 function buildFilterContainerHTML(): string {
   return `
     <div class="filter-phrases-container">
-      <div class="postpatrol-update-banner-slot"></div>
+      <div class="sieve-update-banner-slot postpatrol-update-banner-slot"></div>
       <div class="filter-phrases-title-row">
-        <span class="filter-phrases-box-name">Post Patrol</span>
+        <span class="filter-phrases-box-name">Sieve</span>
         ${platformFilterSwitchHTML}
       </div>
       <div class="filter-phrases-header">
@@ -326,7 +326,7 @@ function setupFixedInWrapper(filterBox: HTMLElement, wrapper: HTMLElement): void
 // News, Trending). On the Home page it also contains the fixed search bar at
 // the top; on Explore the search bar lives in the main column instead, but the
 // same wrapper is still the first child of sidebarContent. Returns the first
-// non-PostPatrol child of sidebarContent.
+// non-Sieve child of sidebarContent.
 function findSidebarWrapper(sidebarContent: Element): HTMLElement | null {
   for (const child of Array.from(sidebarContent.children)) {
     if (child instanceof HTMLElement
@@ -345,11 +345,11 @@ export function injectFilterPhrasesInput() {
     filterPhrasesContainer = document.querySelector<HTMLElement>('.filter-phrases-sidebar');
   }
   if (filterPhrasesContainer && filterPhrasesContainer.isConnected) {
-    console.log('[PostPatrol] injectFilterPhrasesInput: adopting existing box (DOM count=', existingInDom, ')');
+    console.log('[Sieve] injectFilterPhrasesInput: adopting existing box (DOM count=', existingInDom, ')');
     updateSidebarFilterVisibility();
     return;
   }
-  console.log('[PostPatrol] injectFilterPhrasesInput: will create new box (DOM count before=', existingInDom, ')');
+  console.log('[Sieve] injectFilterPhrasesInput: will create new box (DOM count before=', existingInDom, ')');
 
   // Don't inject on non-applicable pages
   if (!_deps.adapter.shouldProcessCurrentPage()) return;
@@ -366,7 +366,7 @@ export function injectFilterPhrasesInput() {
   // back to the top of sidebarContent if the wrapper can't be found.
   // LinkedIn Groups' legacy scaffold aside is itself the right-column wrapper;
   // its direct children are native cards. Treating the first card as the
-  // wrapper would mount PostPatrol inside that card and inherit its clipping.
+  // wrapper would mount Sieve inside that card and inherit its clipping.
   const scaffoldAside = _deps.adapter.siteId === 'linkedin'
     && sidebarContent instanceof HTMLElement
     && sidebarContent.matches('.scaffold-layout__aside')
@@ -640,7 +640,7 @@ export function injectBottomFilterBox() {
     bottomFilterContainer = document.querySelector<HTMLElement>('.filter-phrases-bottom');
   }
   if (bottomFilterContainer && bottomFilterContainer.isConnected) {
-    console.log('[PostPatrol] injectBottomFilterBox: adopting existing box (DOM count=', existingInDom, ')');
+    console.log('[Sieve] injectBottomFilterBox: adopting existing box (DOM count=', existingInDom, ')');
     updateBottomFilterVisibility();
     return;
   }
@@ -711,7 +711,7 @@ export function injectMobileFilterBox() {
     mobileFilterContainer = document.querySelector<HTMLElement>('.filter-phrases-mobile');
   }
   if (mobileFilterContainer && mobileFilterContainer.isConnected) {
-    console.log('[PostPatrol] injectMobileFilterBox: adopting existing box (DOM count=', existingInDom, ')');
+    console.log('[Sieve] injectMobileFilterBox: adopting existing box (DOM count=', existingInDom, ')');
     updateMobileFilterVisibility();
     return;
   }
@@ -785,7 +785,7 @@ function updateBannerFilterVisibility() {
 export function injectBannerFilterBox() {
   const adapter = _deps.adapter;
   if (!adapter.getFilterBoxAnchor) {
-    console.warn('[PostPatrol] injectBannerFilterBox: adapter has no getFilterBoxAnchor');
+    console.warn('[Sieve] injectBannerFilterBox: adapter has no getFilterBoxAnchor');
     return;
   }
 
@@ -859,7 +859,7 @@ export async function shareFilterPack(container?: HTMLElement | null): Promise<v
     try {
       await runShareFilterPackForIOS();
     } catch (err) {
-      console.error('[PostPatrol] shareFilterPack fallback error:', err);
+      console.error('[Sieve] shareFilterPack fallback error:', err);
     } finally {
       sharingFilterPackInProgress = false;
     }
@@ -872,7 +872,7 @@ export async function shareFilterPack(container?: HTMLElement | null): Promise<v
     const shareCode = await encodeFilterPackCode({ phrases: sharedPhrases });
     await openComposerWithImage(file, shareCode);
   } catch (err) {
-    console.error('[PostPatrol] shareFilterPack error:', err);
+    console.error('[Sieve] shareFilterPack error:', err);
   } finally {
     sharingFilterPackInProgress = false;
   }
@@ -890,7 +890,7 @@ async function screenshotFilterBox(box: HTMLElement): Promise<File> {
     box.classList.remove('ff-capture');
   }
   if (!blob) throw new Error('html-to-image returned null');
-  return new File([blob], 'postpatrol-filter-pack.png', { type: 'image/png' });
+  return new File([blob], 'sieve-filter-pack.png', { type: 'image/png' });
 }
 
 // iOS variant: there's no visible filter card on x.com when the iOS app's
@@ -1003,7 +1003,7 @@ async function attachImageToMobileComposer(file: File): Promise<void> {
     3000
   );
   if (!fileInput) {
-    console.warn('[PostPatrol] Mobile composer file input not found — text-only share');
+    console.warn('[Sieve] Mobile composer file input not found — text-only share');
     return;
   }
   const dt = new DataTransfer();
@@ -1021,7 +1021,7 @@ async function attachImageToMobileComposer(file: File): Promise<void> {
 // on any ClipboardEvent whose clipboardData carries a File, which is the same
 // code path as a real Cmd-V of an image — so we just drive that path directly
 // instead of fighting with React-controlled <input type="file"> semantics.
-const SHARE_TWEET_TEXT = 'I use Post Patrol to remove this from my feed.';
+const SHARE_TWEET_TEXT = 'I use Sieve to remove this from my feed.';
 
 async function openComposerWithImage(file: File, shareCode: string): Promise<void> {
   // Click the sidebar Post link the same way a user would — this triggers X's
@@ -1115,7 +1115,7 @@ export function processImportCodeInPost(article: HTMLElement): void {
       if (!pack) return;
       if (!tweetText.isConnected || !found.link.isConnected) return;
       swapImportSentenceForButton(found.link, pack.phrases);
-    }).catch((err) => console.error('[PostPatrol] decodeFilterPackCode failed:', err));
+    }).catch((err) => console.error('[Sieve] decodeFilterPackCode failed:', err));
   }
 }
 
@@ -1132,7 +1132,8 @@ function maybeExpandForImportCode(article: HTMLElement, tweetText: HTMLElement):
   if (!showMore) return;
   // One-shot per article — don't re-click if the first expansion already
   // happened (even if the re-rendered DOM somehow still includes a "Show more").
-  if (article.dataset.postpatrolExpandedForImport) return;
+  if (article.dataset.sieveExpandedForImport || article.dataset.postpatrolExpandedForImport) return;
+  article.dataset.sieveExpandedForImport = '1';
   article.dataset.postpatrolExpandedForImport = '1';
   showMore.click();
 
@@ -1146,14 +1147,14 @@ function maybeExpandForImportCode(article: HTMLElement, tweetText: HTMLElement):
   const tick = () => {
     if (++attempts > 30) return; // ~3s at 100ms per tick
     if (!article.isConnected) return;
-    if (article.querySelector('.postpatrol-import-btn')) return;
+    if (article.querySelector('.sieve-import-btn, .postpatrol-import-btn')) return;
     processImportCodeInPost(article);
     setTimeout(tick, 100);
   };
   setTimeout(tick, 50);
 }
 
-// Scan <a> elements within `root` for a postpatrol filter-pack share URL.
+// Scan <a> elements within `root` for a sieve filter-pack share URL.
 // Twitter splits the rendered URL across plain text and aria-hidden spans, but
 // `innerText` reads them all back as a single string (with stray newlines from
 // the inline-block layout that we strip before matching).
@@ -1209,10 +1210,10 @@ function swapImportSentenceForButton(
 function buildImportButton(phrases: string[]): HTMLElement {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'postpatrol-import-btn';
+  btn.className = 'sieve-import-btn postpatrol-import-btn';
   btn.setAttribute('aria-label', 'Import filter pack');
   const phraseCount = phrases.length;
-  btn.replaceChildren(parseHTML(`<span>Import filter pack</span><span class="postpatrol-import-btn-meta">${phraseCount} ${phraseCount === 1 ? 'phrase' : 'phrases'}</span>`));
+  btn.replaceChildren(parseHTML(`<span>Import filter pack</span><span class="sieve-import-btn-meta postpatrol-import-btn-meta">${phraseCount} ${phraseCount === 1 ? 'phrase' : 'phrases'}</span>`));
   btn.addEventListener('click', (e) => {
     // Stop the click from falling through to the tweet's own click handler
     // (which would navigate into the tweet's permalink page).
@@ -1221,29 +1222,29 @@ function buildImportButton(phrases: string[]): HTMLElement {
     const article = btn.closest<HTMLElement>('article');
     if (_deps.IS_IOS) {
       // The native FAB lives outside the WebView, so the desktop "fly the
-      // tweet image into the on-page PostPatrol box" choreography doesn't
+      // tweet image into the on-page Sieve box" choreography doesn't
       // translate. ios.ts owns the iOS-specific genie animation; we just
       // hand it the article + the import callback.
       runIOSImportAnimation(article, () => confirmAndImportPack(phrases)).catch((err) =>
-        console.error('[PostPatrol] import failed:', err),
+        console.error('[Sieve] import failed:', err),
       );
     } else {
       flyScreenshotAndImport(article, phrases).catch((err) =>
-        console.error('[PostPatrol] import failed:', err),
+        console.error('[Sieve] import failed:', err),
       );
     }
   });
   return btn;
 }
 
-// Three PostPatrol layout variants live in the DOM at all times — sidebar (wide),
+// Three Sieve layout variants live in the DOM at all times — sidebar (wide),
 // bottom (medium), mobile (narrow) — and media queries display:none all but
 // one. Returns the variant that's currently rendered so the import-flight
 // animation lands on a real, on-screen box. checkVisibility() rather than
 // offsetParent: offsetParent is also null for position:fixed elements, which
 // misread the bottom pill (position: fixed) as hidden and silently skipped
 // the animation at medium window widths.
-function pickVisiblePostPatrolLayout(): HTMLElement | null {
+function pickVisibleSieveLayout(): HTMLElement | null {
   const layouts = document.querySelectorAll<HTMLElement>(
     '.filter-phrases-sidebar, .filter-phrases-bottom, .filter-phrases-mobile, .filter-phrases-banner',
   );
@@ -1258,7 +1259,7 @@ function pickVisiblePostPatrolLayout(): HTMLElement | null {
   return null;
 }
 
-// Animate the tweet's screenshot image flying into the user's PostPatrol box,
+// Animate the tweet's screenshot image flying into the user's Sieve box,
 // then run the actual import. The flight takes ~700ms; we kick the storage
 // writes off in parallel so the new phrases land in the box right as the
 // flier dissolves into it. Falls back to a plain import (no animation) if we
@@ -1267,19 +1268,19 @@ async function flyScreenshotAndImport(
   article: HTMLElement | null,
   phrases: string[],
 ): Promise<void> {
-  console.log('[PostPatrol/import-anim] click', { hasArticle: !!article, phraseCount: phrases.length });
+  console.log('[Sieve/import-anim] click', { hasArticle: !!article, phraseCount: phrases.length });
 
   // Three layout variants live in the DOM simultaneously (sidebar, bottom,
   // mobile); media queries display:none all but the active one. Pick the
   // visible variant via offsetParent — querySelectorAll('.filter-phrases-
   // container') would return the first in document order, which is often a
   // hidden one with a zero-size rect.
-  const visibleLayout = pickVisiblePostPatrolLayout();
+  const visibleLayout = pickVisibleSieveLayout();
   const containerInLayout = visibleLayout?.querySelector<HTMLElement>('.filter-phrases-container') ?? null;
   // Use the container when it has real dimensions; otherwise the layout pill
   // (.filter-phrases-bottom collapses its inner container to max-height: 0,
   // but the outer pill is still on screen and is what the user perceives as
-  // "the PostPatrol UI").
+  // "the Sieve UI").
   const containerRect = containerInLayout?.getBoundingClientRect();
   const useContainer = containerInLayout && containerRect && containerRect.height >= 24 && containerRect.width >= 24;
   const destEl: HTMLElement | null = useContainer ? containerInLayout : visibleLayout;
@@ -1288,7 +1289,7 @@ async function flyScreenshotAndImport(
   const twimgImg = article?.querySelector<HTMLImageElement>('img[src*="pbs.twimg.com/media"]') ?? null;
   const tweetImg = tweetPhotoImg ?? twimgImg;
 
-  console.log('[PostPatrol/import-anim] lookups', {
+  console.log('[Sieve/import-anim] lookups', {
     visibleLayoutClass: visibleLayout?.className,
     containerInLayoutFound: !!containerInLayout,
     containerRect: containerRect ? { w: containerRect.width, h: containerRect.height } : null,
@@ -1300,8 +1301,8 @@ async function flyScreenshotAndImport(
   });
 
   if (!destEl || !tweetImg) {
-    console.log('[PostPatrol/import-anim] bailing — falling back to plain import', {
-      reason: !destEl ? 'no visible PostPatrol layout on screen' : 'no tweet image found in article',
+    console.log('[Sieve/import-anim] bailing — falling back to plain import', {
+      reason: !destEl ? 'no visible Sieve layout on screen' : 'no tweet image found in article',
     });
     await confirmAndImportPack(phrases);
     return;
@@ -1309,23 +1310,23 @@ async function flyScreenshotAndImport(
 
   const sourceRect = tweetImg.getBoundingClientRect();
   const destRect = destEl.getBoundingClientRect();
-  console.log('[PostPatrol/import-anim] rects', {
+  console.log('[Sieve/import-anim] rects', {
     source: { x: sourceRect.left, y: sourceRect.top, w: sourceRect.width, h: sourceRect.height },
     dest: { x: destRect.left, y: destRect.top, w: destRect.width, h: destRect.height },
   });
 
   if (sourceRect.width < 4 || destRect.width < 4) {
-    console.log('[PostPatrol/import-anim] bailing — degenerate rect', {
+    console.log('[Sieve/import-anim] bailing — degenerate rect', {
       sourceWidth: sourceRect.width,
       destWidth: destRect.width,
     });
     await confirmAndImportPack(phrases);
     return;
   }
-  console.log('[PostPatrol/import-anim] starting flight');
+  console.log('[Sieve/import-anim] starting flight');
 
   const flier = document.createElement('div');
-  flier.className = 'postpatrol-import-flier';
+  flier.className = 'sieve-import-flier postpatrol-import-flier';
   Object.assign(flier.style, {
     position: 'fixed',
     left: `${sourceRect.left}px`,
@@ -1386,8 +1387,8 @@ async function flyScreenshotAndImport(
 
   // Brief pulse on the destination so the user's eye lands on the place where
   // the new pack just appeared.
-  destEl.classList.add('postpatrol-import-landing');
-  setTimeout(() => destEl.classList.remove('postpatrol-import-landing'), 700);
+  destEl.classList.add('sieve-import-landing', 'postpatrol-import-landing');
+  setTimeout(() => destEl.classList.remove('sieve-import-landing', 'postpatrol-import-landing'), 700);
 
   // Make sure storage writes are surfaced before we return so callers see real
   // failures and not a silently-completed flight.
@@ -1448,14 +1449,14 @@ function renderPhrasesInContainer(container: Element, descriptions: string[]) {
 const MAX_CATEGORIES_LENGTH = 1000;
 
 export async function addFilterPhrase(text: string) {
-  console.log('[PostPatrol] addFilterPhrase called with:', text);
+  console.log('[Sieve] addFilterPhrase called with:', text);
   if (!text) return false;
 
   try {
     const descriptions = await getDescriptions(_deps.descriptionsKey);
-    console.log('[PostPatrol] Current descriptions:', descriptions);
+    console.log('[Sieve] Current descriptions:', descriptions);
 
-    if (descriptions.includes(text)) { console.log('[PostPatrol] Already exists'); return false; }
+    if (descriptions.includes(text)) { console.log('[Sieve] Already exists'); return false; }
 
     // Check total character length with the new phrase
     const totalLength = [...descriptions, text].reduce((sum, d) => sum + d.length, 0);
@@ -1465,9 +1466,9 @@ export async function addFilterPhrase(text: string) {
     }
 
     const next = [...descriptions, text];
-    console.log('[PostPatrol] Saving descriptions:', next);
+    console.log('[Sieve] Saving descriptions:', next);
     await setDescriptions(_deps.descriptionsKey, next);
-    console.log('[PostPatrol] addFilterPhrase complete');
+    console.log('[Sieve] addFilterPhrase complete');
     syncFilterPhrases();
     // Planting the seed phrase alone must not sweep — it is not a filter
     // category, and the aiFilterIntent write it provokes triggers the sweep
@@ -1478,7 +1479,7 @@ export async function addFilterPhrase(text: string) {
     }
     return true;
   } catch (err) {
-    console.error('[PostPatrol] addFilterPhrase error:', err);
+    console.error('[Sieve] addFilterPhrase error:', err);
     return false;
   }
 }
@@ -1514,7 +1515,7 @@ export function showSettingsModal(section?: 'local') {
   let iframe: HTMLIFrameElement | undefined;
 
   // In-app mode (WKWebView): inject popup directly into DOM
-  const popup = window.__postpatrolPopup || window.__feedfilterPopup;
+  const popup = window.__sievePopup || window.__postpatrolPopup || window.__feedfilterPopup;
   if (chrome._polyfilled && popup) {
 
     // Inject popup CSS once (rewrite body.X-mode selectors to target container div)
@@ -1559,7 +1560,7 @@ export function showSettingsModal(section?: 'local') {
 
     // Run popup JS directly via import (no eval)
     initPopup().catch((e: Error) => {
-      console.error('[PostPatrol] Error running popup init:', e, e.stack);
+      console.error('[Sieve] Error running popup init:', e, e.stack);
     });
   } else {
     // Extension mode: load popup.html in iframe
@@ -1668,7 +1669,11 @@ export function updateFilteredTabCount() {
   //      re-render in response.
   // `filteredPosts.length` remains the single source of truth; these are
   // just publish surfaces.
+  document.documentElement.dataset.sieveFilteredCount = String(newCount);
   document.documentElement.dataset.postpatrolFilteredCount = String(newCount);
+  document.dispatchEvent(new CustomEvent('sieve:filtered-count-changed', {
+    detail: { count: newCount, animate: shouldAnimate },
+  }));
   document.dispatchEvent(new CustomEvent('postpatrol:filtered-count-changed', {
     detail: { count: newCount, animate: shouldAnimate },
   }));
@@ -1921,7 +1926,7 @@ function createRestoreButton(post: FilteredPost, postContent: PostContent): HTML
       siteId: _deps.adapter.siteId,
       shouldHide: false,
       reasoning: 'User reported: false positive'
-    }).catch(err => console.error('[PostPatrol] Override cache error:', err));
+    }).catch(err => console.error('[Sieve] Override cache error:', err));
 
     updateFilteredTabCount();
     const outerContainer = restoreBtn.closest('.filtered-view-container') || restoreBtn.closest('.ff-ios-filtered-modal-backdrop');
@@ -2655,7 +2660,7 @@ export function showReasoningPopup(article: HTMLElement, x: number, y: number) {
       try {
         await _deps.reEvaluateSinglePost(article);
       } catch (err) {
-        console.error('[PostPatrol] Re-evaluate error:', err);
+        console.error('[Sieve] Re-evaluate error:', err);
       }
     })().catch(err => console.error('[UI] reeval handler failed:', err));
   });
@@ -2694,7 +2699,7 @@ export function showReasoningPopup(article: HTMLElement, x: number, y: number) {
           btn.disabled = true;
         }
       } catch (err) {
-        console.error('[PostPatrol] Suggest reasons error:', err);
+        console.error('[Sieve] Suggest reasons error:', err);
         btn.textContent = 'Error - try again';
         btn.disabled = false;
       }
@@ -3200,12 +3205,12 @@ export function addWhyAnnoyingButton(article: HTMLElement) {
           siteId: _deps.adapter.siteId,
           shouldHide: true,
           reasoning: 'User reported: should have been filtered'
-        }).catch(err => console.error('[PostPatrol] Override cache error:', err));
+        }).catch(err => console.error('[Sieve] Override cache error:', err));
       });
       try {
         response = await cachedPromise;
       } catch (err) {
-        console.error('[PostPatrol] Why annoying error:', err);
+        console.error('[Sieve] Why annoying error:', err);
         cleanupProgress();
         tooltip.replaceChildren(parseHTML('<span class="ff-annoying-empty">Error - try again</span>'));
         annoyingReasonsCache.delete(article);
@@ -3277,7 +3282,7 @@ export function addWhyAnnoyingButton(article: HTMLElement) {
           siteId: _deps.adapter.siteId,
           shouldHide: true,
           reasoning
-        }).catch(err => console.error('[PostPatrol] Override cache error:', err));
+        }).catch(err => console.error('[Sieve] Override cache error:', err));
       };
 
       customInput.addEventListener('click', (e) => e.stopPropagation());
@@ -3322,7 +3327,7 @@ export function addWhyAnnoyingButton(article: HTMLElement) {
           siteId: _deps.adapter.siteId,
           shouldHide: true,
           reasoning: 'User reported: should have been filtered'
-        }).catch(err => console.error('[PostPatrol] Override cache error:', err));
+        }).catch(err => console.error('[Sieve] Override cache error:', err));
       });
       tooltip.appendChild(missedLink);
 
@@ -3363,7 +3368,7 @@ export function setupAnnoyingTooltipCloser() {
   }, true);
 }
 
-// Hide PostPatrol sidebar when Twitter's search suggestions menu is open (so it doesn't cover the dropdown)
+// Hide Sieve sidebar when Twitter's search suggestions menu is open (so it doesn't cover the dropdown)
 export function setupSearchBarHide() {
   new MutationObserver(() => {
     const form = _deps.adapter.getSearchForm();

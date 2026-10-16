@@ -1,6 +1,6 @@
-# PostPatrol — Web Extension
+# Sieve — Web Extension
 
-The main codebase for the PostPatrol browser extension (Chrome MV3, Firefox, Safari desktop).
+The main codebase for the Sieve browser extension (Chrome MV3, Firefox, Safari desktop).
 
 ## Build
 

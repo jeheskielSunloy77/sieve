@@ -11,12 +11,13 @@ const targetArg = process.argv.find((a) => a.startsWith('--target='));
 const target = targetArg ? targetArg.split('=')[1] : 'chrome';
 
 const ENV_KEYS = [
+  'SIEVE_ENV',
   'POSTPATROL_ENV',
 ];
 
 function loadEnvFile(envName) {
   const envPath = path.join(__dirname, `.env.${envName}`);
-  const result = { POSTPATROL_ENV: envName };
+  const result = { SIEVE_ENV: envName, POSTPATROL_ENV: envName };
 
   // Read from .env file if it exists
   if (fs.existsSync(envPath)) {
@@ -49,6 +50,7 @@ const define = {
   // Baked into the bundles so src/shared/platforms.ts can filter PLATFORMS
   // to the platforms that ship on this build target (keeps the popup, the
   // pipeline, and storage keys in lockstep with the generated manifest).
+  'process.env.SIEVE_TARGET': JSON.stringify(target),
   'process.env.POSTPATROL_TARGET': JSON.stringify(target),
 };
 for (const [key, value] of Object.entries(config)) {
@@ -86,7 +88,7 @@ function copyLitertlmAssets() {
 }
 
 async function build() {
-  console.log(`Building PostPatrol (env: ${env}, target: ${target})`);
+  console.log(`Building Sieve (env: ${env}, target: ${target})`);
 
   // 0. Regenerate manifest.json from manifest.base.json + manifest.<target>.json.
   generateManifest(target);

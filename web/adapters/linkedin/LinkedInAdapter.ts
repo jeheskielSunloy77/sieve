@@ -31,7 +31,7 @@ import type { PlatformAdapter, PlatformSelectors, PostContent, QuoteContent } fr
 // Keep the hostname check inline. Must match the `linkedin` entry in
 // src/shared/platforms.ts (PLATFORM_RUNTIME.linkedin.hostPattern).
 
-const PostPatrolLinkedInAdapter = class LinkedInAdapter implements PlatformAdapter {
+const SieveLinkedInAdapter = class LinkedInAdapter implements PlatformAdapter {
   siteId = 'linkedin' as const;
 
   // linkedin adaptation: union selectors covering desktop SDUI, mobile web,
@@ -755,6 +755,6 @@ const PostPatrolLinkedInAdapter = class LinkedInAdapter implements PlatformAdapt
 // using the wrong selectors.
 // Regex mirrors src/shared/platforms.ts PLATFORM_RUNTIME.linkedin.hostPattern.
 if (/(^|\.)linkedin\.com$/i.test(location.hostname)) {
-  window.PostPatrolAdapter = PostPatrolLinkedInAdapter;
-  window.PostPatrolAdapter = PostPatrolLinkedInAdapter;
+  window.SieveAdapter = SieveLinkedInAdapter;
+  window.PostPatrolAdapter = SieveLinkedInAdapter;
 }

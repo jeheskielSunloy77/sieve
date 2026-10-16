@@ -286,8 +286,8 @@ export async function fetchProviderModels(
 
     if (api === 'openrouter') {
       const headers: Record<string, string> = {
-        'HTTP-Referer': 'https://github.com/jeheskielSunloy77/post-patrol',
-        'X-Title': 'Post Patrol'
+        'HTTP-Referer': 'https://github.com/jeheskielSunloy77/sieve',
+        'X-Title': 'Sieve'
       };
       if (apiKey) {
         headers['Authorization'] = `Bearer ${apiKey}`;

@@ -25,8 +25,8 @@ const activeContentTabs = new Set<number>();
 let activeTabId: number | null = null;
 
 function updateActiveTab(tabId: number | undefined | null): void {
-  const isPostPatrolTab = tabId && activeContentTabs.has(tabId);
-  const newActiveId = isPostPatrolTab ? tabId : null;
+  const isSieveTab = tabId && activeContentTabs.has(tabId);
+  const newActiveId = isSieveTab ? tabId : null;
   if (newActiveId !== activeTabId) {
     activeTabId = newActiveId;
     setActiveTab(newActiveId);
@@ -109,7 +109,7 @@ async function migrateStaleLocalSelection(): Promise<void> {
     await localEngine.syncAllStatuses();
     await localEngine.autoInitSelected();
 
-    // Proactively detect active PostPatrol tabs after service worker restart.
+    // Proactively detect active Sieve tabs after service worker restart.
     // Without this, activeTabId stays null until a content script sends a message,
     // leaving the per-tab queue idle even if posts are already queued.
     try {
@@ -149,7 +149,7 @@ async function handleMessage(
 
   switch (message.type) {
     case 'evaluatePost': {
-      console.log('[PostPatrol][diag] evaluatePost received: tabId=', tabId, 'activeTabId=', activeTabId, 'sender.tab=', !!sender.tab);
+      console.log('[Sieve][diag] evaluatePost received: tabId=', tabId, 'activeTabId=', activeTabId, 'sender.tab=', !!sender.tab);
       // Ensure tab is registered (re-registers after service worker restart)
       if (tabId) activeContentTabs.add(tabId);
 
@@ -198,18 +198,18 @@ async function handleMessage(
         const item = { evaluationId: message.evaluationId, post: message.post, rawText: message.rawText, imageUrls, resolve, cacheKey, tabId, postUrl: message.postUrl, siteId: message.siteId, isReply: message.isReply === true };
         enqueuePost(tabId!, item);
       });
-      console.log('[PostPatrol][diag] evaluatePost enqueued for tab', tabId);
+      console.log('[Sieve][diag] evaluatePost enqueued for tab', tabId);
 
       // On first evaluatePost when activeTabId is unknown, detect if this tab is active
       if (activeTabId === null) {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }).then((tabs) => {
-          console.log('[PostPatrol][diag] tabs.query(active,lastFocused) returned', tabs.length, 'tab(s); first.id=', tabs[0]?.id, 'msg.tabId=', tabId);
+          console.log('[Sieve][diag] tabs.query(active,lastFocused) returned', tabs.length, 'tab(s); first.id=', tabs[0]?.id, 'msg.tabId=', tabId);
           const tab = tabs[0];
           if (tab && tab.id === tabId) updateActiveTab(tabId);
-        }).catch((err) => { console.log('[PostPatrol][diag] tabs.query failed:', err); });
+        }).catch((err) => { console.log('[Sieve][diag] tabs.query failed:', err); });
       }
 
-      console.log('[PostPatrol][diag] calling scheduleBatch; activeTabId=', activeTabId);
+      console.log('[Sieve][diag] calling scheduleBatch; activeTabId=', activeTabId);
       scheduleBatch();
       broadcastQueueStatus().catch(err => console.error('[Background] broadcastQueueStatus error:', err));
       return resultPromise;
@@ -221,7 +221,7 @@ async function handleMessage(
         const reasons = await suggestAnnoyingReasons(message.post, imageUrls, message.siteId || 'twitter', sender.tab?.id);
         return { reasons, hadImages: imageUrls.length > 0 };
       } catch (err) {
-        console.error('[PostPatrol] suggestAnnoyingReasons error:', err);
+        console.error('[Sieve] suggestAnnoyingReasons error:', err);
         return { reasons: [], error: (err as Error).message };
       }
     }
@@ -333,7 +333,7 @@ async function handleMessage(
         authUrl.searchParams.set('callback_url', redirectUrl);
         authUrl.searchParams.set('code_challenge', codeChallenge);
         authUrl.searchParams.set('code_challenge_method', 'S256');
-        authUrl.searchParams.set('title', 'Post Patrol');
+        authUrl.searchParams.set('title', 'Sieve');
 
         const responseUrl = await chrome.identity.launchWebAuthFlow({
           url: authUrl.toString(),

@@ -1,10 +1,10 @@
-# PostPatrol
+# Sieve
 
 <p align="center">
-  <img src="web/icons/icon128.png" alt="PostPatrol" width="128" />
+  <img src="web/icons/icon128.png" alt="Sieve" width="128" />
 </p>
 
-**Heal your feed.** PostPatrol is a browser extension that uses AI to filter unwanted posts from your X, Threads, and LinkedIn feeds. Define filter topics in plain language — "crypto", "engagement bait", "rage politics" — and PostPatrol classifies and hides matching posts in real time.
+**Heal your feed.** Sieve is a browser extension that uses AI to filter unwanted posts from your X, Threads, and LinkedIn feeds. Define filter topics in plain language — "crypto", "engagement bait", "rage politics" — and Sieve classifies and hides matching posts in real time.
 
 ## Features
 
@@ -42,7 +42,7 @@ npm run build
 2. Enable **Developer mode**
 3. Click **Load unpacked** and select the `web/` folder
 4. Navigate to x.com, threads.com, or LinkedIn's home feed
-5. Click "Settings" in the PostPatrol element and add your preferred provider API key (or enable local models) and select your preferred model from the dropdown.
+5. Click "Settings" in the Sieve element and add your preferred provider API key (or enable local models) and select your preferred model from the dropdown.
 
 ## How It Works
 

@@ -12,11 +12,11 @@ Social media users on X/Twitter, Threads, and LinkedIn who want to take control 
 
 ## Product Purpose
 
-PostPatrol cleans up social feeds in real time using AI. Users define filter topics in natural English, and PostPatrol hides matching posts automatically while keeping a transparent log of what was filtered and why.
+Sieve cleans up social feeds in real time using AI. Users define filter topics in natural English, and Sieve hides matching posts automatically while keeping a transparent log of what was filtered and why.
 
 ## Positioning
 
-Unlike basic keyword blockers, PostPatrol understands semantic intent and multimodal image content, running either completely private on-device via WebGPU or through user-provided AI model keys (OpenAI, Gemini, Anthropic, OpenRouter).
+Unlike basic keyword blockers, Sieve understands semantic intent and multimodal image content, running either completely private on-device via WebGPU or through user-provided AI model keys (OpenAI, Gemini, Anthropic, OpenRouter).
 
 ## Operating Context
 
@@ -34,7 +34,7 @@ Runs as a browser extension (Chrome, Edge, Brave, Safari, Firefox). Operates in 
 
 ## Brand Commitments
 
-- Name: PostPatrol ("Heal your feed").
+- Name: Sieve ("Heal your feed").
 - Aesthetic commitment: Clean, modern, architectural minimalism with a strict monotone palette (black/white/grayscale).
 - Typography: Clean, high-legibility system stack (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`).
 

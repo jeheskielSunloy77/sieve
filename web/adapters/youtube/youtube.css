@@ -1,13 +1,13 @@
-/* YouTube-specific styles for PostPatrol.
+/* YouTube-specific styles for Sieve.
  *
  * Two surfaces live here:
- *   1. The mini-guide entry — a PostPatrol button injected into
+ *   1. The mini-guide entry — a Sieve button injected into
  *      `ytd-mini-guide-renderer #items`, styled to match the native
  *      Home / Shorts / Subscriptions / You entries. Clicking it presses
  *      YT's hamburger to open the drawer.
  *   2. The inline filter box — `.filter-phrases-banner--youtube`, anchored
  *      inside `ytd-guide-renderer #sections` after the first section.
- *      The box's DOM is the same PostPatrol markup used on every platform;
+ *      The box's DOM is the same Sieve markup used on every platform;
  *      these rules restyle it to feel native to YT's guide rail.
  *
  * Adding another platform: write its own `<site>.css` with the same
@@ -15,11 +15,15 @@
  * Nothing here needs to be touched. */
 
 /* When the YouTube platform toggle is off, the content script's init flow
- * adds `body.postpatrol-disabled` and removes adapter-injected chrome. The
+ * adds `body.sieve-disabled` and removes adapter-injected chrome. The
  * adapter's mini-guide observer keeps trying to re-add the entry on every
  * DOM mutation — CSS hides what slips through. */
+body.sieve-disabled .sieve-mini-guide-entry,
+body.sieve-disabled .postpatrol-mini-guide-entry,
 body.postpatrol-disabled .postpatrol-mini-guide-entry,
+body.sieve-disabled .filter-phrases-banner,
 body.postpatrol-disabled .filter-phrases-banner,
+body.sieve-disabled .ff-why-annoying-btn,
 body.postpatrol-disabled .ff-why-annoying-btn {
   display: none !important;
 }
@@ -37,6 +41,7 @@ body.site-youtube .post-verification-bar {
 /* Matches `ytd-mini-guide-entry-renderer`: 74px square button, icon on
  * top, 10px label below. Native hover/active feedback. */
 
+.sieve-mini-guide-entry,
 .postpatrol-mini-guide-entry {
   display: flex;
   flex-direction: column;
@@ -60,22 +65,27 @@ body.site-youtube .post-verification-bar {
   -webkit-tap-highlight-color: transparent;
 }
 
+.sieve-mini-guide-entry:hover,
 .postpatrol-mini-guide-entry:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
+.sieve-mini-guide-entry:active,
 .postpatrol-mini-guide-entry:active {
   background: rgba(0, 0, 0, 0.08);
 }
 
+html[dark] .sieve-mini-guide-entry:hover,
 html[dark] .postpatrol-mini-guide-entry:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
+html[dark] .sieve-mini-guide-entry:active,
 html[dark] .postpatrol-mini-guide-entry:active {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.sieve-mini-guide-entry__icon-wrap,
 .postpatrol-mini-guide-entry__icon-wrap {
   position: relative;
   width: 24px;
@@ -83,6 +93,7 @@ html[dark] .postpatrol-mini-guide-entry:active {
   display: block;
 }
 
+.sieve-mini-guide-entry__icon,
 .postpatrol-mini-guide-entry__icon {
   width: 24px;
   height: 24px;
@@ -90,6 +101,7 @@ html[dark] .postpatrol-mini-guide-entry:active {
   display: block;
 }
 
+.sieve-mini-guide-entry__label,
 .postpatrol-mini-guide-entry__label {
   margin-top: 6px;
   font-size: 10px;
@@ -99,12 +111,14 @@ html[dark] .postpatrol-mini-guide-entry:active {
   color: #0f0f0f;
 }
 
+html[dark] .sieve-mini-guide-entry__label,
 html[dark] .postpatrol-mini-guide-entry__label {
   color: #f1f1f1;
 }
 
 /* Count badge — circular overlay anchored to the top-right of the icon.
  * Hidden visually (just a "0") until at least one post is filtered. */
+.sieve-mini-guide-entry__count,
 .postpatrol-mini-guide-entry__count {
   position: absolute;
   top: -6px;
@@ -123,6 +137,7 @@ html[dark] .postpatrol-mini-guide-entry__label {
   box-sizing: border-box;
 }
 
+.sieve-mini-guide-entry__count--nonzero,
 .postpatrol-mini-guide-entry__count--nonzero {
   background: rgb(200, 110, 65);
   color: #fff;
@@ -151,8 +166,8 @@ html[dark] .postpatrol-mini-guide-entry__label {
   padding: 12px 16px;
   background-color: #ffffff !important;
   /* Brand orange outline — matches the Twitter panel. Color comes from the
-   * `--postpatrol-brand-rgb` variable defined in content.css's :root. */
-  border: var(--green-border-width) solid rgb(var(--postpatrol-brand-rgb)) !important;
+   * `--sieve-brand-rgb` variable defined in content.css's :root. */
+  border: var(--green-border-width) solid rgb(var(--sieve-brand-rgb)) !important;
   border-radius: 12px !important;
   display: flex;
   flex-direction: column;
@@ -248,7 +263,7 @@ html[dark] .filter-phrases-banner--youtube .filter-phrase-separator {
 }
 
 .filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input:focus {
-  border-bottom-color: rgb(var(--postpatrol-brand-rgb)) !important;
+  border-bottom-color: rgb(var(--sieve-brand-rgb)) !important;
 }
 
 html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input {
@@ -257,7 +272,7 @@ html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-phr
 }
 
 html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input:focus {
-  border-bottom-color: rgb(var(--postpatrol-brand-rgb)) !important;
+  border-bottom-color: rgb(var(--sieve-brand-rgb)) !important;
 }
 
 /* Nudge the cycling placeholder up 2px so its baseline aligns with the
@@ -391,19 +406,21 @@ html[dark] ytd-watch-flexy #secondary .filter-phrases-banner.filter-phrases-bann
 
 /* ===== Filtered-video placeholder =====
  * When the `youtubeShowPlaceholder` setting is on (controlled from the
- * popup), the YouTube adapter stamps <html> with `postpatrol-yt-show-placeholder`
- * AND appends a `.postpatrol-yt-placeholder` element into each filtered card.
+ * popup), the YouTube adapter stamps <html> with `sieve-yt-show-placeholder`
+ * AND appends a `.sieve-yt-placeholder` element into each filtered card.
  * The mode class on <html> is intentionally distinct from the element's
- * class — otherwise `.postpatrol-yt-placeholder { display: none }` would also
+ * class — otherwise `.sieve-yt-placeholder { display: none }` would also
  * hit <html> and blank the whole page.
  * These rules hide the card's real content and show the placeholder
- * (logo + "Filtered by PostPatrol" label inside a thumbnail-shaped panel,
+ * (logo + "Filtered by Sieve" label inside a thumbnail-shaped panel,
  * with a skeleton avatar + text bars below). Outside this class, filtered
  * cards keep the default `display: none` set by `hidePost`. */
 
 /* Anchor the absolutely-positioned placeholder. The card retains its
  * natural layout because children below use `visibility: hidden` (which
  * preserves their occupied space) rather than `display: none`. */
+html.sieve-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"],
+html.sieve-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"],
 html.postpatrol-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"],
 html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] {
   position: relative;
@@ -412,15 +429,24 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
 /* Hide the original card content visually but keep it in flow so the
  * card's intrinsic height (16:9 thumb + meta row) is preserved. The
  * placeholder then overlays it. */
-html.postpatrol-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > *:not(.postpatrol-yt-placeholder),
-html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > *:not(.postpatrol-yt-placeholder) {
+html.sieve-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > *:not(.sieve-yt-placeholder):not(.postpatrol-yt-placeholder),
+html.sieve-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > *:not(.sieve-yt-placeholder):not(.postpatrol-yt-placeholder),
+html.postpatrol-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > *:not(.sieve-yt-placeholder):not(.postpatrol-yt-placeholder),
+html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > *:not(.sieve-yt-placeholder):not(.postpatrol-yt-placeholder) {
   visibility: hidden;
 }
 
 /* Hide the placeholder element itself by default (so it's invisible when
  * not in placeholder mode or when the card isn't filtered). It only shows
  * when its parent has both the page-level class and the filtered flag. */
+.sieve-yt-placeholder,
 .postpatrol-yt-placeholder { display: none; }
+html.sieve-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > .sieve-yt-placeholder,
+html.sieve-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > .sieve-yt-placeholder,
+html.sieve-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > .postpatrol-yt-placeholder,
+html.sieve-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > .postpatrol-yt-placeholder,
+html.postpatrol-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > .sieve-yt-placeholder,
+html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > .sieve-yt-placeholder,
 html.postpatrol-yt-show-placeholder ytd-rich-item-renderer[data-filtered-by-extension="true"] > .postpatrol-yt-placeholder,
 html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extension="true"] > .postpatrol-yt-placeholder {
   display: block;
@@ -430,8 +456,9 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
 }
 
 /* Thumbnail-shaped panel: matches a real YT thumbnail's 16:9 aspect + 12px
- * radius. Logo above the label, both centered. The logo is the PostPatrol
+ * radius. Logo above the label, both centered. The logo is the Sieve
  * icon as-is (not forced into a circle) so its actual shape reads. */
+.sieve-yt-placeholder-thumb,
 .postpatrol-yt-placeholder-thumb {
   position: relative;
   width: 100%;
@@ -446,11 +473,13 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
   padding: 12px;
   box-sizing: border-box;
 }
+.sieve-yt-placeholder-logo,
 .postpatrol-yt-placeholder-logo {
   width: 40px;
   height: 40px;
   display: block;
 }
+.sieve-yt-placeholder-label,
 .postpatrol-yt-placeholder-label {
   font-size: 14px;
   font-weight: 500;
@@ -460,12 +489,14 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
 /* Byline-shaped skeleton row below the thumbnail: 36px avatar circle on
  * the left, three text bars on the right that decrease in width to mimic
  * a real video's title (2 lines) + byline (1 line). */
+.sieve-yt-placeholder-meta,
 .postpatrol-yt-placeholder-meta {
   display: flex;
   gap: 12px;
   margin-top: 12px;
   align-items: flex-start;
 }
+.sieve-yt-placeholder-avatar,
 .postpatrol-yt-placeholder-avatar {
   width: 36px;
   height: 36px;
@@ -473,6 +504,7 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
   background: #e5e5e5;
   flex-shrink: 0;
 }
+.sieve-yt-placeholder-bars,
 .postpatrol-yt-placeholder-bars {
   display: flex;
   flex-direction: column;
@@ -480,22 +512,32 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
   flex: 1;
   min-width: 0;
 }
+.sieve-yt-placeholder-bar,
 .postpatrol-yt-placeholder-bar {
   background: #e5e5e5;
   border-radius: 4px;
   height: 12px;
 }
+.sieve-yt-placeholder-bar.long,
 .postpatrol-yt-placeholder-bar.long  { width: 95%; }
+.sieve-yt-placeholder-bar.short,
 .postpatrol-yt-placeholder-bar.short { width: 60%; }
+.sieve-yt-placeholder-bar.tiny,
 .postpatrol-yt-placeholder-bar.tiny  { width: 45%; height: 10px; }
 
 /* Shorts variant: tall 2:3 thumb (matches `ytThumbnailViewModelAspectRatio2By3`)
  * and a simpler meta row with no avatar — shorts cards don't render one.
  * Without these overrides the 16:9 thumb leaves a wide empty band at the
  * bottom of the tall shorts cell. */
+.sieve-yt-placeholder--short .sieve-yt-placeholder-thumb,
+.sieve-yt-placeholder--short .postpatrol-yt-placeholder-thumb,
+.postpatrol-yt-placeholder--short .sieve-yt-placeholder-thumb,
 .postpatrol-yt-placeholder--short .postpatrol-yt-placeholder-thumb {
   aspect-ratio: 2 / 3;
 }
+.sieve-yt-placeholder--short .sieve-yt-placeholder-meta,
+.sieve-yt-placeholder--short .postpatrol-yt-placeholder-meta,
+.postpatrol-yt-placeholder--short .sieve-yt-placeholder-meta,
 .postpatrol-yt-placeholder--short .postpatrol-yt-placeholder-meta {
   gap: 0;
 }
@@ -503,12 +545,16 @@ html.postpatrol-yt-show-placeholder yt-lockup-view-model[data-filtered-by-extens
 /* Dark theme: switch to YT's dark surface colors. Desktop-only (`html[dark]`):
  * the placeholder is never shown on mobile/iOS (filtered videos are removed
  * outright there), and desktop carries `darker-dark-theme` even in light mode. */
+html[dark] .sieve-yt-placeholder-thumb,
 html[dark] .postpatrol-yt-placeholder-thumb {
   background: #1f1f1f;
 }
+html[dark] .sieve-yt-placeholder-label,
 html[dark] .postpatrol-yt-placeholder-label {
   color: #aaa;
 }
+html[dark] .sieve-yt-placeholder-avatar,
+html[dark] .sieve-yt-placeholder-bar,
 html[dark] .postpatrol-yt-placeholder-avatar,
 html[dark] .postpatrol-yt-placeholder-bar {
   background: #2b2b2b;
@@ -663,7 +709,7 @@ body.site-youtube .yt-card-reasoning {
 /* ===== "Bounce this video" action button ===== */
 /* Per-card cancel icon — sized to match YT's own 24×24 icon-button so it
  * reads as a native sibling of the 3-dot "More actions" menu, then tinted
- * with the PostPatrol brand orange so users can recognise it as our control.
+ * with the Sieve brand orange so users can recognise it as our control.
  * The 34px default sizing from content.css is overridden here. */
 
 .ff-why-annoying-btn.ff-yt-under-menu,
@@ -674,9 +720,9 @@ body.site-youtube .yt-card-reasoning {
    * with the 3-dot button next to it. */
   width: 24px;
   height: 24px;
-  /* PostPatrol brand accent. Defined in content.css :root as
-   * `--postpatrol-brand-rgb`. */
-  color: rgb(var(--postpatrol-brand-rgb));
+  /* Sieve brand accent. Defined in content.css :root as
+   * `--sieve-brand-rgb`. */
+  color: rgb(var(--sieve-brand-rgb));
 }
 
 /* For the next-to-menu placement we can't rely on inherited `color` driving
@@ -684,7 +730,7 @@ body.site-youtube .yt-card-reasoning {
  * `color` on the host. Force `stroke` directly on the SVG so the brand orange
  * wins regardless of YT's icon-color cascade. */
 .ff-why-annoying-btn.ff-yt-next-to-menu svg {
-  stroke: rgb(var(--postpatrol-brand-rgb));
+  stroke: rgb(var(--sieve-brand-rgb));
 }
 
 .ff-why-annoying-btn.ff-yt-under-menu:hover,

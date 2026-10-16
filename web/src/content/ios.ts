@@ -51,7 +51,7 @@ declare const webkit: WebkitBridge;
 // Dependencies (set by initIOS from index.ts)
 let _deps: IOSDeps;
 
-// "iOS" here means "running inside a native shell that provides the PostPatrol
+// "iOS" here means "running inside a native shell that provides the Sieve
 // sheet" — true for both iOS WKWebView and the Android WebView app (whose
 // startup shim aliases window.AndroidBridge to webkit.messageHandlers). The
 // flag name is kept for git churn; new call sites should read it as
@@ -64,20 +64,20 @@ export function isIOSSafari() {
 export const IS_IOS = isIOSSafari();
 
 export function initIOS(deps: IOSDeps) {
-  console.log('[PostPatrol][iOS] initIOS called');
+  console.log('[Sieve][iOS] initIOS called');
   _deps = deps;
 
   // Bridge functions for native Swift sheet to call back into JS
   const w = window as Window & FFWindow;
   w.__ff_addPhrase = async (text: string): Promise<boolean> => {
-    console.log('[PostPatrol][iOS] __ff_addPhrase called with:', text);
+    console.log('[Sieve][iOS] __ff_addPhrase called with:', text);
     const added = await _deps.addFilterPhrase(text);
-    console.log('[PostPatrol][iOS] addFilterPhrase returned:', added);
+    console.log('[Sieve][iOS] addFilterPhrase returned:', added);
     updateIOSFilteredCount();
     return added;
   };
   w.__ff_removePhrase = async (phrase: string): Promise<void> => {
-    console.log('[PostPatrol][iOS] __ff_removePhrase called with:', phrase);
+    console.log('[Sieve][iOS] __ff_removePhrase called with:', phrase);
     await _deps.removeFilterPhrase(phrase);
     updateIOSFilteredCount();
   };
@@ -135,7 +135,7 @@ export function initIOS(deps: IOSDeps) {
     try {
       await chrome.runtime.sendMessage({ type: 'clearCache' });
     } catch (err) {
-      console.warn('[PostPatrol][iOS] clearModelCache failed:', err);
+      console.warn('[Sieve][iOS] clearModelCache failed:', err);
     }
   };
 
@@ -167,7 +167,7 @@ export function initIOS(deps: IOSDeps) {
     const n = Number(value);
     if (!Number.isFinite(n)) return;
     const clamped = clampThreshold(n);
-    console.log('[PostPatrol][iOS] __ff_setAiTextDetectionThreshold:', clamped);
+    console.log('[Sieve][iOS] __ff_setAiTextDetectionThreshold:', clamped);
     await chrome.storage.local.set({ aiTextDetectionThreshold: clamped });
   };
 
@@ -182,7 +182,7 @@ export function initIOS(deps: IOSDeps) {
     const n = Number(value);
     if (!Number.isFinite(n)) return;
     const clamped = clampReplyThreshold(n);
-    console.log('[PostPatrol][iOS] __ff_setAiTextReplyDetectionThreshold:', clamped);
+    console.log('[Sieve][iOS] __ff_setAiTextReplyDetectionThreshold:', clamped);
     await chrome.storage.local.set({ aiTextReplyDetectionThreshold: clamped });
   };
 
@@ -203,7 +203,7 @@ export function initIOS(deps: IOSDeps) {
     const n = Number(value);
     if (!Number.isFinite(n)) return;
     const clamped = clampImageThreshold(n);
-    console.log('[PostPatrol][iOS] __ff_setAiImageDetectionThreshold:', clamped);
+    console.log('[Sieve][iOS] __ff_setAiImageDetectionThreshold:', clamped);
     await chrome.storage.local.set({ aiImageDetectionThreshold: clamped });
   };
 
@@ -226,7 +226,7 @@ export function initIOS(deps: IOSDeps) {
   };
 
   // Send initial phrases to native Swift UI so the sheet isn't empty on first open
-  console.log('[PostPatrol][iOS] Sending initial phrases update');
+  console.log('[Sieve][iOS] Sending initial phrases update');
   updateIOSFilteredCount();
 }
 
@@ -236,7 +236,8 @@ export function getIOSPageContainer(): HTMLElement | null { return null; }
 export function getFFFabButton(): HTMLElement | null { return null; }
 
 // FAB is now in the native Swift NavBarView — no JS injection needed
-export function injectPostPatrolFAB() {}
+export function injectSieveFAB() {}
+export const injectPostPatrolFAB = injectSieveFAB;
 
 // Show iOS filtered posts modal
 export function showIOSFilteredModal() {
@@ -346,8 +347,8 @@ export function handleDOMMutationIOS() {}
 // ==================== Import-Pack Genie Animation ====================
 
 /**
- * iOS counterpart to the desktop "fly the tweet image into the PostPatrol box"
- * animation. The native PostPatrol FAB sits in a UIKit toolbar below the
+ * iOS counterpart to the desktop "fly the tweet image into the Sieve box"
+ * animation. The native Sieve FAB sits in a UIKit toolbar below the
  * WebView, so we can't actually deliver pixels into it from JS — instead we
  * genie the tweet's photo down off the bottom of the viewport, where the
  * native FAB visually sits just below.
@@ -405,7 +406,7 @@ export async function runIOSImportAnimation(
   const originalVis = tweetImg.style.visibility;
   tweetImg.style.visibility = 'hidden';
 
-  // Aim at the center of the native PostPatrol button (rightmost of four
+  // Aim at the center of the native Sieve button (rightmost of four
   // equally-spaced toolbar buttons), and have the funnel taper to roughly
   // the button's visible width (~56pt) rather than a single point. targetY
   // exits the viewport so the funnel's tip drains *off* the bottom — the

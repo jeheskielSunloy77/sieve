@@ -13,15 +13,15 @@ beforeEach(async () => {
     } as unknown as typeof chrome.runtime,
   } as typeof chrome;
 
-  // The adapter only claims `window.PostPatrolAdapter` when running on a
-  // linkedin.com host (see LinkedInAdapter.ts). happy-dom defaults to
+  // The adapter claims `window.SieveAdapter` (and legacy `window.PostPatrolAdapter`)
+  // when running on a linkedin.com host (see LinkedInAdapter.ts). happy-dom defaults to
   // localhost, so point it at linkedin.com before the module's hostname
   // guard runs on import.
   (window as unknown as { happyDOM: { setURL(url: string): void } })
     .happyDOM.setURL('https://www.linkedin.com/feed/');
 
   await import('../../adapters/linkedin/LinkedInAdapter.js');
-  LinkedInAdapter = window.PostPatrolAdapter;
+  LinkedInAdapter = window.SieveAdapter || window.PostPatrolAdapter;
 });
 
 // Real desktop SDUI actor header captured from the live feed (obfuscated class

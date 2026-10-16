@@ -91,7 +91,7 @@
               }
             }
           } catch (e) {
-            console.log('[PostPatrol][Store] Failed to parse unified_card:', e.message);
+            console.log('[Sieve][Store] Failed to parse unified_card:', e.message);
           }
         }
 

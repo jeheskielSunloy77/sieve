@@ -41,14 +41,14 @@ beforeEach(async () => {
     return origAppendChild(node);
   };
 
-  // The adapter only claims `window.PostPatrolAdapter` when running on an
-  // X/Twitter host (see TwitterAdapter.ts). happy-dom defaults to localhost,
+  // The adapter claims `window.SieveAdapter` (and legacy `window.PostPatrolAdapter`)
+  // when running on an X/Twitter host (see TwitterAdapter.ts). happy-dom defaults to localhost,
   // so point it at x.com before the module's hostname guard runs on import.
   (window as unknown as { happyDOM: { setURL(url: string): void } })
     .happyDOM.setURL('https://x.com/home');
 
   await import('../../adapters/twitter/TwitterAdapter.js');
-  TwitterAdapter = window.PostPatrolAdapter;
+  TwitterAdapter = window.SieveAdapter || window.PostPatrolAdapter;
 });
 
 // ==================== finding tweets ====================

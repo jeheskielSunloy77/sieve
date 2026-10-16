@@ -642,7 +642,7 @@ export async function callLocalAiIntentJudgment(
 }
 
 // Orchestrates local inference for a single post. Uses the pipe-delimited
-// verdict row from the postpatrol-evals-and-results `table_yesno` combo: one
+// verdict row from the sieve-evals-and-results `table_yesno` combo: one
 // `yes`/`no` per category, no reasoning. ~3 tokens per category vs ~25 for
 // a reasoning sentence, which dominates wall-clock for a 4B model on WebGPU.
 export async function callLocalInference(

@@ -202,7 +202,7 @@ interface SettingsBase {
   // this map is derived from those keys at settings-read time.
   platformEnabled: Partial<Record<SiteId, boolean>>;
   // When true on YouTube, filtered videos are left in the grid and shown
-  // as a "Filtered by PostPatrol" placeholder card (see youtube.css). Default
+  // as a "Filtered by Sieve" placeholder card (see youtube.css). Default
   // false — remove the card outright, matching Twitter's behavior.
   youtubeShowPlaceholder: boolean;
 }

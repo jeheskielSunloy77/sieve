@@ -494,7 +494,7 @@
               : typeof v === 'symbol' ? 'Symbol(' + (v.description || '') + ')'
               : typeof v !== 'object' ? typeof v + '(' + String(v).slice(0, 40) + ')'
               : 'object{' + Object.keys(v).slice(0, 8).join(',') + '}';
-            console.warn('[PostPatrol][YT] No data found on', richItem.tagName.toLowerCase(), {
+            console.warn('[Sieve][YT] No data found on', richItem.tagName.toLowerCase(), {
               ref: richItem,
               rawProps: describe(richItem.rawProps),
               'rawProps.data': describe(richItem.rawProps && richItem.rawProps.data),
@@ -507,7 +507,7 @@
               ownProps: Object.getOwnPropertyNames(richItem).slice(0, 30),
             });
           }
-          console.log('[PostPatrol][YT][bridge] no-data-property', { requestId, tag: richItem.tagName.toLowerCase() });
+          console.log('[Sieve][YT][bridge] no-data-property', { requestId, tag: richItem.tagName.toLowerCase() });
           document.dispatchEvent(new CustomEvent('ff-youtube-data-result', {
             detail: JSON.stringify({ requestId, success: false, error: 'no-data-property' })
           }));
@@ -518,29 +518,29 @@
         const isAd = !!raw.content?.adSlotRenderer;
         const isShort = !!raw.content?.shortsLockupViewModel;
         if (isAd) {
-          console.log('[PostPatrol][YT][bridge] AD raw', {
+          console.log('[Sieve][YT][bridge] AD raw', {
             requestId, videoId,
             adSlotRenderer: raw.content.adSlotRenderer,
           });
         }
         if (isShort) {
-          console.log('[PostPatrol][YT][bridge] SHORT raw', {
+          console.log('[Sieve][YT][bridge] SHORT raw', {
             requestId, videoId,
             shortsLockupViewModel: raw.content.shortsLockupViewModel,
           });
         }
         const data = normalize(raw, videoId);
         if (!data) {
-          console.log('[PostPatrol][YT][bridge] normalize-failed', { requestId, videoId, rawKeys: Object.keys(raw) });
+          console.log('[Sieve][YT][bridge] normalize-failed', { requestId, videoId, rawKeys: Object.keys(raw) });
           document.dispatchEvent(new CustomEvent('ff-youtube-data-result', {
             detail: JSON.stringify({ requestId, success: false, error: 'normalize-failed' })
           }));
           return;
         }
         if (data.skip) {
-          console.log('[PostPatrol][YT][bridge] skipping', { requestId, videoId, reason: data.reason });
+          console.log('[Sieve][YT][bridge] skipping', { requestId, videoId, reason: data.reason });
         } else if (isAd) {
-          console.log('[PostPatrol][YT][bridge] AD extracted', {
+          console.log('[Sieve][YT][bridge] AD extracted', {
             requestId,
             videoId: data.videoId,
             title: data.title,
@@ -549,7 +549,7 @@
             thumbnailUrl: data.thumbnailUrl,
           });
         } else if (isShort) {
-          console.log('[PostPatrol][YT][bridge] SHORT extracted', {
+          console.log('[Sieve][YT][bridge] SHORT extracted', {
             requestId,
             videoId: data.videoId,
             title: data.title,
@@ -560,7 +560,7 @@
           detail: JSON.stringify({ requestId, success: true, data })
         }));
       } catch (e) {
-        console.warn('[PostPatrol][YT][bridge] threw', { requestId, error: e && e.message ? e.message : String(e) });
+        console.warn('[Sieve][YT][bridge] threw', { requestId, error: e && e.message ? e.message : String(e) });
         document.dispatchEvent(new CustomEvent('ff-youtube-data-result', {
           detail: JSON.stringify({ requestId, success: false, error: e && e.message ? e.message : String(e) })
         }));

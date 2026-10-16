@@ -27,14 +27,14 @@ export const FILTER_PACK_CODE_REGEX = /bncr2_[A-Za-z0-9_-]+/g;
 /** Landing page that hosts the share URL. The bncr2_ code rides in the URL
  *  fragment so it never hits the server — the importing extension extracts it
  *  client-side from the rendered <a>. */
-export const FILTER_PACK_SHARE_URL_BASE = 'github.com/jeheskielSunloy77/post-patrol';
+export const FILTER_PACK_SHARE_URL_BASE = 'github.com/jeheskielSunloy77/sieve';
 
-/** Match a postpatrol share URL anywhere in a string. Captures the
+/** Match a sieve share URL anywhere in a string. Captures the
  *  bncr2_ code so callers can pass it straight to decodeFilterPackCode. The
  *  scheme is optional because Twitter's link rendering sometimes hides it in
  *  an aria-hidden span and sometimes drops it entirely. Supports both the
  *  current GitHub repository URL and legacy share links. */
-export const FILTER_PACK_SHARE_URL_REGEX = /(?:https?:\/\/)?(?:github\.com\/jeheskielSunloy77\/post-patrol|imbue\.com\/product\/postpatrol)#(bncr2_[A-Za-z0-9_-]+)/i;
+export const FILTER_PACK_SHARE_URL_REGEX = /(?:https?:\/\/)?(?:github\.com\/jeheskielSunloy77\/(?:sieve|post-patrol)|imbue\.com\/product\/(?:sieve|postpatrol))#(bncr2_[A-Za-z0-9_-]+)/i;
 
 /** Build the share URL that gets pasted into the tweet caption. */
 export function buildFilterPackShareUrl(code: string): string {

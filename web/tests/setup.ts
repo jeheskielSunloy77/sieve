@@ -1,6 +1,7 @@
 // Build-time env vars (normally replaced by esbuild, need defaults for tests)
 globalThis.process = globalThis.process || {};
 globalThis.process.env = globalThis.process.env || {};
+process.env.SIEVE_ENV = process.env.SIEVE_ENV || 'test';
 process.env.POSTPATROL_ENV = process.env.POSTPATROL_ENV || 'test';
 
 // Global mocks for Chrome extension APIs

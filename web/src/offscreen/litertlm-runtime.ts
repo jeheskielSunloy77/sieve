@@ -1,4 +1,4 @@
-// Wraps LiteRT-LM's Engine + Conversation for use as a PostPatrol LocalBackend.
+// Wraps LiteRT-LM's Engine + Conversation for use as a Sieve LocalBackend.
 // Runs in any DOM-backed context — the Firefox event-page background and the
 // Chrome offscreen document both instantiate this directly. Chrome's MV3
 // service worker proxies through litertlm-proxy.ts because @litertjs/wasm-utils
@@ -196,7 +196,7 @@ export class LitertlmRuntime {
     this.chain = Promise.resolve();
   }
 
-  // Translate PostPatrol's ChatMessage[] into LiteRT-LM's Preface + final user
+  // Translate Sieve's ChatMessage[] into LiteRT-LM's Preface + final user
   // message. The system message goes into the preface; the last user message
   // is what gets sent. LiteRT-LM applies the model's chat template internally.
   private splitMessages(messages: ChatMessage[]): { prefaceMessages: Message[]; userText: string } {

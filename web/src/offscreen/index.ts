@@ -3,7 +3,7 @@
 // the LiteRT-LM Engine. The protocol is request/response with an `id`
 // field; the SW side (litertlm-proxy.ts) generates ids and routes replies.
 //
-// One offscreen document hosts at most one runtime — PostPatrol only loads a
+// One offscreen document hosts at most one runtime — Sieve only loads a
 // single local model at a time, so collapsing the lifecycle here mirrors the
 // orchestrator's invariant.
 

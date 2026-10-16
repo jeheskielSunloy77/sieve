@@ -17,12 +17,12 @@ import type {
 // it's available as a runtime global.
 declare const DOMPurify: { sanitize(html: string, opts: { RETURN_DOM_FRAGMENT: true }): DocumentFragment };
 
-// Classic PostPatrol trashcan glyph (same as Twitter/LinkedIn). Sized via the
+// Classic Sieve trashcan glyph (same as Twitter/LinkedIn). Sized via the
 // `.ff-yt-* svg` rule in youtube.css. Stroke-based, so the wrapper uses
 // `stroke: currentcolor` and `fill: none` rather than a fill cascade.
 const CANCEL_SVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; display: inherit; width: 100%; height: 100%;"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M5 6v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/></svg>';
 
-// YT-native icon-button wrapper. When the PostPatrol button sits next to a
+// YT-native icon-button wrapper. When the Sieve button sits next to a
 // real "More actions" 3-dot menu, we clone YT's button-shape DOM around the
 // trash SVG so YT's own stylesheet drives sizing and hover. Stroke (not fill)
 // drives the glyph color since the trashcan is a stroke-only path.
@@ -99,11 +99,11 @@ function buildThumbnailUrls(
   return { imageUrls: [], displayImageUrls: undefined };
 }
 
-// Assigned to `window.PostPatrolAdapter` only when running on a YouTube host (see
+// Assigned to `window.SieveAdapter` only when running on a YouTube host (see
 // the guarded assignment at the bottom of this file). On iOS both the Twitter
 // and YouTube adapters are injected into every page, so each must claim the
 // global slot only for its own site or they'd clobber each other.
-const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter {
+const SieveYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter {
   siteId = 'youtube' as const;
   filterBoxPlacement = 'banner' as const;
 
@@ -115,7 +115,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   // `ytm-media-item`) that need their own extraction path. The DOM-facing
   // members below branch on this flag. All the desktop chrome (banner box,
   // mini-guide, per-post action button) is skipped on mobile — on iOS the
-  // entire PostPatrol UI lives in the native filtered-posts tab, so the adapter
+  // entire Sieve UI lives in the native filtered-posts tab, so the adapter
   // only needs to make matching videos disappear.
   private _mobile = location.hostname === 'm.youtube.com';
 
@@ -198,9 +198,10 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   }
 
   private _applyPlaceholderClass(): void {
-    // Distinct from the placeholder element's class — selecting `.postpatrol-
+    // Distinct from the placeholder element's class — selecting `.sieve-
     // yt-placeholder` on its own would match both <html> and the element,
     // and hiding the element with `display:none` would also hide <html>.
+    document.documentElement.classList.toggle('sieve-yt-show-placeholder', this._showPlaceholder);
     document.documentElement.classList.toggle('postpatrol-yt-show-placeholder', this._showPlaceholder);
   }
 
@@ -209,7 +210,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   // visibility, so it's safe to leave the element in place when toggling
   // the setting off; only fresh hides require an injection.
   private _ensurePlaceholderElement(el: HTMLElement): void {
-    if (el.querySelector(':scope > .postpatrol-yt-placeholder')) return;
+    if (el.querySelector(':scope > .sieve-yt-placeholder, :scope > .postpatrol-yt-placeholder')) return;
 
     // Shorts cards use a 2:3 thumbnail and a simpler byline (title + views,
     // no avatar). Detect by descendant — the rich-item-renderer wraps a
@@ -217,37 +218,39 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     const isShort = !!el.querySelector('ytm-shorts-lockup-view-model, .shortsLockupViewModelHost');
 
     const wrap = document.createElement('div');
-    wrap.className = isShort ? 'postpatrol-yt-placeholder postpatrol-yt-placeholder--short' : 'postpatrol-yt-placeholder';
+    wrap.className = isShort
+      ? 'sieve-yt-placeholder postpatrol-yt-placeholder sieve-yt-placeholder--short postpatrol-yt-placeholder--short'
+      : 'sieve-yt-placeholder postpatrol-yt-placeholder';
 
     const thumb = document.createElement('div');
-    thumb.className = 'postpatrol-yt-placeholder-thumb';
+    thumb.className = 'sieve-yt-placeholder-thumb postpatrol-yt-placeholder-thumb';
     const logo = document.createElement('img');
-    logo.className = 'postpatrol-yt-placeholder-logo';
+    logo.className = 'sieve-yt-placeholder-logo postpatrol-yt-placeholder-logo';
     logo.src = chrome.runtime.getURL('icons/icon48.png');
     logo.alt = '';
     logo.setAttribute('aria-hidden', 'true');
     const label = document.createElement('span');
-    label.className = 'postpatrol-yt-placeholder-label';
-    label.textContent = 'Filtered by Post Patrol';
+    label.className = 'sieve-yt-placeholder-label postpatrol-yt-placeholder-label';
+    label.textContent = 'Filtered by Sieve';
     thumb.appendChild(logo);
     thumb.appendChild(label);
 
     const meta = document.createElement('div');
-    meta.className = 'postpatrol-yt-placeholder-meta';
+    meta.className = 'sieve-yt-placeholder-meta postpatrol-yt-placeholder-meta';
     // Regular cards have an avatar circle; shorts don't.
     if (!isShort) {
       const avatar = document.createElement('div');
-      avatar.className = 'postpatrol-yt-placeholder-avatar';
+      avatar.className = 'sieve-yt-placeholder-avatar postpatrol-yt-placeholder-avatar';
       meta.appendChild(avatar);
     }
     const bars = document.createElement('div');
-    bars.className = 'postpatrol-yt-placeholder-bars';
+    bars.className = 'sieve-yt-placeholder-bars postpatrol-yt-placeholder-bars';
     // Shorts get two short bars (title + views) instead of the regular
     // three-line byline (title × 2 + channel + views).
     const barVariants = isShort ? ['long', 'tiny'] : ['long', 'short', 'tiny'];
     for (const variant of barVariants) {
       const bar = document.createElement('div');
-      bar.className = `postpatrol-yt-placeholder-bar ${variant}`;
+      bar.className = `sieve-yt-placeholder-bar postpatrol-yt-placeholder-bar ${variant}`;
       bars.appendChild(bar);
     }
     meta.appendChild(bars);
@@ -261,7 +264,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   // The full filter box is anchored inline in YT's guide drawer (see
   // `getFilterBoxAnchor`). When the drawer is collapsed to its mini-rail
   // (`ytd-mini-guide-renderer`), we still want users to be able to reach
-  // PostPatrol — so we inject a PostPatrol entry styled to match the native
+  // Sieve — so we inject a Sieve entry styled to match the native
   // mini-guide entries (Home / Shorts / Subs / You). Clicking it presses
   // YT's own hamburger button, which opens the drawer and reveals the
   // inline box.
@@ -274,12 +277,12 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     // `shouldProcessCurrentPage` returns true and the inline box exists).
     // On other pages, strip any stale entry so we don't leave dangling UI.
     if (!this.shouldProcessCurrentPage()) {
-      const stale = document.querySelector<HTMLElement>('.postpatrol-mini-guide-entry');
+      const stale = document.querySelector<HTMLElement>('.sieve-mini-guide-entry, .postpatrol-mini-guide-entry');
       stale?.remove();
       return null;
     }
 
-    let entry = document.querySelector<HTMLElement>('.postpatrol-mini-guide-entry');
+    let entry = document.querySelector<HTMLElement>('.sieve-mini-guide-entry, .postpatrol-mini-guide-entry');
     if (entry && entry.isConnected) return entry;
 
     const miniItems = document.querySelector<HTMLElement>('ytd-mini-guide-renderer #items');
@@ -287,15 +290,15 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
 
     const logoUrl = chrome.runtime.getURL('icons/icon48.png');
     entry = document.createElement('button');
-    entry.className = 'postpatrol-mini-guide-entry';
+    entry.className = 'sieve-mini-guide-entry postpatrol-mini-guide-entry';
     (entry as HTMLButtonElement).type = 'button';
-    entry.setAttribute('aria-label', 'Open Post Patrol filters');
+    entry.setAttribute('aria-label', 'Open Sieve filters');
     entry.replaceChildren(DOMPurify.sanitize(`
-      <span class="postpatrol-mini-guide-entry__icon-wrap">
-        <img class="postpatrol-mini-guide-entry__icon" src="${logoUrl}" alt="" aria-hidden="true">
-        <span class="postpatrol-mini-guide-entry__count" aria-hidden="true">0</span>
+      <span class="sieve-mini-guide-entry__icon-wrap postpatrol-mini-guide-entry__icon-wrap">
+        <img class="sieve-mini-guide-entry__icon postpatrol-mini-guide-entry__icon" src="${logoUrl}" alt="" aria-hidden="true">
+        <span class="sieve-mini-guide-entry__count postpatrol-mini-guide-entry__count" aria-hidden="true">0</span>
       </span>
-      <span class="postpatrol-mini-guide-entry__label">Post Patrol</span>
+      <span class="sieve-mini-guide-entry__label postpatrol-mini-guide-entry__label">Sieve</span>
     `, { RETURN_DOM_FRAGMENT: true }));
     entry.addEventListener('click', (e) => {
       e.preventDefault();
@@ -304,7 +307,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     });
 
     // Insert between Shorts and Subscriptions so the order in the mini-rail
-    // matches the order in the expanded drawer: Home → Shorts → PostPatrol →
+    // matches the order in the expanded drawer: Home → Shorts → Sieve →
     // Subscriptions → You. We anchor against the Subscriptions link rather
     // than a positional index because YT occasionally reshuffles primary
     // tabs (e.g. signed-out users see fewer entries).
@@ -323,23 +326,26 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   // first open, so DOM-scrape mirrors miss filter activity that happens
   // before the user touches the drawer.
   private _wireFilteredCountListener(): void {
-    document.addEventListener('postpatrol:filtered-count-changed', () => {
+    const onCountChanged = () => {
       this._applyCountToBadge();
-    });
+    };
+    document.addEventListener('sieve:filtered-count-changed', onCountChanged);
+    document.addEventListener('postpatrol:filtered-count-changed', onCountChanged);
   }
 
   // Mirror the published filtered-post count onto the mini-guide badge.
-  // Reads from `document.documentElement.dataset.postpatrolFilteredCount`,
-  // which `updateFilteredTabCount` keeps in sync with `filteredPosts.length`
-  // (the single source of truth). Idempotent — safe to call when the
-  // entry doesn't yet exist (no-op) or when the value hasn't changed
+  // Reads from `document.documentElement.dataset.sieveFilteredCount` (or fallback
+  // `postpatrolFilteredCount`), which `updateFilteredTabCount` keeps in sync with
+  // `filteredPosts.length` (the single source of truth). Idempotent — safe to call
+  // when the entry doesn't yet exist (no-op) or when the value hasn't changed
   // (avoids dispatching a no-op DOM mutation that would re-fire the
   // tick observer).
   private _applyCountToBadge(): void {
-    const c = document.querySelector<HTMLElement>('.postpatrol-mini-guide-entry__count');
+    const c = document.querySelector<HTMLElement>('.sieve-mini-guide-entry__count, .postpatrol-mini-guide-entry__count');
     if (!c) return;
-    const n = document.documentElement.dataset.postpatrolFilteredCount || '0';
+    const n = document.documentElement.dataset.sieveFilteredCount || document.documentElement.dataset.postpatrolFilteredCount || '0';
     if (c.textContent !== n) c.textContent = n;
+    c.classList.toggle('sieve-mini-guide-entry__count--nonzero', n !== '0');
     c.classList.toggle('postpatrol-mini-guide-entry__count--nonzero', n !== '0');
   }
 
@@ -433,8 +439,8 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     }
 
     // Home: anchor inside the FIRST guide section's `#items` list, after
-    // the Shorts entry — so PostPatrol becomes part of the same section as
-    // Home and Shorts (keeping YT's section divider below PostPatrol, above
+    // the Shorts entry — so Sieve becomes part of the same section as
+    // Home and Shorts (keeping YT's section divider below Sieve, above
     // Subscriptions).
     const firstSection = document.querySelector<HTMLElement>(
       'ytd-guide-renderer #sections ytd-guide-section-renderer'
@@ -530,7 +536,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
   // Two modes, gated by the `youtubeShowPlaceholder` setting:
   //   - off (default): remove the card outright, matching Twitter.
   //   - on: leave the slot in the home grid and cover it with a
-  //         "Filtered by PostPatrol" placeholder (see youtube.css).
+  //         "Filtered by Sieve" placeholder (see youtube.css).
   // The watch-page sidebar is always remove-only — it's a linear list, so
   // a placeholder row would be noise between real suggestions.
   hidePost(article: HTMLElement): void {
@@ -721,7 +727,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
           resolve(result);
         }
       } catch (err) {
-        console.log('[PostPatrol][YT][Store] Parse error:', err);
+        console.log('[Sieve][YT][Store] Parse error:', err);
       }
     });
   }
@@ -730,11 +736,11 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     const vid = getVideoIdFromContentIdClass(article);
     const data = await this._requestStoreData(article);
     if (!data) {
-      console.log('[PostPatrol][YT] store: no data', { videoId: vid });
+      console.log('[Sieve][YT] store: no data', { videoId: vid });
       return null;
     }
     if (data.skip) {
-      console.log('[PostPatrol][YT] store: skip', { videoId: vid, reason: data.reason });
+      console.log('[Sieve][YT] store: skip', { videoId: vid, reason: data.reason });
       return null;
     }
     return this._normalize(data, article);
@@ -746,7 +752,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
         this._pendingStoreRequests.delete(requestId);
-        console.log('[PostPatrol][YT] store: timeout', { requestId });
+        console.log('[Sieve][YT] store: timeout', { requestId });
         resolve(null);
       }, 200);
 
@@ -755,7 +761,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
         if (result.success && result.data) {
           resolve(result.data);
         } else {
-          console.log('[PostPatrol][YT] store: bridge error', { requestId, error: result.error });
+          console.log('[Sieve][YT] store: bridge error', { requestId, error: result.error });
           resolve(null);
         }
       });
@@ -819,7 +825,7 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
 
     // Strip any injected placeholder DOM — the panel renders the real
     // video, so the skeleton cover would just be cruft inside the clone.
-    el.querySelectorAll('.postpatrol-yt-placeholder').forEach(p => p.remove());
+    el.querySelectorAll('.sieve-yt-placeholder, .postpatrol-yt-placeholder').forEach(p => p.remove());
 
     // Strip our injected trash button — otherwise the filtered-posts panel
     // renders it inside the cloned card (e.g. inside a Short's title).
@@ -967,6 +973,6 @@ const PostPatrolYouTubeAdapter = class YouTubeAdapter implements PlatformAdapter
 // Self-guard by hostname — covers both www.youtube.com and m.youtube.com.
 // Regex mirrors src/shared/platforms.ts PLATFORM_RUNTIME.youtube.hostPattern.
 if (/(^|\.)(m\.)?youtube\.com$/i.test(location.hostname)) {
-  window.PostPatrolAdapter = PostPatrolYouTubeAdapter;
-  window.PostPatrolAdapter = PostPatrolYouTubeAdapter;
+  window.SieveAdapter = SieveYouTubeAdapter;
+  window.PostPatrolAdapter = SieveYouTubeAdapter;
 }

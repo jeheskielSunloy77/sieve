@@ -13,7 +13,7 @@ Output your reasoning and the best matching category in this format:
 `;
 
 // System prompt for local models — pipe-delimited yes/no row over
-// categories. Ported from postpatrol-evals-and-results' table_yesno.
+// categories. Ported from sieve-evals-and-results' table_yesno.
 // The model emits one verdict per category in the order given.
 //
 // Known weakness on Gemma 4 IT at 4B: the pipe character has a strong
@@ -95,7 +95,7 @@ export function buildTableYesnoUserMessage(postText: string, categories: string[
 }
 
 // Gemma export quirks: leaked turn-template markers leak into the generated
-// text in different ways across the model variants PostPatrol runs:
+// text in different ways across the model variants Sieve runs:
 //   - Gemma 4 IT (iOS .litertlm) emits `<turn|>` as end-of-turn; the runtime's
 //     stop_tokens list only includes <eos> so the marker reaches the JS side.
 //     The matching `<|turn>` open form is also stripped in case templating

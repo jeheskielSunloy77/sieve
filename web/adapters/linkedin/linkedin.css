@@ -1,6 +1,6 @@
 /* linkedin adaptation
  *
- * LinkedIn-specific styles for PostPatrol. The shared content.css already covers
+ * LinkedIn-specific styles for Sieve. The shared content.css already covers
  * both `.light-mode` and `.dark-mode` UI surfaces, and LinkedInAdapter only
  * ever reports 'light' | 'dark' (LinkedIn has no Twitter-style "dim" theme),
  * so no per-theme overrides are needed here — unlike adapters/twitter/twitter.css

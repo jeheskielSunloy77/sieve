@@ -1,4 +1,4 @@
-// Platform registry — single source of truth for everything PostPatrol needs
+// Platform registry — single source of truth for everything Sieve needs
 // to know about a supported site. Adding a new platform is:
 //   - one entry in PLATFORM_IDS + PLATFORM_RUNTIME below
 //   - one entry in platforms.config.json (consumed by both the TS bundle
@@ -82,10 +82,10 @@ const PLATFORM_RUNTIME: Record<SiteId, PlatformRuntimeOnly> = {
 
 export type PlatformDef = PlatformBuildConfig & PlatformRuntimeOnly;
 
-/** Current build target. build.js replaces `process.env.POSTPATROL_TARGET` with
+/** Current build target. build.js replaces `process.env.SIEVE_TARGET` with
  *  a literal at bundle time; outside a build (e.g. vitest) it falls back to
  *  `chrome`. */
-export const CURRENT_TARGET = process.env.POSTPATROL_TARGET || 'chrome';
+export const CURRENT_TARGET = process.env.SIEVE_TARGET || process.env.POSTPATROL_TARGET || 'chrome';
 
 /** Joined registry: build-config (from JSON) + runtime fields — EVERY
  *  configured platform, regardless of build target. The content pipeline,

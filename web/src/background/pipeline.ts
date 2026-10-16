@@ -27,7 +27,7 @@ import type {
 
 // Resolved at build time (esbuild define) — same flag ui.ts uses to gate the
 // sign-out button. Gates debug detail in user-facing reasoning strings.
-const IS_DEV_BUILD = (process.env.POSTPATROL_ENV || '').toLowerCase() === 'dev';
+const IS_DEV_BUILD = (process.env.SIEVE_ENV || process.env.POSTPATROL_ENV || '').toLowerCase() === 'dev';
 
 const CACHE_SIZE = 500; // Increased for persistent storage
 const BATCH_DELAY_MS = 1000; // Wait time to collect posts before sending batch
@@ -313,7 +313,7 @@ export function initPipeline(tabs: Set<number>): void {
 
 // Update active tab. Clears inference queue (stale closures) and schedules batch for new tab.
 export function setActiveTab(tabId: number | null): void {
-  console.log('[PostPatrol][diag] setActiveTab: prev=', activeTabId, 'new=', tabId, 'hasQueue=', tabId !== null && tabQueues.has(tabId), 'queueLen=', tabId !== null ? tabQueues.get(tabId)?.length : 'n/a');
+  console.log('[Sieve][diag] setActiveTab: prev=', activeTabId, 'new=', tabId, 'hasQueue=', tabId !== null && tabQueues.has(tabId), 'queueLen=', tabId !== null ? tabQueues.get(tabId)?.length : 'n/a');
   activeTabId = tabId;
   localEngine.clearQueue();
   if (tabId !== null && tabQueues.has(tabId) && tabQueues.get(tabId)!.length > 0) {
@@ -352,7 +352,7 @@ export function isKeyPending(tabId: number, cacheKey: string): boolean {
 
 // Resolve an item AND any duplicate resolvers waiting on the same cacheKey.
 function resolveWithDuplicates(tabId: number, item: PendingEvaluation, result: PipelineResponse): void {
-  console.log('[PostPatrol][diag] resolveWithDuplicates: tab=', tabId, 'evalId=', item.evaluationId, 'resultKind=', result === null ? 'null' : Object.keys(result).slice(0, 3).join(','));
+  console.log('[Sieve][diag] resolveWithDuplicates: tab=', tabId, 'evalId=', item.evaluationId, 'resultKind=', result === null ? 'null' : Object.keys(result).slice(0, 3).join(','));
   item.resolve(result);
   const dupes = tabDuplicateResolvers.get(tabId);
   if (dupes && item.cacheKey && dupes.has(item.cacheKey)) {
@@ -792,7 +792,7 @@ export function classifyError(errorMessage: string, apiName: string): { errorTyp
 
 // Process a batch of posts
 async function processBatch(): Promise<void> {
-  console.log('[PostPatrol][diag] processBatch entered; activeTabId=', activeTabId, 'inFlight=', inFlightBatches);
+  console.log('[Sieve][diag] processBatch entered; activeTabId=', activeTabId, 'inFlight=', inFlightBatches);
   batchTimeout = null; // Clear timeout first, before any early returns
 
   if (activeTabId === null) return;
@@ -1108,21 +1108,21 @@ async function processBatch(): Promise<void> {
 // Schedule processing for the next pending post
 export function scheduleBatch(): void {
   if (batchTimeout) {
-    console.log('[PostPatrol][diag] scheduleBatch: already scheduled, returning');
+    console.log('[Sieve][diag] scheduleBatch: already scheduled, returning');
     return;
   }
   if (activeTabId === null) {
-    console.log('[PostPatrol][diag] scheduleBatch: activeTabId is null — items will sit unresolved until setActiveTab runs');
+    console.log('[Sieve][diag] scheduleBatch: activeTabId is null — items will sit unresolved until setActiveTab runs');
     return;
   }
 
   const activeQueue = tabQueues.get(activeTabId);
   if (!activeQueue || activeQueue.length === 0) {
-    console.log('[PostPatrol][diag] scheduleBatch: no queue or empty queue for activeTabId=', activeTabId);
+    console.log('[Sieve][diag] scheduleBatch: no queue or empty queue for activeTabId=', activeTabId);
     return;
   }
 
-  console.log('[PostPatrol][diag] scheduleBatch: invoking processBatch, queueLen=', activeQueue.length);
+  console.log('[Sieve][diag] scheduleBatch: invoking processBatch, queueLen=', activeQueue.length);
   processBatch().catch(err => console.error('[Pipeline] processBatch failed:', err));
 }
 

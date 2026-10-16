@@ -109,7 +109,7 @@ describe('share-encoding parsing safety', () => {
 describe('FILTER_PACK_CODE_REGEX', () => {
   it('matches a generated code embedded in tweet text', async () => {
     const code = await encodeFilterPackCode({ phrases: ['crypto', 'engagement bait'] });
-    const tweet = `PostPatrol users can use this code to import the list: ${code} more text`;
+    const tweet = `Sieve users can use this code to import the list: ${code} more text`;
     FILTER_PACK_CODE_REGEX.lastIndex = 0;
     const m = FILTER_PACK_CODE_REGEX.exec(tweet);
     expect(m?.[0]).toBe(code);
@@ -118,11 +118,18 @@ describe('FILTER_PACK_CODE_REGEX', () => {
 
 describe('FILTER_PACK_SHARE_URL', () => {
   it('builds share URL pointing to GitHub repo', () => {
-    expect(FILTER_PACK_SHARE_URL_BASE).toBe('github.com/jeheskielSunloy77/post-patrol');
-    expect(buildFilterPackShareUrl('bncr2_testcode')).toBe('https://github.com/jeheskielSunloy77/post-patrol#bncr2_testcode');
+    expect(FILTER_PACK_SHARE_URL_BASE).toBe('github.com/jeheskielSunloy77/sieve');
+    expect(buildFilterPackShareUrl('bncr2_testcode')).toBe('https://github.com/jeheskielSunloy77/sieve#bncr2_testcode');
   });
 
   it('matches GitHub share URLs in text', () => {
+    const text = 'I use Sieve: https://github.com/jeheskielSunloy77/sieve#bncr2_abc123';
+    const match = FILTER_PACK_SHARE_URL_REGEX.exec(text);
+    expect(match).not.toBeNull();
+    expect(match?.[1]).toBe('bncr2_abc123');
+  });
+
+  it('matches legacy post-patrol GitHub share URLs in text', () => {
     const text = 'I use PostPatrol: https://github.com/jeheskielSunloy77/post-patrol#bncr2_abc123';
     const match = FILTER_PACK_SHARE_URL_REGEX.exec(text);
     expect(match).not.toBeNull();

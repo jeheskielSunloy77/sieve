@@ -16,7 +16,7 @@ beforeEach(async () => {
   setUrl('/');
   Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1440 });
   await import('../../adapters/threads/ThreadsAdapter.js');
-  ThreadsAdapter = window.PostPatrolAdapter;
+  ThreadsAdapter = window.SieveAdapter || window.PostPatrolAdapter;
   loadThreadsFixture();
 });
 
@@ -119,7 +119,7 @@ describe('Threads card and UI integration', () => {
     expect(post.style.display).toBe('none');
   });
 
-  it('finds Share and inserts the PostPatrol action after it', () => {
+  it('finds Share and inserts the Sieve action after it', () => {
     const adapter = new ThreadsAdapter();
     const post = document.getElementById('post-one')!;
     const share = document.getElementById('share-one')!;
@@ -213,7 +213,7 @@ describe('Threads card and UI integration', () => {
 
     const adapter = new ThreadsAdapter();
     const anchor = adapter.getFilterBoxAnchor?.();
-    const host = document.getElementById('postpatrol-threads-right-rail');
+    const host = document.getElementById('sieve-threads-right-rail') || document.getElementById('postpatrol-threads-right-rail');
     expect(anchor?.parent).toBe(host);
     expect(host).toBeInstanceOf(HTMLElement);
     expect((host as HTMLElement).style.left).toBe('904px');

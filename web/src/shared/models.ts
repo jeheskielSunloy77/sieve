@@ -1,4 +1,4 @@
-// Shared model definitions for PostPatrol
+// Shared model definitions for Sieve
 // Used by both background and popup (via esbuild bundling)
 
 import type { PredefinedModelsMap } from '../types';

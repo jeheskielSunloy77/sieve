@@ -94,7 +94,7 @@ export function mobileWatchCard(): HTMLElement {
  * Desktop home lockup with the per-card "More actions" overflow menu attached.
  * Same shape as `desktopVideoLockup`, plus a `yt-button-shape` wrapper around
  * a `button[aria-label="More actions"]` — the preferred injection anchor for
- * the PostPatrol action button.
+ * the Sieve action button.
  */
 export function desktopVideoLockupWithMenu(): HTMLElement {
   return setBody(`
