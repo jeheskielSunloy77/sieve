@@ -21,8 +21,8 @@ Unlike basic keyword blockers, Sieve understands semantic intent and multimodal 
 ## Operating Context
 
 Runs as a browser extension (Chrome, Edge, Brave, Safari, Firefox). Operates in two distinct UI spaces:
-1. **Extension Popup**: Standalone or modal settings window for model selection (on-device vs BYOK APIs), platform toggles, and AI detection thresholds.
-2. **In-Feed Injected UI**: Sidebar filter box, floating quick-filter pills, reasoning popups on filtered posts, and the filtered posts review drawer.
+1. **Extension Popup**: Standalone or modal settings window for model selection (on-device vs BYOK APIs), model provider configuration, and AI detection thresholds.
+2. **In-Feed Injected UI**: Sidebar filter box, per-site filtering toggle, floating quick-filter pills, reasoning popups on filtered posts, and the filtered posts review drawer.
 
 ## Capabilities and Constraints
 
@@ -30,7 +30,7 @@ Runs as a browser extension (Chrome, Edge, Brave, Safari, Firefox). Operates in 
 - Security constraint: Strict ban on `.innerHTML`. All dynamic HTML insertion must use `parseHTML(...)` with `DOMPurify` and `element.replaceChildren(...)`.
 - Theme adaptability: Must flawlessly support light mode, dim mode, and dark mode.
 - User-bound visual identity: Monotone color palette (primary black on light mode, primary white on dark mode), architectural minimalism, razor-sharp 1px borders.
-- Preserves all existing functionality: model switching, on-device download progress, provider credentials, platform toggles, filter replies, AI detection threshold sliders, sharing filter packs.
+- Preserves all existing functionality: model switching, on-device download progress, provider credentials, in-feed platform toggle, filter replies, AI detection threshold sliders, sharing filter packs.
 
 ## Brand Commitments
 

@@ -767,60 +767,6 @@ input[type="password"]::placeholder {
   border-radius: var(--radius-xs);
 }
 
-/* Inline Platform Toggle */
-.platform-provider {
-  margin-bottom: 6px;
-  border-radius: var(--radius-sm);
-}
-
-.platform-provider:last-child {
-  margin-bottom: 0;
-}
-
-.ts-inline {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.ts-inline input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.ts-inline-slider {
-  position: relative;
-  width: 30px;
-  height: 16px;
-  background-color: var(--track-off);
-  border-radius: var(--radius-full);
-  transition: background-color 0.2s ease;
-}
-
-.ts-inline-slider::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  background-color: var(--thumb-off);
-  border-radius: 50%;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.ts-inline input:checked + .ts-inline-slider {
-  background-color: var(--track-on);
-}
-
-.ts-inline input:checked + .ts-inline-slider::before {
-  transform: translateX(14px);
-  background-color: var(--thumb-on);
-}
-
 /* Custom Model Dropdown */
 /* Custom Model Dropdown & Combobox */
 .model-select-section {
