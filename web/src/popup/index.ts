@@ -2,7 +2,7 @@
 
 import type { ModelDef, LocalModelStatus, StorageSchema, SiteId } from '../types';
 import { PREDEFINED_MODELS, DEFAULT_MODEL } from '../shared/models';
-import { fetchProviderModels } from '../shared/model-fetcher';
+import { fetchProviderModels, isExcludedModel } from '../shared/model-fetcher';
 import { escapeHtml, parseHTML } from '../shared/utils';
 import { getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentAutoActive } from '../shared/storage';
 import { asyncHandler } from '../shared/async';
@@ -311,7 +311,12 @@ function setupStorageListener() {
       }
     }
     if (areaName === 'local' && changes.cachedDynamicModels) {
-      dropdownState.dynamicModels = (changes.cachedDynamicModels.newValue as Record<string, ModelDef[]>) || {};
+      const rawNew = (changes.cachedDynamicModels.newValue as Record<string, ModelDef[]>) || {};
+      const sanitized: Record<string, ModelDef[]> = {};
+      for (const [provider, list] of Object.entries(rawNew)) {
+        sanitized[provider] = Array.isArray(list) ? list.filter(m => !isExcludedModel(provider, m.name)) : [];
+      }
+      dropdownState.dynamicModels = sanitized;
       renderModelDropdown(dropdownState.customModels, dropdownState.selectedModel);
     }
     if (areaName === 'local' && changes.aiImageDetectionThreshold) {
@@ -349,7 +354,12 @@ async function loadSettings() {
   ]);
 
   // Dynamic models from cache
-  dropdownState.dynamicModels = data.cachedDynamicModels || {};
+  const rawCached = data.cachedDynamicModels || {};
+  const sanitizedCached: Record<string, ModelDef[]> = {};
+  for (const [provider, list] of Object.entries(rawCached)) {
+    sanitizedCached[provider] = Array.isArray(list) ? list.filter(m => !isExcludedModel(provider, m.name)) : [];
+  }
+  dropdownState.dynamicModels = sanitizedCached;
 
   // Load predefined model kwargs overrides
   predefinedModelKwargs = data.predefinedModelKwargs || {};
@@ -421,7 +431,13 @@ async function loadSettings() {
   updateApiProviderStates(data);
 
   // Model selection
-  renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+  let selected = data.selectedModel || DEFAULT_MODEL;
+  const [selApi, ...selParts] = selected.split(':');
+  if (selApi && isExcludedModel(selApi, selParts.join(':'))) {
+    selected = DEFAULT_MODEL;
+    await setStorage({ selectedModel: DEFAULT_MODEL });
+  }
+  renderModelDropdown(data.customModels || [], selected);
 
   // Background refresh of available cloud models
   void refreshDynamicModels(data);
@@ -1204,7 +1220,8 @@ function getApiDisplayName(api: string) {
 
 function getModelsForProvider(api: string) {
   const dynamic = dropdownState.dynamicModels?.[api];
-  const predefined = (dynamic && dynamic.length > 0) ? dynamic : (PREDEFINED_MODELS[api] || []);
+  const filteredDynamic = dynamic ? dynamic.filter(m => !isExcludedModel(api, m.name)) : undefined;
+  const predefined = (filteredDynamic && filteredDynamic.length > 0) ? filteredDynamic : (PREDEFINED_MODELS[api] || []);
   const custom = dropdownState.customModels.filter(m => m.api === api);
   return { predefined, custom };
 }

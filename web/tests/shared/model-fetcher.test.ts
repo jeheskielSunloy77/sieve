@@ -5,12 +5,13 @@ import {
   filterAnthropicModels,
   filterGeminiModels,
   formatOpenAIDisplayName,
-  formatGeminiDisplayName
+  formatGeminiDisplayName,
+  isExcludedModel
 } from '../../src/shared/model-fetcher';
 
 describe('model-fetcher', () => {
   describe('OpenAI Model Filtering', () => {
-    it('filters out audio, embedding, tts, and moderation models', () => {
+    it('filters out audio, embedding, tts, image, and moderation models', () => {
       const raw = [
         { id: 'whisper-1' },
         { id: 'tts-1' },
@@ -22,6 +23,8 @@ describe('model-fetcher', () => {
         { id: 'babbage-002' },
         { id: 'gpt-4o-realtime-preview-2024-10-01' },
         { id: 'gpt-4o-audio-preview' },
+        { id: 'gpt-image-1.5' },
+        { id: 'gpt-image-2' },
         { id: 'gpt-4o-mini', created: 100 },
         { id: 'gpt-4o', created: 90 },
         { id: 'o3-mini', created: 110 },
@@ -42,6 +45,11 @@ describe('model-fetcher', () => {
       expect(names).not.toContain('dall-e-3');
       expect(names).not.toContain('gpt-4o-realtime-preview-2024-10-01');
       expect(names).not.toContain('gpt-4o-audio-preview');
+      expect(names).not.toContain('gpt-image-1.5');
+      expect(names).not.toContain('gpt-image-2');
+
+      expect(isExcludedModel('openai', 'gpt-image-1.5')).toBe(true);
+      expect(isExcludedModel('openai', 'gpt-4o')).toBe(false);
     });
 
     it('formats OpenAI display names and assigns low reasoning effort for reasoning models', () => {

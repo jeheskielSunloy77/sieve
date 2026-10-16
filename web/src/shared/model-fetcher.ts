@@ -34,7 +34,7 @@ export function formatGeminiDisplayName(id: string): string {
     .replace(/\b\w/g, l => l.toUpperCase());
 }
 
-const OPENAI_EXCLUDED_PATTERNS = [
+export const OPENAI_EXCLUDED_PATTERNS = [
   'realtime',
   'audio',
   'transcribe',
@@ -47,7 +47,11 @@ const OPENAI_EXCLUDED_PATTERNS = [
   'babbage',
   'search',
   'similarity',
-  'instruct-preview'
+  'instruct-preview',
+  'image',
+  'diffusion',
+  'video',
+  'sora'
 ];
 
 export function filterOpenAIModels(rawModels: Array<{ id?: string; created?: number }>): ModelDef[] {
@@ -104,7 +108,7 @@ export function filterOpenRouterModels(rawModels: OpenRouterRawModel[]): ModelDe
   const filtered = rawModels.filter(m => {
     if (!m.id) return false;
     const lower = m.id.toLowerCase();
-    // Exclude image generation, audio, embedding, tts
+    // Exclude image generation, audio, embedding, tts, video
     if (
       lower.includes('flux') ||
       lower.includes('midjourney') ||
@@ -113,13 +117,22 @@ export function filterOpenRouterModels(rawModels: OpenRouterRawModel[]): ModelDe
       lower.includes('embedding') ||
       lower.includes('tts') ||
       lower.includes('speech') ||
-      lower.includes('stable-diffusion')
+      lower.includes('stable-diffusion') ||
+      lower.includes('diffusion') ||
+      lower.includes('image') ||
+      lower.includes('video') ||
+      lower.includes('sora')
     ) {
       return false;
     }
     const modality = m.architecture?.modality?.toLowerCase();
-    if (modality && !modality.endsWith('->text') && !modality.includes('text')) {
-      return false;
+    if (modality) {
+      if (modality.includes('->') && !modality.endsWith('->text')) {
+        return false;
+      }
+      if (!modality.includes('->') && !modality.includes('text')) {
+        return false;
+      }
     }
     return true;
   });
@@ -182,14 +195,44 @@ export interface GeminiRawModel {
   name?: string;
 }
 
-const GEMINI_EXCLUDED_PATTERNS = [
+export const GEMINI_EXCLUDED_PATTERNS = [
   'embedding',
   'imagen',
   'aqa',
   'robotics',
   'custom',
-  'vision'
+  'vision',
+  'image',
+  'video',
+  'veo'
 ];
+
+export function isExcludedModel(api: string, modelName: string): boolean {
+  const lower = modelName.toLowerCase();
+  if (api === 'openai') {
+    return OPENAI_EXCLUDED_PATTERNS.some(pat => lower.includes(pat));
+  }
+  if (api === 'gemini') {
+    return GEMINI_EXCLUDED_PATTERNS.some(pat => lower.includes(pat));
+  }
+  if (api === 'openrouter') {
+    return (
+      lower.includes('flux') ||
+      lower.includes('midjourney') ||
+      lower.includes('dall-e') ||
+      lower.includes('whisper') ||
+      lower.includes('embedding') ||
+      lower.includes('tts') ||
+      lower.includes('speech') ||
+      lower.includes('stable-diffusion') ||
+      lower.includes('diffusion') ||
+      lower.includes('image') ||
+      lower.includes('video') ||
+      lower.includes('sora')
+    );
+  }
+  return false;
+}
 
 export function filterGeminiModels(rawModels: GeminiRawModel[]): ModelDef[] {
   const filtered = rawModels.filter(m => {
