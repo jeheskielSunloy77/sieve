@@ -873,21 +873,20 @@ input[type="password"]::placeholder {
   border-radius: var(--radius-sm);
   outline: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   cursor: text;
   box-sizing: border-box;
 }
 
 .model-dropdown-combobox:hover {
-  border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
 .model-dropdown.open .model-dropdown-combobox,
 .model-dropdown-combobox:focus-within {
-  border-color: var(--border-strong);
+  background: var(--surface-hover);
   outline: none;
   box-shadow: none;
-  background: var(--surface);
 }
 
 .model-dropdown-selected-logo {
