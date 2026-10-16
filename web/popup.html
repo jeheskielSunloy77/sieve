@@ -127,14 +127,23 @@
         </div>
         <div class="api-provider-content advanced-settings-content" id="advancedSettingsContent">
 
-          <!-- Filter replies under posts toggle -->
+          <!-- Filter replies & comments under posts -->
           <section class="filter-replies-section">
-            <label class="toggle-switch">
-              <input type="checkbox" id="enableFilterReplies" checked>
-              <span class="toggle-switch-slider" aria-hidden="true"></span>
-              <span class="toggle-switch-text">
-                <span class="toggle-switch-label">Filter replies & comments under posts</span>
-              </span>
+            <label>Comments & Replies</label>
+            <label class="filter-replies-card">
+              <div class="filter-replies-content">
+                <div class="filter-replies-header">
+                  <svg class="filter-replies-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <span class="filter-replies-title">Filter comments & replies</span>
+                </div>
+                <p class="filter-replies-hint">Apply filter topics to replies in threads and video comment sections.</p>
+              </div>
+              <div class="filter-replies-toggle-wrap">
+                <input type="checkbox" id="enableFilterReplies" checked>
+                <span class="toggle-switch-slider" aria-hidden="true"></span>
+              </div>
             </label>
           </section>
 

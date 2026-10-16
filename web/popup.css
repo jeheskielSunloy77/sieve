@@ -523,16 +523,94 @@ label {
   text-decoration: underline;
 }
 
-/* Modern Toggle Switches */
-.toggle-switch {
+/* Filter Replies & Comments Card */
+.filter-replies-section {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 4px 0;
-  user-select: none;
+  flex-direction: column;
+  gap: 6px;
 }
 
+.filter-replies-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.filter-replies-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-subtle);
+}
+
+.filter-replies-card:active {
+  transform: scale(0.995);
+}
+
+.filter-replies-card:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.filter-replies-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.filter-replies-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-replies-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.filter-replies-card:hover .filter-replies-icon {
+  color: var(--text);
+}
+
+.filter-replies-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.filter-replies-hint {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-muted);
+  text-transform: none;
+  margin: 0;
+  padding-left: 24px;
+}
+
+/* Modern Toggle Switches */
+.filter-replies-toggle-wrap,
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.filter-replies-toggle-wrap input,
 .toggle-switch input {
   position: absolute;
   opacity: 0;
@@ -546,7 +624,7 @@ label {
   height: 20px;
   background-color: var(--track-off);
   border-radius: var(--radius-full);
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
 }
 
@@ -563,15 +641,18 @@ label {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
+.filter-replies-toggle-wrap input:checked + .toggle-switch-slider,
 .toggle-switch input:checked + .toggle-switch-slider {
   background-color: var(--track-on);
 }
 
+.filter-replies-toggle-wrap input:checked + .toggle-switch-slider::before,
 .toggle-switch input:checked + .toggle-switch-slider::before {
   transform: translateX(16px);
   background-color: var(--thumb-on);
 }
 
+.filter-replies-toggle-wrap input:focus-visible + .toggle-switch-slider,
 .toggle-switch input:focus-visible + .toggle-switch-slider {
   box-shadow: var(--focus-ring);
 }
@@ -580,6 +661,7 @@ label {
   font-size: 12px;
   font-weight: 500;
   color: var(--text);
+  text-transform: none;
 }
 
 /* Accordion & Providers: Smooth Modern Containers */
