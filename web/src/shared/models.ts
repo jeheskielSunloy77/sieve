@@ -67,22 +67,22 @@ export const PREDEFINED_MODELS: PredefinedModelsMap = {
     }
   ],
   openrouter: [
-    { name: "nvidia/nemotron-nano-12b-v2-vl:free", display: "Nemotron Nano 12B 2 VL", isFree: true },
-    { name: "mistralai/ministral-3b-2512", display: "Ministral 3B", isFree: false }
+    { name: "meta-llama/llama-3.3-70b-instruct:free", display: "Llama 3.3 70B Instruct", isFree: true },
+    { name: "google/gemini-2.0-flash-001", display: "Gemini 2.0 Flash", isFree: false }
   ],
   openai: [
-    { name: 'gpt-5-nano', display: 'GPT-5 Nano', apiKwargs: { reasoning_effort: "minimal" } },
-    { name: 'gpt-5.6-luna', display: 'GPT-5.6 Luna' },
-    { name: 'gpt-5.6-terra', display: 'GPT-5.6 Terra' },
+    { name: 'gpt-4o-mini', display: 'GPT-4o Mini' },
+    { name: 'gpt-4o', display: 'GPT-4o' },
+    { name: 'o3-mini', display: 'o3-mini', apiKwargs: { reasoning_effort: "low" } }
   ],
   gemini: [
-    { name: 'gemini-2.5-flash-lite', display: 'Gemini 2.5 Flash Lite' },
-    { name: 'gemini-2.5-flash', display: 'Gemini 2.5 Flash' },
-    { name: 'gemini-3-flash-preview', display: 'Gemini 3 Flash' },
-    { name: 'gemini-3.1-flash-lite-preview', display: 'Gemini 3.1 Flash Lite' }
+    { name: 'gemini-2.0-flash', display: 'Gemini 2.0 Flash' },
+    { name: 'gemini-2.0-flash-lite', display: 'Gemini 2.0 Flash Lite' },
+    { name: 'gemini-1.5-flash', display: 'Gemini 1.5 Flash' }
   ],
   anthropic: [
-    { name: 'claude-haiku-4-5-20251001', display: 'Claude Haiku 4.5' }
+    { name: 'claude-3-5-haiku-20241022', display: 'Claude 3.5 Haiku' },
+    { name: 'claude-3-7-sonnet-20250219', display: 'Claude 3.7 Sonnet' }
   ],
   // Populated from the injected native catalog (see InjectedIosModel above).
   // The native side resolves files/URLs from the "iosLocal:<id>" key.

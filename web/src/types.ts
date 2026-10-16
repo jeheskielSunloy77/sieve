@@ -427,6 +427,7 @@ export type DescriptionKey = `descriptions_${SiteId}`;
 /** Typed schema for chrome.storage.local keys. */
 export type StorageSchema = SettingsBase & {
   authErrorApis: Record<string, boolean>;
+  cachedDynamicModels?: Record<string, ModelDef[]>;
   // Inferred "user wants AI content removed" state, judged from the phrase
   // list (backend detectAiIntent route / local model) and re-checked only
   // when the list changes. The sole on/off control for AI detection — there

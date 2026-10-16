@@ -2,6 +2,7 @@
 
 import type { ModelDef, LocalModelStatus, StorageSchema, SiteId } from '../types';
 import { PREDEFINED_MODELS, DEFAULT_MODEL } from '../shared/models';
+import { fetchProviderModels } from '../shared/model-fetcher';
 import { escapeHtml, parseHTML } from '../shared/utils';
 import { getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentAutoActive } from '../shared/storage';
 import { asyncHandler } from '../shared/async';
@@ -66,6 +67,13 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   openai: 'OpenAI',
   anthropic: 'Anthropic',
   gemini: 'Gemini'
+};
+
+const PROVIDER_LOGOS: Record<string, string> = {
+  openrouter: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z"/></svg>',
+  openai: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>',
+  anthropic: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>',
+  gemini: '<svg class="provider-logo" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>'
 };
 
 // Track local model statuses (per-model)
@@ -301,6 +309,10 @@ function setupStorageListener() {
         refreshModelDropdownWithLocal().catch(err => console.error('[Popup] refreshModelDropdownWithLocal failed:', err));
       }
     }
+    if (areaName === 'local' && changes.cachedDynamicModels) {
+      dropdownState.dynamicModels = (changes.cachedDynamicModels.newValue as Record<string, ModelDef[]>) || {};
+      renderModelDropdown(dropdownState.customModels, dropdownState.selectedModel);
+    }
     if (areaName === 'local' && changes.aiImageDetectionThreshold) {
       const v = clampImageThreshold(changes.aiImageDetectionThreshold.newValue);
       const thresholdEl = document.getElementById('aiImageThreshold') as HTMLInputElement | null;
@@ -316,6 +328,7 @@ async function loadSettings() {
     'enabled',
     'selectedModel',
     'customModels',
+    'cachedDynamicModels',
     'openrouterApiKey',
     'openaiApiKey',
     'openaiApiBase',
@@ -333,6 +346,9 @@ async function loadSettings() {
     // Per-platform master-switch keys come from the registry.
     ...PLATFORMS.map(p => enabledStorageKey(p.id)),
   ]);
+
+  // Dynamic models from cache
+  dropdownState.dynamicModels = data.cachedDynamicModels || {};
 
   // Load predefined model kwargs overrides
   predefinedModelKwargs = data.predefinedModelKwargs || {};
@@ -405,6 +421,9 @@ async function loadSettings() {
 
   // Model selection
   renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+
+  // Background refresh of available cloud models
+  void refreshDynamicModels(data);
 
   // Update local model section visibility
   updateLocalModelSectionVisibility();
@@ -568,6 +587,9 @@ function setupEventListeners() {
     const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'openaiApiBase', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
     updateApiProviderStates(data);
     renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+    if (key) {
+      void fetchAndApplyModels('openai', key, data.openaiApiBase);
+    }
   })().catch(err => console.error('[Popup] openaiApiKey change failed:', err)); });
 
   // OpenAI API base URL
@@ -640,6 +662,7 @@ function setupEventListeners() {
           updateApiProviderStates(data);
           updateAnthropicEnabledUI(true);
           renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+          void fetchAndApplyModels('anthropic', key);
         } else {
           errorEl.textContent = msg;
           errorEl.style.display = 'block';
@@ -658,6 +681,7 @@ function setupEventListeners() {
         updateApiProviderStates(data);
         updateAnthropicEnabledUI(true);
         renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+        void fetchAndApplyModels('anthropic', key);
       }
     } catch (err) {
       console.error('[Anthropic] Network error during verification:', err);
@@ -687,6 +711,9 @@ function setupEventListeners() {
     const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
     updateApiProviderStates(data);
     renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+    if (key) {
+      void fetchAndApplyModels('gemini', key);
+    }
   })().catch(err => console.error('[Popup] geminiApiKey change failed:', err)); });
 
   // OpenRouter: Safari has no chrome.identity, so launchWebAuthFlow throws.
@@ -862,8 +889,11 @@ function setupModelRadios() {
     if (!isApi) {
       let chosen = '';
       for (const [api, auth] of Object.entries(dropdownState.authenticatedApis)) {
-        if (auth && PREDEFINED_MODELS[api]?.length) {
-          chosen = `${api}:${PREDEFINED_MODELS[api][0].name}`;
+        if (!auth || api === 'local' || api === 'iosLocal') continue;
+        const { predefined, custom } = getModelsForProvider(api);
+        const first = predefined[0] || custom[0];
+        if (first) {
+          chosen = `${api}:${first.name}`;
           break;
         }
       }
@@ -888,6 +918,7 @@ interface DropdownState {
   customModels: ModelDef[];
   selectedModel: string;
   authenticatedApis: Record<string, boolean>;
+  dynamicModels: Record<string, ModelDef[]>;
 }
 
 const dropdownState: DropdownState = {
@@ -899,8 +930,76 @@ const dropdownState: DropdownState = {
     openai: false,
     gemini: false,
     anthropic: false
-  }
+  },
+  dynamicModels: {}
 };
+
+async function fetchAndApplyModels(api: string, key?: string, apiBase?: string) {
+  try {
+    const models = await fetchProviderModels(api, key || '', apiBase);
+    if (models.length > 0) {
+      dropdownState.dynamicModels = {
+        ...dropdownState.dynamicModels,
+        [api]: models
+      };
+      await setStorage({ cachedDynamicModels: dropdownState.dynamicModels });
+      renderModelDropdown(dropdownState.customModels, dropdownState.selectedModel);
+    }
+  } catch (err) {
+    console.warn(`[Popup] Failed to fetch and apply models for ${api}:`, err);
+  }
+}
+
+async function refreshDynamicModels(data: Partial<StorageSchema>) {
+  try {
+    let changed = false;
+    const current = { ...(dropdownState.dynamicModels || {}) };
+
+    // 1. OpenRouter (fetch if connected or not yet cached)
+    if (data.openrouterApiKey || !current.openrouter?.length) {
+      const models = await fetchProviderModels('openrouter', data.openrouterApiKey || '');
+      if (models.length > 0) {
+        current.openrouter = models;
+        changed = true;
+      }
+    }
+
+    // 2. OpenAI
+    if (data.openaiApiKey && !current.openai?.length) {
+      const models = await fetchProviderModels('openai', data.openaiApiKey, data.openaiApiBase);
+      if (models.length > 0) {
+        current.openai = models;
+        changed = true;
+      }
+    }
+
+    // 3. Anthropic
+    if (data.anthropicApiKey && !current.anthropic?.length) {
+      const models = await fetchProviderModels('anthropic', data.anthropicApiKey);
+      if (models.length > 0) {
+        current.anthropic = models;
+        changed = true;
+      }
+    }
+
+    // 4. Gemini
+    if (data.geminiApiKey && !current.gemini?.length) {
+      const models = await fetchProviderModels('gemini', data.geminiApiKey);
+      if (models.length > 0) {
+        current.gemini = models;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      dropdownState.dynamicModels = current;
+      await setStorage({ cachedDynamicModels: current });
+      renderModelDropdown(dropdownState.customModels, dropdownState.selectedModel);
+    }
+  } catch (err) {
+    console.warn('[Popup] refreshDynamicModels failed:', err);
+  }
+}
 
 function setupModelDropdown() {
   const dropdown = document.getElementById('modelDropdown')!;
@@ -1007,7 +1106,8 @@ function getApiDisplayName(api: string) {
 }
 
 function getModelsForProvider(api: string) {
-  const predefined = PREDEFINED_MODELS[api] || [];
+  const dynamic = dropdownState.dynamicModels?.[api];
+  const predefined = (dynamic && dynamic.length > 0) ? dynamic : (PREDEFINED_MODELS[api] || []);
   const custom = dropdownState.customModels.filter(m => m.api === api);
   return { predefined, custom };
 }
@@ -1020,6 +1120,14 @@ function getModelDisplayLabel(selectedModel: string, customModels: ModelDef[]): 
   // Parse model key (format: api:modelName)
   const [api, ...nameParts] = selectedModel.split(':');
   const modelName = nameParts.join(':');
+
+  // Check dynamic models first
+  const dynamicModel = (dropdownState.dynamicModels?.[api] || []).find(m => m.name === modelName);
+  if (dynamicModel) {
+    const apiSuffix = api === 'local' || api === 'iosLocal' ? '' : ` (${getApiDisplayName(api)})`;
+    return `${dynamicModel.display}${apiSuffix}`;
+  }
+
   // Find display name from predefined models
   const predefinedModel = (PREDEFINED_MODELS[api] || []).find(m => m.name === modelName);
   const displayName = predefinedModel ? predefinedModel.display : modelName;
@@ -1376,8 +1484,9 @@ function createProviderItem(api: string, predefinedModels: ModelDef[], customMod
   // Create header (clickable to expand/collapse)
   const header = document.createElement('div');
   header.className = 'provider-item-header';
+  const logo = PROVIDER_LOGOS[api] || '';
   header.replaceChildren(parseHTML(`
-    <span class="model-dropdown-item-text">${getApiDisplayName(api)}</span>
+    <span class="model-dropdown-item-text">${logo}${getApiDisplayName(api)}</span>
     ${isProviderSelected ? '<span class="provider-selected-indicator">&#8226;</span>' : ''}
     <span class="provider-arrow">&#9656;</span>
   `));
@@ -1469,10 +1578,8 @@ async function startOpenRouterOAuth() {
   } finally {
     signInBtn.disabled = false;
     signInBtn.replaceChildren(parseHTML(`
-      <svg class="openrouter-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg class="openrouter-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z"/>
       </svg>
       Sign in with OpenRouter
     `));
@@ -1498,6 +1605,9 @@ async function updateOpenRouterStatus() {
   // Update all API provider states
   updateApiProviderStates(data);
   renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+  if (isSignedIn) {
+    void fetchAndApplyModels('openrouter', data.openrouterApiKey);
+  }
 }
 
 // Sign out from OpenRouter
