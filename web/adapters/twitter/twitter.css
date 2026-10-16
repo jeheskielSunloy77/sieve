@@ -56,21 +56,21 @@ div[data-testid="BottomBar"] {
 }
 
 .dim-mode .filtered-toggle-btn.active {
-  background: rgba(29, 155, 240, 0.15);
-  border-color: rgba(29, 155, 240, 0.4);
-  color: rgb(29, 155, 240);
+  background: var(--pp-primary);
+  border-color: var(--pp-primary);
+  color: var(--pp-primary-contrast);
 }
 
 .dim-mode .filtered-toggle-btn.active:hover {
-  background: rgba(29, 155, 240, 0.2);
+  opacity: 0.9;
 }
 
 .dim-mode .filtered-toggle-count {
-  color: rgb(231, 233, 234);
+  color: inherit;
 }
 
 .dim-mode .filtered-toggle-btn.active .filtered-toggle-count {
-  color: rgb(29, 155, 240);
+  color: var(--pp-primary-contrast);
 }
 
 /* Filtered modal */
