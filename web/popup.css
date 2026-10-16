@@ -588,11 +588,6 @@ label {
   border-radius: var(--radius-md);
   background: var(--surface);
   overflow: hidden;
-  transition: border-color 0.15s ease;
-}
-
-.api-provider:hover {
-  border-color: var(--border-strong);
 }
 
 .api-provider-header {
@@ -750,7 +745,6 @@ input[type="password"]::placeholder {
 
 .api-signout-btn:hover {
   background: var(--surface-hover);
-  border-color: var(--border-strong);
 }
 
 .api-verify-error {
@@ -834,11 +828,11 @@ input[type="password"]::placeholder {
   cursor: pointer;
   font-size: 12px;
   color: var(--text);
-  transition: border-color 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .model-dropdown-selected:hover {
-  border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
 .model-dropdown.open .model-dropdown-selected {
