@@ -28,7 +28,8 @@
 
 .dark-mode,
 .twitter-dark,
-[data-theme="dark"] {
+[data-theme="dark"],
+html[dark] {
   --sieve-brand-rgb: 250, 250, 250;
   --postpatrol-brand-rgb: var(--sieve-brand-rgb);
   --pp-bg: #09090b;

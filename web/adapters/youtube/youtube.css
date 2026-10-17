@@ -158,55 +158,12 @@ html[dark] .postpatrol-mini-guide-entry__label {
   width: 100%;
   margin: 0;
   padding: 8px 0 12px;
-  font-family: "Roboto", "Arial", sans-serif;
   box-sizing: border-box;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-container {
-  padding: 12px 16px;
-  background-color: #ffffff !important;
-  /* Brand orange outline — matches the Twitter panel. Color comes from the
-   * `--sieve-brand-rgb` variable defined in content.css's :root. */
-  border: var(--green-border-width) solid rgb(var(--sieve-brand-rgb)) !important;
-  border-radius: 12px !important;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container {
-  background-color: #0f0f0f !important;
-}
-
-/* Title row: bold "PostPatrol" header. No accent dot — the orange border
- * around the card already carries the brand. */
-.filter-phrases-banner--youtube .filter-phrases-title-row {
-  padding-bottom: 2px;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-box-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 0;
-  font-family: "Roboto", "Arial", sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.1px;
-  color: #0f0f0f;
-  text-transform: none;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-box-name {
-  color: #f1f1f1;
 }
 
 /* Header row ("Filter out X, Y and ___"). The narrow guide column doesn't
  * have room for label + tags + input on one line, so we force the input
- * to its own row (`flex-basis: 100%`). Result:
- *   row 1: "Filter out" + phrase tags (wraps naturally if many)
- *   row 2: "and [input field    ]"
- * Same DOM as on Twitter — only the CSS row-break differs. */
+ * to its own row (`flex-basis: 100%`). */
 .filter-phrases-banner--youtube .filter-phrases-header {
   column-gap: 4px;
   row-gap: 4px;
@@ -215,169 +172,6 @@ html[dark] .filter-phrases-banner--youtube .filter-phrases-box-name {
 .filter-phrases-banner--youtube .filter-phrases-and-input {
   flex-basis: 100%;
   margin-top: 2px;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-label,
-.filter-phrases-banner--youtube .filter-phrases-and {
-  font-size: 14px;
-  font-weight: 400;
-  color: #0f0f0f;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-label,
-html[dark] .filter-phrases-banner--youtube .filter-phrases-and {
-  color: #f1f1f1;
-}
-
-/* Phrase tags — italicized to read as user content, native hover feedback. */
-.filter-phrases-banner--youtube .filter-phrase-inline {
-  font-size: 14px;
-  font-weight: 600;
-  color: #606060;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrase-inline {
-  color: #aaa;
-}
-
-.filter-phrases-banner--youtube .filter-phrase-inline:hover {
-  color: #cc0000;
-}
-
-.filter-phrases-banner--youtube .filter-phrase-separator {
-  font-size: 14px;
-  color: #0f0f0f;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrase-separator {
-  color: #f1f1f1;
-}
-
-/* Input — flat underline in YT's grey, focused state uses YT's accent red. */
-.filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f0f0f;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.2) !important;
-  padding: 0 2px 2px !important;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input:focus {
-  border-bottom-color: rgb(var(--sieve-brand-rgb)) !important;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input {
-  color: #f1f1f1;
-  border-bottom-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-phrases-input:focus {
-  border-bottom-color: rgb(var(--sieve-brand-rgb)) !important;
-}
-
-/* Nudge the cycling placeholder up 2px so its baseline aligns with the
- * input's typed text on YT (the input uses a slightly different font metric
- * than the shared placeholder pin). */
-.filter-phrases-banner--youtube .filter-placeholder-cycle {
-  top: -2px;
-}
-
-/* Actions row — "View filtered" pill + icon buttons, sized for the column. */
-.filter-phrases-banner--youtube .filter-phrases-actions {
-  margin-top: 4px;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-container .filtered-toggle-btn {
-  padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 18px;
-  color: #0f0f0f;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.filter-phrases-banner--youtube .filtered-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filtered-toggle-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #f1f1f1;
-}
-
-html[dark] .filter-phrases-banner--youtube .filtered-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.filter-phrases-banner--youtube .filtered-toggle-count {
-  color: inherit;
-}
-
-/* Settings icon button — circular, YT secondary text color, accent on hover. */
-.filter-phrases-banner--youtube .filter-phrases-container .filter-settings-btn {
-  color: #606060;
-}
-
-.filter-phrases-banner--youtube .filter-phrases-container .filter-settings-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #0f0f0f;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-settings-btn {
-  color: #aaa;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-phrases-container .filter-settings-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f1f1f1;
-}
-
-/* AI-text toggle row — YT secondary text, tighter spacing. */
-.filter-phrases-banner--youtube .filter-ai-text-toggle {
-  margin-top: 0;
-  font-size: 12px;
-  color: #606060;
-}
-
-html[dark] .filter-phrases-banner--youtube .filter-ai-text-toggle {
-  color: #aaa;
-}
-
-/* Sign-in prompt — neutral soft button. The card already carries the
- * orange brand via its border; the CTA stays out of the way (white card
- * on light theme, light-grey card on dark theme) so it doesn't fight
- * with the box frame. */
-.filter-phrases-banner--youtube .google-signin-btn {
-  background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  color: #0f0f0f !important;
-  font-weight: 500;
-}
-
-/* Keep "Activate PostPatrol" on one line in the narrow YT guide column —
- * without this the two-word label wraps and pushes the button height. */
-.filter-phrases-banner--youtube .google-signin-btn-label {
-  white-space: nowrap;
-}
-
-.filter-phrases-banner--youtube .google-signin-btn:hover {
-  background: #f2f2f2 !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-html[dark] .filter-phrases-banner--youtube .google-signin-btn {
-  background: #3f3f3f !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  color: #f1f1f1 !important;
-}
-
-html[dark] .filter-phrases-banner--youtube .google-signin-btn:hover {
-  background: #525252 !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
 /* ===== Watch-page sidebar: sticky to top of the scroll area =====
@@ -397,11 +191,6 @@ ytd-watch-flexy #secondary .filter-phrases-banner.filter-phrases-banner--youtube
   isolation: isolate;
   padding: 0;
   margin-bottom: 12px;
-  background-color: #ffffff;
-}
-
-html[dark] ytd-watch-flexy #secondary .filter-phrases-banner.filter-phrases-banner--youtube {
-  background-color: #0f0f0f;
 }
 
 /* ===== Filtered-video placeholder =====

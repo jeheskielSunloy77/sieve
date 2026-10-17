@@ -25,6 +25,18 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
     textContent: 'span[dir="auto"]',
   };
 
+  constructor() {
+    window.addEventListener('resize', () => {
+      if (document.getElementById('sieve-threads-right-rail') || document.getElementById('postpatrol-threads-right-rail')) {
+        const feed = this.getPrimaryColumn();
+        if (feed) {
+          const feedRect = feed.getBoundingClientRect();
+          this._getFallbackRail(feedRect);
+        }
+      }
+    }, { passive: true });
+  }
+
   waitUntilReady(): Promise<void> {
     // Threads streams SSR markup and then hydrates it. Mutating post cards
     // during that hand-off produces React hydration errors, so wait until the
