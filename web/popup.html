@@ -18,7 +18,17 @@
   <!-- Main settings -->
   <div class="container" id="mainContainer">
     <header>
-      <h1>Sieve Settings</h1>
+      <h1>
+        <span class="sieve-logo-prefix" aria-hidden="true">
+          <svg class="logo v3 play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+            <g class="mark">
+              <g class="gMain"><g class="hMain"><path class="main" pathLength="1" fill="currentColor" fill-rule="evenodd" d="M 98 56 H 260 C 390 56 456 168 456 235 V 246 A 12 12 0 0 1 444 258 H 418 C 350 256 328 190 312 156 C 298 200 240 262 190 277 C 230 300 290 330 288 375 V 442 A 14 14 0 0 1 274 456 H 232 C 182 456 56 410 56 248 V 98 A 42 42 0 0 1 98 56 Z"/></g></g>
+              <g class="gBlock"><g class="hBlock"><path class="block" pathLength="1" fill="currentColor" fill-rule="evenodd" d="M 336 375 C 340 335 350 308 420 302 H 436 A 20 20 0 0 1 456 322 V 422 A 34 34 0 0 1 422 456 H 350 A 14 14 0 0 1 336 442 Z"/></g></g>
+            </g>
+          </svg>
+        </span>
+        <span>Sieve Settings</span>
+      </h1>
       <div class="header-actions">
         <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
       </div>
@@ -38,6 +48,16 @@
 
     <!-- Model selection: headline searchable combobox grouped by provider -->
     <section id="modelSelectSection" class="model-select-section">
+      <div id="selectModelNotice" class="select-model-notice" style="display: none;" role="alert">
+        <svg class="select-model-notice-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="8" cy="8" r="7"/>
+          <path d="M8 5v3.5M8 11.5h.01"/>
+        </svg>
+        <div class="select-model-notice-content">
+          <strong>Please select a model first</strong>
+          <p>Choose an on-device or cloud model below to activate filtering.</p>
+        </div>
+      </div>
       <label for="modelDropdownInput">Model</label>
       <div class="model-dropdown" id="modelDropdown">
         <div class="model-dropdown-combobox" id="modelDropdownCombobox">

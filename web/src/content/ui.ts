@@ -3,6 +3,7 @@
 import { toBlob } from 'html-to-image';
 import { asyncHandler } from '../shared/async';
 import { cleanReasoning, escapeHtml, formatPostForEvaluation, parseHTML, AI_DETECTION_SEED_PHRASE, phraseAddNeedsReEvaluation } from '../shared/utils';
+import { getSieveLogoHTML, initLogoAnimation } from '../shared/logo';
 import { init as initPopup } from '../popup/index';
 import {
   encodeFilterPackCode, decodeFilterPackCode, buildFilterPackShareUrl,
@@ -124,7 +125,7 @@ const placeholderHTML = `<span class="filter-input-wrapper"><input type="text" c
 
 const platformFilterSwitchHTML = `
   <label class="filter-platform-switch" title="Enable Sieve filtering on this site">
-    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Sieve filtering on this site" checked>
+    <input class="filter-platform-switch-input" type="checkbox" role="switch" aria-label="Enable Sieve filtering on this site">
     <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
   </label>
 `;
@@ -225,7 +226,10 @@ function buildFilterContainerHTML(): string {
     <div class="filter-phrases-container">
       <div class="sieve-update-banner-slot postpatrol-update-banner-slot"></div>
       <div class="filter-phrases-title-row">
-        <span class="filter-phrases-box-name">Sieve</span>
+        <span class="filter-phrases-box-name">
+          <span class="sieve-logo-prefix" aria-hidden="true">${getSieveLogoHTML()}</span>
+          <span>Sieve</span>
+        </span>
         ${platformFilterSwitchHTML}
       </div>
       <div class="filter-phrases-header">
@@ -489,6 +493,11 @@ function setupFilterBoxEventHandlers(container: HTMLElement) {
   if ((container as HTMLElement & { __ffWired?: boolean }).__ffWired) return;
   (container as HTMLElement & { __ffWired?: boolean }).__ffWired = true;
 
+  const logoSvg = container.querySelector<SVGSVGElement>('.sieve-logo-prefix svg.logo');
+  if (logoSvg) {
+    initLogoAnimation(logoSvg);
+  }
+
   const phrasesListContainer = container.querySelector('.filter-phrases-list')!;
   const input = container.querySelector<HTMLInputElement>('.filter-phrases-input')!;
   const placeholderCycle = container.querySelector('.filter-placeholder-cycle');
@@ -497,12 +506,33 @@ function setupFilterBoxEventHandlers(container: HTMLElement) {
 
   const platformKey = enabledStorageKey(_deps.adapter.siteId);
   const platformSwitch = container.querySelector<HTMLInputElement>('.filter-platform-switch-input');
-  getStorage([platformKey]).then(data => {
-    const isEnabled = data[platformKey] !== false;
+  getStorage([platformKey, 'selectedModel']).then(data => {
+    const hasModel = typeof data.selectedModel === 'string' && data.selectedModel.trim().length > 0;
+    const isEnabled = data[platformKey] !== false && hasModel;
     container.classList.toggle('filtering-disabled', !isEnabled);
     if (platformSwitch) platformSwitch.checked = isEnabled;
   }).catch(err => console.error('[UI] Failed to load platform filtering state:', err));
+
+  platformSwitch?.addEventListener('click', asyncHandler<MouseEvent>(async (e) => {
+    const { selectedModel } = await getStorage(['selectedModel']);
+    const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
+    if (!hasModel) {
+      e.preventDefault();
+      platformSwitch.checked = false;
+      showSettingsModal('select-model');
+      return;
+    }
+    await setStorage({ [platformKey]: platformSwitch.checked });
+  }));
+
   platformSwitch?.addEventListener('change', asyncHandler(async () => {
+    const { selectedModel } = await getStorage(['selectedModel']);
+    const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
+    if (!hasModel && platformSwitch.checked) {
+      platformSwitch.checked = false;
+      showSettingsModal('select-model');
+      return;
+    }
     await setStorage({ [platformKey]: platformSwitch.checked });
   }));
 
@@ -1499,9 +1529,10 @@ export async function removeFilterPhrase(phrase: string) {
 
 // `section: 'local'` deep-links to the local model setup: the popup sees the
 // #local hash and preselects the Local radio so its download section is
-// immediately visible (extension mode only — the iOS in-app path has no
-// guest trial and never passes a section).
-export function showSettingsModal(section?: 'local') {
+// immediately visible.
+// `section: 'select-model'` deep-links to the model combobox and prompts the
+// user to choose an AI model before activating filtering.
+export function showSettingsModal(section?: 'local' | 'select-model') {
   // Remove existing modal if any
   if (settingsModal && settingsModal.isConnected) {
     settingsModal.remove();
@@ -1558,6 +1589,10 @@ export function showSettingsModal(section?: 'local') {
       settingsModal!.classList.add('visible');
     });
 
+    if (section) {
+      window.location.hash = `#${section}`;
+    }
+
     // Run popup JS directly via import (no eval)
     initPopup().catch((e: Error) => {
       console.error('[Sieve] Error running popup init:', e, e.stack);
@@ -1566,7 +1601,7 @@ export function showSettingsModal(section?: 'local') {
     // Extension mode: load popup.html in iframe
     iframe = document.createElement('iframe');
     iframe.className = 'settings-modal-iframe';
-    iframe.src = chrome.runtime.getURL('popup.html') + (section === 'local' ? '#local' : '');
+    iframe.src = chrome.runtime.getURL('popup.html') + (section ? `#${section}` : '');
 
     // Send current theme to iframe once it loads
     iframe.addEventListener('load', () => {

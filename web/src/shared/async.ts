@@ -7,10 +7,10 @@
  * references get a useful name automatically; arrow wrappers fall back
  * to 'anonymous'.
  */
-export function asyncHandler(fn: () => Promise<void>): () => void {
+export function asyncHandler<E = Event>(fn: (e: E) => Promise<void>): (e: E) => void {
   const name = fn.name || 'anonymous';
-  return () => {
-    fn().catch(err => {
+  return (e: E) => {
+    fn(e).catch(err => {
       console.error(`[Async] Unhandled error in ${name}:`, err);
     });
   };

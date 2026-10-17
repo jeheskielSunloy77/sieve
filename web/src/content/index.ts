@@ -631,9 +631,10 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     // pre-date the toggle keep filtering as before. The {id}Enabled naming
     // convention is centralized in the platform registry.
     const platformKey = enabledStorageKey(adapter.siteId);
-    const data = await getStorage(['enabled', 'filterReplies', platformKey]);
+    const data = await getStorage(['enabled', 'filterReplies', platformKey, 'selectedModel']);
     let globalEnabled = data.enabled !== false;
-    let platformEnabled = data[platformKey] !== false;
+    const hasModel = typeof data.selectedModel === 'string' && data.selectedModel.trim().length > 0;
+    let platformEnabled = data[platformKey] !== false && hasModel;
     enabled = globalEnabled && platformEnabled;
     // Treat undefined as true so users on builds released before this
     // setting existed keep their current behavior.
@@ -695,32 +696,49 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     // Listen for settings changes
     chrome.storage.onChanged.addListener((changes) => {
       if (changes[platformKey]) {
-        platformEnabled = changes[platformKey].newValue !== false;
-        enabled = globalEnabled && platformEnabled;
-        document.querySelectorAll<HTMLElement>('.filter-phrases-container').forEach(box => {
-          box.classList.toggle('filtering-disabled', !platformEnabled);
-          const input = box.querySelector<HTMLInputElement>('.filter-platform-switch-input');
-          if (input) input.checked = platformEnabled;
-        });
-        if (enabled) {
-          observePosts();
-          processExistingPosts();
-        } else {
-          restoreAllFilteredPosts();
-        }
+        getStorage(['selectedModel']).then(({ selectedModel }) => {
+          const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
+          platformEnabled = changes[platformKey].newValue !== false && hasModel;
+          enabled = globalEnabled && platformEnabled;
+          document.querySelectorAll<HTMLElement>('.filter-phrases-container').forEach(box => {
+            box.classList.toggle('filtering-disabled', !platformEnabled);
+            const input = box.querySelector<HTMLInputElement>('.filter-platform-switch-input');
+            if (input) input.checked = platformEnabled;
+          });
+          if (enabled) {
+            observePosts();
+            processExistingPosts();
+          } else {
+            restoreAllFilteredPosts();
+          }
+        }).catch(err => console.error('[Content] Error checking selectedModel on platform change:', err));
         return;
       }
       if (changes.enabled) {
-        globalEnabled = changes.enabled.newValue !== false;
-        enabled = globalEnabled && platformEnabled;
-        if (enabled) {
-          observePosts();
-          processExistingPosts();
-        }
+        getStorage(['selectedModel']).then(({ selectedModel }) => {
+          const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
+          globalEnabled = changes.enabled.newValue !== false;
+          enabled = globalEnabled && platformEnabled && hasModel;
+          if (enabled) {
+            observePosts();
+            processExistingPosts();
+          }
+        }).catch(err => console.error('[Content] Error checking selectedModel on global enabled change:', err));
       }
       if (changes.selectedModel) {
-        const newModel = (changes.selectedModel.newValue as string) || 'cloud';
+        const newModel = (changes.selectedModel.newValue as string) || '';
         isLocalModelActive = newModel.startsWith('local:') || false;
+        const hasModel = typeof newModel === 'string' && newModel.trim().length > 0;
+        if (!hasModel && enabled) {
+          enabled = false;
+          platformEnabled = false;
+          restoreAllFilteredPosts();
+          document.querySelectorAll<HTMLElement>('.filter-phrases-container').forEach(box => {
+            box.classList.toggle('filtering-disabled', true);
+            const input = box.querySelector<HTMLInputElement>('.filter-platform-switch-input');
+            if (input) input.checked = false;
+          });
+        }
       }
       if (changes[descriptionsKey]) {
         syncFilterPhrases();

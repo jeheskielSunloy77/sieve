@@ -1327,9 +1327,90 @@ article {
 }
 
 .filter-phrases-box-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding-bottom: 10px;
   font-weight: 800;
   font-size: 20px;
+}
+
+.sieve-logo-prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background: transparent;
+}
+
+.sieve-logo-prefix .logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sieve-logo-prefix .logo g,
+.sieve-logo-prefix .logo path,
+.sieve-logo-prefix .logo rect {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sieve-logo-prefix .logo .mark,
+.sieve-logo-prefix .logo .hMain,
+.sieve-logo-prefix .logo .hBlock {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sieve-logo-prefix .logo,
+  .sieve-logo-prefix .logo * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.sieve-logo-prefix .v3.play .gMain {
+  animation: v3m 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.sieve-logo-prefix .v3.play .gBlock {
+  animation: v3b 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes v3m {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes v3b {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.sieve-logo-prefix .v3:hover .mark {
+  transform: rotate(-5deg) scale(1.07);
+}
+
+.sieve-logo-prefix .v3:hover .hBlock {
+  transform: scale(1.14);
 }
 
 .filter-phrases-sidebar {
@@ -2015,9 +2096,6 @@ article {
   outline: none;
 }
 
-.filter-phrases-container.filtering-disabled {
-  opacity: 0.62;
-}
 
 /* Legacy AI indicator styles retained for the native bridges. */
 /* AI-detection indicator, top-right of the filter box title row: a single

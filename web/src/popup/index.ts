@@ -7,6 +7,7 @@ import { escapeHtml, parseHTML } from '../shared/utils';
 import { getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentAutoActive } from '../shared/storage';
 import { asyncHandler } from '../shared/async';
 import { encodeFilterPackCode, buildFilterPackShareUrl } from '../shared/share-encoding';
+import { initLogoAnimation } from '../shared/logo';
 
 // Storage key for predefined model API kwargs overrides
 // Format: { "api:modelName": { key: value, ... }, ... }
@@ -154,6 +155,11 @@ export async function init() {
 
 
 
+  const logoSvg = document.querySelector<SVGSVGElement>('.sieve-logo-prefix svg.logo');
+  if (logoSvg) {
+    initLogoAnimation(logoSvg);
+  }
+
   console.log('[Popup] About to loadSettings');
   await loadSettings();
   console.log('[Popup] loadSettings done, setupEventListeners');
@@ -182,6 +188,8 @@ export async function init() {
   // selected (checked radios don't re-fire change).
   if (window.location.hash === '#local') {
     void selectModel(LOCAL_RADIO_MODEL_KEY);
+  } else if (window.location.hash === '#select-model') {
+    focusModelSelector(!dropdownState.selectedModel);
   }
 
   console.log('[Popup] init() completed successfully');
@@ -955,6 +963,20 @@ function setupModelDropdown() {
   });
 }
 
+function focusModelSelector(showNotice = false) {
+  const input = document.getElementById('modelDropdownInput') as HTMLInputElement | null;
+  const combobox = document.getElementById('modelDropdownCombobox');
+  const notice = document.getElementById('selectModelNotice');
+
+  if (showNotice && notice) {
+    notice.style.display = 'flex';
+  }
+
+  combobox?.classList.add('pulse-highlight');
+  openDropdown();
+  input?.focus();
+}
+
 function toggleDropdown() {
   if (dropdownState.isOpen) {
     closeDropdown(true);
@@ -1061,6 +1083,12 @@ async function selectModel(modelKey: string) {
       alert.remove();
     }
   }
+
+  // Remove select model notice and combobox pulse highlight if displayed
+  const notice = document.getElementById('selectModelNotice');
+  if (notice) notice.style.display = 'none';
+  const combobox = document.getElementById('modelDropdownCombobox');
+  combobox?.classList.remove('pulse-highlight');
 }
 
 // Show/hide the local model section based on whether a local model is
