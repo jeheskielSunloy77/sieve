@@ -29,6 +29,8 @@ const PROVIDER_LOGOS: Record<string, string> = {
   gemini: '<svg class="provider-logo provider-logo-gemini" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="url(#ppGeminiGrad)" d="M20.616 10.835a14.147 14.147 0 0 1-4.45-3.001 14.111 14.111 0 0 1-3.678-6.452.503.503 0 0 0-.975 0 14.134 14.134 0 0 1-3.679 6.452 14.155 14.155 0 0 1-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 0 0 0 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 0 1 4.45 3.001 14.112 14.112 0 0 1 3.679 6.453.502.502 0 0 0 .975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 0 1 3.001-4.45 14.113 14.113 0 0 1 6.453-3.678.503.503 0 0 0 0-.975 13.245 13.245 0 0 1-2.003-.678z"/></svg>'
 };
 
+const DEFAULT_MODEL_SEARCH_ICON = '<svg class="model-dropdown-default-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>';
+
 // Track local model statuses (per-model)
 let localModelStatuses: Record<string, LocalModelStatus> = {};
 let webgpuSupported = true;
@@ -1146,7 +1148,7 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
   const [selectedApi] = (selectedModel || '').split(':');
   const selectedLogoEl = document.getElementById('modelDropdownSelectedLogo');
   if (selectedLogoEl) {
-    const logoSvg = PROVIDER_LOGOS[selectedApi] || '';
+    const logoSvg = PROVIDER_LOGOS[selectedApi] || DEFAULT_MODEL_SEARCH_ICON;
     selectedLogoEl.replaceChildren(parseHTML(logoSvg));
   }
 

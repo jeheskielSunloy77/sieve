@@ -904,6 +904,19 @@ input[type="password"]::placeholder {
   display: block;
 }
 
+.model-dropdown-selected-logo .model-dropdown-default-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.model-dropdown-combobox:hover .model-dropdown-default-icon,
+.model-dropdown.open .model-dropdown-default-icon,
+.model-dropdown-combobox:focus-within .model-dropdown-default-icon {
+  color: var(--text-secondary);
+}
+
 .model-dropdown-input,
 input[type="text"].model-dropdown-input,
 input[type="text"].model-dropdown-input:focus,
