@@ -1121,11 +1121,11 @@ input[type="text"].model-dropdown-input:focus-visible {
 
 .model-dropdown-item.disabled {
   opacity: 0.45;
-  cursor: pointer;
+  cursor: not-allowed;
 }
 
 .model-dropdown-item.disabled:hover {
-  background: var(--surface-hover);
+  background: transparent;
 }
 
 .model-dropdown-item-left {

@@ -759,12 +759,6 @@ async function clearPendingLocalSelection() {
   await removeStorage('pendingLocalModelSelection');
 }
 
-// True when the model behind the headline Local radio has its weights on
-// disk (ready to select outright).
-function localRadioModelDownloaded(): boolean {
-  const state = localModelStatuses[LOCAL_RADIO_MODEL_KEY.split(':')[1]]?.state;
-  return state === 'ready' || state === 'cached';
-}
 
 // Wire the headline radios. selectModel() persists, re-renders the dropdown
 // (which re-syncs the radios via updateModelRadioUI), clears the
@@ -1068,13 +1062,15 @@ async function selectModel(modelKey: string) {
 }
 
 // Show/hide the local model section based on whether a local model is
-// selected — or parked as the pending choice, so its download panel is
-// reachable before the switch actually happens.
+// selected, parked as the pending choice, or when no model has been selected yet.
 function updateLocalModelSectionVisibility() {
-  const localModelSection = document.getElementById('localModelSection')!;
-  const isLocalModelSelected = dropdownState.selectedModel?.startsWith('local:')
-    || pendingLocalSelection?.startsWith('local:');
-  localModelSection.style.display = isLocalModelSelected ? 'block' : 'none';
+  const localModelSection = document.getElementById('localModelSection');
+  if (!localModelSection) return;
+  const isCloudModelSelected = dropdownState.selectedModel &&
+    !dropdownState.selectedModel.startsWith('local:') &&
+    !dropdownState.selectedModel.startsWith('iosLocal:');
+  const isVisible = (webgpuSupported || isIOSDevice) && (!isCloudModelSelected || !!pendingLocalSelection?.startsWith('local:'));
+  localModelSection.style.display = isVisible ? 'block' : 'none';
 }
 
 async function removeModel(modelKey: string, e: Event) {
@@ -1311,7 +1307,7 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
       }
 
       // Local models are free: use free badge, remove local badge & download icon
-      const badgeHtml = '<span class="free-badge">FREE*</span>';
+      const badgeHtml = '<span class="free-badge">FREE</span>';
 
       localItems.push(buildItem({
         modelKey,
@@ -1333,7 +1329,7 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
         hasUndownloaded = true;
       }
 
-      const badgeHtml = '<span class="free-badge">FREE*</span>';
+      const badgeHtml = '<span class="free-badge">FREE</span>';
 
       localItems.push(buildItem({
         modelKey,
@@ -1729,31 +1725,38 @@ async function updateLocalModelStatus() {
   }
 
   // Always update UI, even on error. webgpuSupported resolves async, so the
-  // radio's disabled state must be refreshed here too, not just from
-  // renderModelDropdown.
+  // section's visibility and items' disabled states must be refreshed here too.
+  updateLocalModelSectionVisibility();
   updateLocalModelSectionUI();
   updateModelRadioUI();
+  await refreshModelDropdownWithLocal();
 }
 
 // Get the currently selected local model (if any)
 function getSelectedLocalModel(): ModelDef | null {
   // A parked pending choice counts: the download panel below the radios
   // must describe/drive the model the user asked for before it's selected.
+  // Defaults to the primary on-device model when none is actively selected.
   const modelKey = dropdownState.selectedModel?.startsWith('local:')
     ? dropdownState.selectedModel
-    : (pendingLocalSelection?.startsWith('local:') ? pendingLocalSelection : null);
+    : (pendingLocalSelection?.startsWith('local:')
+        ? pendingLocalSelection
+        : LOCAL_RADIO_MODEL_KEY);
   if (!modelKey) {
     return null;
   }
   const modelName = modelKey.split(':')[1];
   // First check predefined models
-  const predefinedModel = PREDEFINED_MODELS.local.find(m => m.name === modelName);
+  const predefinedList = isInAppMode && IOS_LOCAL_MODEL
+    ? PREDEFINED_MODELS.iosLocal
+    : PREDEFINED_MODELS.local;
+  const predefinedModel = (predefinedList || []).find(m => m.name === modelName);
   if (predefinedModel) {
     return predefinedModel;
   }
   // Then check custom local models
   const customModel = dropdownState.customModels.find(m => m.api === 'local' && m.name === modelName);
-  return customModel || null;
+  return customModel || (predefinedList?.[0] ?? null);
 }
 
 // Track which models we've already triggered auto-initialization for to prevent duplicate calls
@@ -1823,14 +1826,20 @@ function updateLocalModelSectionUI() {
   }
 
   if (!selectedLocalModel) {
-    // No local model selected - show hint to select one
+    // No local model available - show hint
     badge.textContent = 'Select a model';
     notDownloaded.style.display = 'block';
     if (downloadHint) {
-      downloadHint.textContent = 'Choose an on-device model in Advanced Settings.';
+      downloadHint.textContent = 'Choose an on-device model to download.';
     }
     document.getElementById('downloadLocalModel')!.style.display = 'none';
     return;
+  }
+
+  // Update title to show model display name
+  const titleEl = document.querySelector('.local-model-title');
+  if (titleEl) {
+    titleEl.textContent = selectedLocalModel.display ? `On-Device Model (${selectedLocalModel.display})` : 'On-Device Model';
   }
 
   // Check if the model supports images and show warning if not
@@ -1923,6 +1932,11 @@ function setupLocalModelListeners() {
         console.error('No local model selected');
         return;
       }
+
+      // Track as pendingLocalSelection so background auto-selects this model upon download
+      const modelKey = (isInAppMode && IOS_LOCAL_MODEL ? 'iosLocal:' : 'local:') + selectedLocalModel.name;
+      pendingLocalSelection = modelKey;
+      await setStorage({ pendingLocalModelSelection: modelKey });
 
       console.log('[Popup] Download button clicked, model:', selectedLocalModel.name);
       downloadBtn.disabled = true;
