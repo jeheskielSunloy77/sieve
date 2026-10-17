@@ -106,36 +106,84 @@
     <!-- On-device model section -->
     <section id="localModelSection" class="local-model-section">
       <div class="local-model-header">
-        <span class="local-model-title">On-Device Model</span>
+        <div class="local-model-header-text">
+          <span class="local-model-title">On-Device Model</span>
+          <div class="local-model-meta" id="localModelMeta">
+            <span class="local-model-name" id="localModelName">Gemma 4 E2B</span>
+            <span class="local-model-meta-dot" aria-hidden="true">•</span>
+            <span class="local-model-size" id="localModelSize">~2.0 GB</span>
+          </div>
+        </div>
         <span id="localModelStatusBadge" class="api-status-badge">Checking...</span>
       </div>
-      <p id="localModelNoImageWarning" class="hint local-model-no-image-warning" style="display: none;">Can't see images — photo and video posts are filtered less accurately.</p>
-      <div id="localModelContent">
-        <div id="localModelUnsupported" style="display: none;">
-          <p class="hint">This browser can't run the on-device model. Use Chrome 113 or newer.</p>
+
+      <div id="localModelNoImageWarning" class="local-model-notice" style="display: none;" role="note">
+        <svg class="local-model-notice-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="8" cy="8" r="7"/>
+          <path d="M8 5v3.5M8 11.5h.01"/>
+        </svg>
+        <div class="local-model-notice-content">
+          <p class="local-model-notice-text">Can't see images, photo & video posts are filtered less accurately</p>
+        </div>
+      </div>
+
+      <div id="localModelContent" class="local-model-content">
+        <div id="localModelUnsupported" class="local-model-unsupported-state" style="display: none;">
+          <div class="local-model-notice">
+            <svg class="local-model-notice-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="M8 5v3.5M8 11.5h.01"/>
+            </svg>
+            <p class="hint">This browser can't run the on-device model. Use Chrome 113 or newer.</p>
+          </div>
         </div>
         <div id="localModelNotDownloaded" style="display: none;">
-          <p class="hint" id="localModelDownloadHint">Download the model to enable on-device filtering.</p>
+          <p class="hint local-model-download-hint" id="localModelDownloadHint">Download the model to enable on-device filtering.</p>
           <button id="downloadLocalModel" class="local-model-download-btn">
-            <span class="download-icon">&#8595;</span>
-            Download Model
+            <svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 2.5v7.5M4.5 7l3.5 3.5 3.5-3.5M3 13.5h10"/>
+            </svg>
+            <span>Download Model</span>
           </button>
         </div>
         <div id="localModelDownloading" style="display: none;">
           <div class="local-model-progress">
-            <div id="localProgressFill" class="local-model-progress-fill" style="width: 0%"></div>
+            <div id="localProgressFill" class="local-model-progress-fill" style="transform: scaleX(0);"></div>
           </div>
           <div class="local-model-download-row">
-            <span id="localProgressText" class="hint">Initializing...</span>
-            <button id="cancelLocalModelDownload" class="local-model-cancel-btn" title="Cancel download">✕</button>
+            <span id="localProgressText" class="hint local-model-progress-text">Initializing...</span>
+            <button id="cancelLocalModelDownload" class="local-model-cancel-btn" title="Cancel download">
+              <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M3.5 3.5l9 9m0-9l-9 9"/>
+              </svg>
+              <span>Cancel</span>
+            </button>
           </div>
         </div>
         <div id="localModelReady" style="display: none;">
-          <p class="hint" id="localModelReadyHint">Model ready.</p>
+          <div class="local-model-ready-row">
+            <svg class="local-model-ready-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13.5 4.5l-7 7L3 8"/>
+            </svg>
+            <p class="hint" id="localModelReadyHint">Model ready.</p>
+          </div>
         </div>
         <div id="localModelError" style="display: none;">
-          <p class="hint local-model-error-text" id="localModelErrorText">An error occurred.</p>
-          <button id="retryLocalModel" class="local-model-retry-btn">Retry</button>
+          <div class="local-model-error-state">
+            <div class="local-model-error-row">
+              <svg class="local-model-error-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="8" cy="8" r="7"/>
+                <path d="M8 5v3.5M8 11.5h.01"/>
+              </svg>
+              <p class="hint local-model-error-text" id="localModelErrorText">An error occurred.</p>
+            </div>
+            <button id="retryLocalModel" class="local-model-retry-btn">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.5 8a5.5 5.5 0 1 0 1.5-3.8L2 6M2 2v4h4"/>
+              </svg>
+              <span>Retry</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>

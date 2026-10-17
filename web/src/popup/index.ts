@@ -1100,7 +1100,7 @@ function updateLocalModelSectionVisibility() {
     !dropdownState.selectedModel.startsWith('local:') &&
     !dropdownState.selectedModel.startsWith('iosLocal:');
   const isVisible = (webgpuSupported || isIOSDevice) && (!isCloudModelSelected || !!pendingLocalSelection?.startsWith('local:'));
-  localModelSection.style.display = isVisible ? 'block' : 'none';
+  localModelSection.style.display = isVisible ? 'flex' : 'none';
 }
 
 async function removeModel(modelKey: string, e: Event) {
@@ -1850,19 +1850,29 @@ function updateLocalModelSectionUI() {
     if (downloadHint) {
       downloadHint.textContent = 'Choose an on-device model to download.';
     }
+    const metaEl = document.getElementById('localModelMeta');
+    if (metaEl) metaEl.style.display = 'none';
     document.getElementById('downloadLocalModel')!.style.display = 'none';
     return;
   }
 
-  // Update title to show model display name
+  // Update title and clean metadata row
   const titleEl = document.querySelector('.local-model-title');
   if (titleEl) {
-    titleEl.textContent = selectedLocalModel.display ? `On-Device Model (${selectedLocalModel.display})` : 'On-Device Model';
+    titleEl.textContent = 'On-Device Model';
+  }
+  const metaEl = document.getElementById('localModelMeta');
+  const nameEl = document.getElementById('localModelName');
+  const sizeEl = document.getElementById('localModelSize');
+  if (metaEl) {
+    metaEl.style.display = 'flex';
+    if (nameEl) nameEl.textContent = selectedLocalModel.display || selectedLocalModel.name;
+    if (sizeEl) sizeEl.textContent = selectedLocalModel.sizeGB ? `~${selectedLocalModel.sizeGB} GB` : 'Local storage';
   }
 
   // Check if the model supports images and show warning if not
-  if (noImageWarning && !selectedLocalModel.supportsImages) {
-    noImageWarning.style.display = 'block';
+  if (noImageWarning) {
+    noImageWarning.style.display = !selectedLocalModel.supportsImages ? 'flex' : 'none';
   }
 
   // Get status for the selected model
@@ -1881,7 +1891,7 @@ function updateLocalModelSectionUI() {
       badge.textContent = 'Loading...';
       badge.classList.add('downloading');
       downloading.style.display = 'block';
-      progressFill.style.width = '0%';
+      progressFill.style.transform = 'scaleX(0)';
       progressText.textContent = 'Loading cached model...';
       // Trigger auto-initialization (async, don't await)
       autoInitializeCachedModel(selectedLocalModel.name).catch(err => console.error('[LocalModel] autoInitializeCachedModel failed:', err));
@@ -1892,12 +1902,12 @@ function updateLocalModelSectionUI() {
       notDownloaded.style.display = 'block';
       if (downloadHint) {
         const sizeText = selectedLocalModel.sizeGB ? ` (~${selectedLocalModel.sizeGB}GB)` : '';
-        downloadHint.textContent = `One-time download${sizeText}.`;
+        downloadHint.textContent = `One-time download${sizeText}. Stored locally in your browser.`;
       }
       const downloadBtn = document.getElementById('downloadLocalModel') as HTMLButtonElement;
       downloadBtn.style.display = 'inline-flex';
       downloadBtn.disabled = false;
-      downloadBtn.replaceChildren(parseHTML('<span class="download-icon">&#8595;</span> Download Model'));
+      downloadBtn.replaceChildren(parseHTML('<svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5M4.5 7l3.5 3.5 3.5-3.5M3 13.5h10"/></svg><span>Download Model</span>'));
       break;
     }
 
@@ -1907,7 +1917,7 @@ function updateLocalModelSectionUI() {
       badge.classList.add('downloading');
       downloading.style.display = 'block';
       const progress = status.progress || 0;
-      progressFill.style.width = `${(progress * 100).toFixed(1)}%`;
+      progressFill.style.transform = `scaleX(${progress})`;
       progressText.textContent = status.text || `${(progress * 100).toFixed(1)}%`;
       break;
     }
@@ -1917,7 +1927,7 @@ function updateLocalModelSectionUI() {
       badge.classList.add('ready');
       ready.style.display = 'block';
       if (readyHint) {
-        readyHint.textContent = 'Model ready.';
+        readyHint.textContent = 'Model is ready for on-device inference.';
       }
       break;
 
@@ -1958,7 +1968,7 @@ function setupLocalModelListeners() {
 
       console.log('[Popup] Download button clicked, model:', selectedLocalModel.name);
       downloadBtn.disabled = true;
-      downloadBtn.replaceChildren(parseHTML('<span class="download-icon">&#8987;</span> Starting...'));
+      downloadBtn.replaceChildren(parseHTML('<svg class="download-icon animate-spin" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke-dasharray="28" stroke-dashoffset="10"/></svg><span>Starting...</span>'));
 
       try {
         console.log('[Popup] Sending initializeLocalModel message for:', selectedLocalModel.name);
@@ -1967,7 +1977,7 @@ function setupLocalModelListeners() {
       } catch (err) {
         console.error('[Popup] Failed to start model download:', err);
         downloadBtn.disabled = false;
-        downloadBtn.replaceChildren(parseHTML('<span class="download-icon">&#8595;</span> Download Model'));
+        downloadBtn.replaceChildren(parseHTML('<svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5M4.5 7l3.5 3.5 3.5-3.5M3 13.5h10"/></svg><span>Download Model</span>'));
       }
     })().catch(err => console.error('[Popup] download click failed:', err)); });
   }
@@ -1981,14 +1991,14 @@ function setupLocalModelListeners() {
       }
 
       retryBtn.disabled = true;
-      retryBtn.textContent = 'Retrying...';
+      retryBtn.replaceChildren(parseHTML('<svg class="download-icon animate-spin" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke-dasharray="28" stroke-dashoffset="10"/></svg><span>Retrying...</span>'));
 
       try {
         await chrome.runtime.sendMessage({ type: 'initializeLocalModel', modelId: selectedLocalModel.name });
       } catch (err) {
         console.error('Failed to retry model download:', err);
         retryBtn.disabled = false;
-        retryBtn.textContent = 'Retry';
+        retryBtn.replaceChildren(parseHTML('<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.5-3.8L2 6M2 2v4h4"/></svg><span>Retry</span>'));
       }
     })().catch(err => console.error('[Popup] retry click failed:', err)); });
   }
