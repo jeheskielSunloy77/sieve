@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   filterOpenAIModels,
   filterOpenRouterModels,
@@ -6,7 +6,8 @@ import {
   filterGeminiModels,
   formatOpenAIDisplayName,
   formatGeminiDisplayName,
-  isExcludedModel
+  isExcludedModel,
+  fetchProviderModels
 } from '../../src/shared/model-fetcher';
 
 describe('model-fetcher', () => {
@@ -146,6 +147,114 @@ describe('model-fetcher', () => {
       expect(names).not.toContain('aqa');
 
       expect(formatGeminiDisplayName('gemini-2.0-flash')).toBe('Gemini 2.0 Flash');
+    });
+  });
+
+  describe('fetchProviderModels', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('returns empty array if apiKey is missing for direct providers', async () => {
+      expect(await fetchProviderModels('openai', '')).toEqual([]);
+      expect(await fetchProviderModels('anthropic', '')).toEqual([]);
+      expect(await fetchProviderModels('gemini', '')).toEqual([]);
+    });
+
+    it('uses custom apiBase for Anthropic', async () => {
+      const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [
+            { id: 'claude-3-5-sonnet-20241022', display_name: 'Claude 3.5 Sonnet' },
+            { id: 'claude-3-5-haiku-20241022', display_name: 'Claude 3.5 Haiku' }
+          ]
+        })
+      } as unknown as Response);
+
+      const models = await fetchProviderModels('anthropic', 'test-key', 'https://proxy.example.com/anthropic/v1/');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://proxy.example.com/anthropic/v1/models',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'x-api-key': 'test-key'
+          })
+        })
+      );
+      expect(models.length).toBe(2);
+      expect(models[0].name).toBe('claude-3-5-haiku-20241022');
+    });
+
+    it('uses default apiBase for Anthropic when not specified', async () => {
+      const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'claude-3-5-haiku-20241022', display_name: 'Claude 3.5 Haiku' }]
+        })
+      } as unknown as Response);
+
+      await fetchProviderModels('anthropic', 'test-key');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.anthropic.com/v1/models',
+        expect.anything()
+      );
+    });
+
+    it('uses custom apiBase for Gemini', async () => {
+      const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'gemini-2.0-flash' }]
+        })
+      } as unknown as Response);
+
+      const models = await fetchProviderModels('gemini', 'test-key', 'https://custom-gemini-proxy.com/v1');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://custom-gemini-proxy.com/v1/models',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-key'
+          })
+        })
+      );
+      expect(models.length).toBe(1);
+      expect(models[0].name).toBe('gemini-2.0-flash');
+    });
+
+    it('uses default OpenAI-compatible base for Gemini when not specified', async () => {
+      const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'gemini-2.0-flash' }]
+        })
+      } as unknown as Response);
+
+      await fetchProviderModels('gemini', 'test-key');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://generativelanguage.googleapis.com/v1beta/openai/models',
+        expect.anything()
+      );
+    });
+
+    it('uses custom apiBase for OpenAI', async () => {
+      const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'gpt-4o-mini' }]
+        })
+      } as unknown as Response);
+
+      const models = await fetchProviderModels('openai', 'test-key', 'https://my-openai-proxy.internal/v1');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://my-openai-proxy.internal/v1/models',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-key'
+          })
+        })
+      );
+      expect(models.length).toBe(1);
+      expect(models[0].name).toBe('gpt-4o-mini');
     });
   });
 });

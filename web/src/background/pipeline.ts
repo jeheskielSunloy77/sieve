@@ -463,7 +463,7 @@ export async function getSettings(siteId?: SiteId): Promise<Settings> {
   const platformEnabledKeys = PLATFORMS.map(p => enabledStorageKey(p.id));
   const settingsKeys = [
     'openaiApiKey', 'openaiApiBase', 'openrouterApiKey', 'geminiApiKey',
-    'anthropicApiKey', 'enabled', 'selectedModel',
+    'geminiApiBase', 'anthropicApiKey', 'anthropicApiBase', 'enabled', 'selectedModel',
     'customModels', 'predefinedModelKwargs', 'aiTextDetectionThreshold',
     'aiTextReplyDetectionThreshold', 'aiImageDetectionThreshold',
     'aiFilterIntent',
@@ -503,7 +503,9 @@ export async function getSettings(siteId?: SiteId): Promise<Settings> {
     openaiApiBase: data.openaiApiBase || '',
     openrouterApiKey: data.openrouterApiKey || '',
     geminiApiKey: data.geminiApiKey || '',
+    geminiApiBase: data.geminiApiBase || '',
     anthropicApiKey: data.anthropicApiKey || '',
+    anthropicApiBase: data.anthropicApiBase || '',
     enabled: data.enabled !== false,
     descriptions,
     effectiveDescriptions,
@@ -897,6 +899,10 @@ async function processBatch(): Promise<void> {
 
     if (apiName === 'openai' && settings.openaiApiBase) {
       apiConfig.apiBase = settings.openaiApiBase;
+    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
+      apiConfig.apiBase = settings.anthropicApiBase;
+    } else if (apiName === 'gemini' && settings.geminiApiBase) {
+      apiConfig.apiBase = settings.geminiApiBase;
     }
 
     let apiKwargs: Record<string, unknown> = {};
@@ -1218,6 +1224,10 @@ async function validateFilterPhrase(postText: string, imageUrls: string[], phras
     const apiConfig: APIConfig = { modelName, apiName, apiKey };
     if (apiName === 'openai' && settings.openaiApiBase) {
       apiConfig.apiBase = settings.openaiApiBase;
+    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
+      apiConfig.apiBase = settings.anthropicApiBase;
+    } else if (apiName === 'gemini' && settings.geminiApiBase) {
+      apiConfig.apiBase = settings.geminiApiBase;
     }
     const messages = buildAPIMessages(postData, [phrase]);
     const callFn = apiName === 'anthropic' ? callAnthropicAPI : callDirectAPI;
@@ -1276,6 +1286,10 @@ async function generateCandidatePhrases(postText: string, imageUrls: string[], c
     const apiConfig: APIConfig = { modelName, apiName, apiKey };
     if (apiName === 'openai' && settings.openaiApiBase) {
       apiConfig.apiBase = settings.openaiApiBase;
+    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
+      apiConfig.apiBase = settings.anthropicApiBase;
+    } else if (apiName === 'gemini' && settings.geminiApiBase) {
+      apiConfig.apiBase = settings.geminiApiBase;
     }
     // Build multimodal user content when images are present
     const userContent: ChatMessage['content'] = hasImages

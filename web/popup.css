@@ -1059,12 +1059,13 @@ input[type="password"]::placeholder {
   padding: 8px 12px;
   background: var(--primary);
   color: var(--primary-contrast);
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.15s ease;
+  box-sizing: border-box;
 }
 
 .openrouter-btn:hover,
@@ -1078,13 +1079,20 @@ input[type="password"]::placeholder {
   cursor: not-allowed;
 }
 
-.openrouter-icon {
+.openrouter-icon,
+.signout-icon {
   width: 14px;
   height: 14px;
+  flex-shrink: 0;
 }
 
 .api-signout-btn {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
   background: var(--surface-secondary);
   border: 1px solid var(--border);
   color: var(--text);
@@ -1093,10 +1101,29 @@ input[type="password"]::placeholder {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 .api-signout-btn:hover {
   background: var(--surface-hover);
+}
+
+.api-key-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.api-btn-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.api-btn-row .api-enable-btn,
+.api-btn-row .api-signout-btn {
+  flex: 1;
+  min-width: 0;
 }
 
 .api-verify-error {

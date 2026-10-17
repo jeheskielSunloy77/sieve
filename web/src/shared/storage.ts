@@ -7,9 +7,9 @@ import type {
 
 /** Typed wrapper around chrome.storage.local.get(). Values may be undefined if not yet set. */
 export async function getStorage<K extends keyof StorageSchema>(
-  keys: K[]
+  keys: readonly K[]
 ): Promise<Partial<Pick<StorageSchema, K>>> {
-  return chrome.storage.local.get(keys);
+  return chrome.storage.local.get(keys as K[]);
 }
 
 /** Typed wrapper around chrome.storage.local.set(). */
@@ -21,9 +21,9 @@ export async function setStorage(
 
 /** Typed wrapper around chrome.storage.local.remove(). */
 export async function removeStorage<K extends keyof StorageSchema>(
-  keys: K | K[]
+  keys: K | readonly K[]
 ): Promise<void> {
-  await chrome.storage.local.remove(keys);
+  await chrome.storage.local.remove(keys as K | K[]);
 }
 
 function siteIdFromDescKey(key: DescriptionKey): SiteId {

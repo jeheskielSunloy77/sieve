@@ -180,7 +180,9 @@ interface SettingsBase {
   openaiApiBase: string;
   openrouterApiKey: string;
   geminiApiKey: string;
+  geminiApiBase: string;
   anthropicApiKey: string;
+  anthropicApiBase: string;
   enabled: boolean;
   selectedModel: string;
   customModels: ModelDef[];

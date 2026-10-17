@@ -372,18 +372,7 @@ async function handleMessage(
           return { success: false, error: 'No API key in response' };
         }
 
-        // Check if first auth for auto-model-switch. Users without an active
-        // model get bumped onto the free model so they have a working configuration
-        // immediately after signing in.
-        const storageData = await getStorage(['openrouterApiKey', 'selectedModel']);
-        const isFirstAuth = !storageData.openrouterApiKey;
-        const currentModel = storageData.selectedModel || '';
-
         await setStorage({ openrouterApiKey: data.key });
-
-        if (isFirstAuth && (currentModel === 'cloud' || currentModel === 'imbue' || !currentModel)) {
-          await setStorage({ selectedModel: 'openrouter:nvidia/nemotron-nano-12b-v2-vl:free' });
-        }
 
         return { success: true };
       } catch (err) {

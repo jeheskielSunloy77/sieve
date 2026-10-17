@@ -317,7 +317,8 @@ export async function fetchProviderModels(
       }
     } else if (api === 'anthropic') {
       if (!apiKey) return [];
-      const res = await fetch('https://api.anthropic.com/v1/models', {
+      const base = (apiBase || 'https://api.anthropic.com/v1').replace(/\/+$/, '');
+      const res = await fetch(`${base}/models`, {
         headers: {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
@@ -333,8 +334,9 @@ export async function fetchProviderModels(
       }
     } else if (api === 'gemini') {
       if (!apiKey) return [];
+      const base = (apiBase || 'https://generativelanguage.googleapis.com/v1beta/openai').replace(/\/+$/, '');
       // Try OpenAI-compatible endpoint first
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/models', {
+      const res = await fetch(`${base}/models`, {
         headers: { 'Authorization': `Bearer ${apiKey}` },
         signal: controller.signal
       });
@@ -343,7 +345,7 @@ export async function fetchProviderModels(
         if (Array.isArray(json.data)) {
           models = filterGeminiModels(json.data);
         }
-      } else {
+      } else if (!apiBase) {
         // Fallback to standard Google models endpoint
         const fallbackRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`, {
           signal: controller.signal

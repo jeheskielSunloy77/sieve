@@ -32,6 +32,38 @@ const PROVIDER_LOGOS: Record<string, string> = {
 
 const DEFAULT_MODEL_SEARCH_ICON = '<svg class="model-dropdown-default-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>';
 
+const BTN_SPINNER_ICON = '<svg class="openrouter-icon animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>';
+
+const OPENAI_BTN_ICON = '<svg class="openrouter-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>';
+
+const ANTHROPIC_BTN_ICON = '<svg class="openrouter-icon" viewBox="0 0 24 24" width="14" height="14" fill="#D97757" aria-hidden="true"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"/></svg>';
+
+const GEMINI_BTN_ICON = '<svg class="openrouter-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="url(#ppGeminiGrad)" d="M20.616 10.835a14.147 14.147 0 0 1-4.45-3.001 14.111 14.111 0 0 1-3.678-6.452.503.503 0 0 0-.975 0 14.134 14.134 0 0 1-3.679 6.452 14.155 14.155 0 0 1-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 0 0 0 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 0 1 4.45 3.001 14.112 14.112 0 0 1 3.679 6.453.502.502 0 0 0 .975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 0 1 3.001-4.45 14.113 14.113 0 0 1 6.453-3.678.503.503 0 0 0 0-.975 13.245 13.245 0 0 1-2.003-.678z"/></svg>';
+
+const ALL_PROVIDER_STORAGE_KEYS = [
+  'openrouterApiKey',
+  'openaiApiKey',
+  'openaiApiBase',
+  'geminiApiKey',
+  'geminiApiBase',
+  'anthropicApiKey',
+  'anthropicApiBase',
+  'customModels',
+  'selectedModel',
+  'authErrorApis'
+] as const;
+
+function setButtonVerifying(btn: HTMLButtonElement, verifying: boolean, defaultIconSvg: string, defaultText: string = 'Enable') {
+  if (verifying) {
+    btn.disabled = true;
+    btn.classList.add('verifying');
+    btn.replaceChildren(parseHTML(`${BTN_SPINNER_ICON}<span>Verifying...</span>`));
+  } else {
+    btn.classList.remove('verifying');
+    btn.replaceChildren(parseHTML(`${defaultIconSvg}<span>${defaultText}</span>`));
+  }
+}
+
 // Track local model statuses (per-model)
 let localModelStatuses: Record<string, LocalModelStatus> = {};
 let webgpuSupported = true;
@@ -280,7 +312,9 @@ async function loadSettings() {
     'openaiApiKey',
     'openaiApiBase',
     'geminiApiKey',
+    'geminiApiBase',
     'anthropicApiKey',
+    'anthropicApiBase',
     'predefinedModelKwargs',
     'authErrorApis',
     'aiTextDetectionThreshold',
@@ -306,12 +340,16 @@ async function loadSettings() {
   // the download lands, or by any explicit model selection).
   pendingLocalSelection = data.pendingLocalModelSelection || null;
 
-  // API keys
+  // API keys and Base URLs
   (document.getElementById('openaiApiKey') as HTMLInputElement).value = data.openaiApiKey || '';
   (document.getElementById('openaiApiBase') as HTMLInputElement).value = data.openaiApiBase || '';
-  (document.getElementById('geminiApiKey') as HTMLInputElement).value = data.geminiApiKey || '';
   (document.getElementById('anthropicApiKey') as HTMLInputElement).value = data.anthropicApiKey || '';
+  (document.getElementById('anthropicApiBase') as HTMLInputElement).value = data.anthropicApiBase || '';
+  (document.getElementById('geminiApiKey') as HTMLInputElement).value = data.geminiApiKey || '';
+  (document.getElementById('geminiApiBase') as HTMLInputElement).value = data.geminiApiBase || '';
+  updateOpenAIEnabledUI(!!data.openaiApiKey);
   updateAnthropicEnabledUI(!!data.anthropicApiKey);
+  updateGeminiEnabledUI(!!data.geminiApiKey);
 
   // "Filter replies in conversations" toggle (defaults to true so existing
   // installs keep filtering replies). The content script reads the same
@@ -409,13 +447,61 @@ function setImageThresholdBlockEnabled(enabled: boolean) {
   if (block) block.setAttribute('aria-disabled', enabled ? 'false' : 'true');
 }
 
+function updateOpenAIEnabledUI(isEnabled: boolean) {
+  const disableBtn = document.getElementById('openaiDisableBtn') as HTMLButtonElement | null;
+  const enableBtn = document.getElementById('openaiEnableBtn') as HTMLButtonElement | null;
+  const errorEl = document.getElementById('openaiError');
+  const keyInput = document.getElementById('openaiApiKey') as HTMLInputElement | null;
+
+  if (errorEl) errorEl.style.display = 'none';
+
+  if (disableBtn) {
+    disableBtn.style.display = isEnabled ? 'inline-flex' : 'none';
+  }
+
+  if (enableBtn) {
+    const label = isEnabled ? 'Update' : 'Enable';
+    setButtonVerifying(enableBtn, false, OPENAI_BTN_ICON, label);
+    enableBtn.disabled = !keyInput?.value.trim();
+  }
+}
+
 function updateAnthropicEnabledUI(isEnabled: boolean) {
-  document.getElementById('anthropicKeyEntry')!.style.display = isEnabled ? 'none' : 'block';
-  document.getElementById('anthropicEnabled')!.style.display = isEnabled ? 'block' : 'none';
-  document.getElementById('anthropicError')!.style.display = 'none';
-  (document.getElementById('anthropicEnableBtn') as HTMLButtonElement).disabled = true;
-  (document.getElementById('anthropicEnableBtn') as HTMLButtonElement).textContent = 'Enable';
-  (document.getElementById('anthropicEnableBtn') as HTMLButtonElement).classList.remove('verifying');
+  const disableBtn = document.getElementById('anthropicDisableBtn') as HTMLButtonElement | null;
+  const enableBtn = document.getElementById('anthropicEnableBtn') as HTMLButtonElement | null;
+  const errorEl = document.getElementById('anthropicError');
+  const keyInput = document.getElementById('anthropicApiKey') as HTMLInputElement | null;
+
+  if (errorEl) errorEl.style.display = 'none';
+
+  if (disableBtn) {
+    disableBtn.style.display = isEnabled ? 'inline-flex' : 'none';
+  }
+
+  if (enableBtn) {
+    const label = isEnabled ? 'Update' : 'Enable';
+    setButtonVerifying(enableBtn, false, ANTHROPIC_BTN_ICON, label);
+    enableBtn.disabled = !keyInput?.value.trim();
+  }
+}
+
+function updateGeminiEnabledUI(isEnabled: boolean) {
+  const disableBtn = document.getElementById('geminiDisableBtn') as HTMLButtonElement | null;
+  const enableBtn = document.getElementById('geminiEnableBtn') as HTMLButtonElement | null;
+  const errorEl = document.getElementById('geminiError');
+  const keyInput = document.getElementById('geminiApiKey') as HTMLInputElement | null;
+
+  if (errorEl) errorEl.style.display = 'none';
+
+  if (disableBtn) {
+    disableBtn.style.display = isEnabled ? 'inline-flex' : 'none';
+  }
+
+  if (enableBtn) {
+    const label = isEnabled ? 'Update' : 'Enable';
+    setButtonVerifying(enableBtn, false, GEMINI_BTN_ICON, label);
+    enableBtn.disabled = !keyInput?.value.trim();
+  }
 }
 
 function updateApiProviderStates(data: Partial<StorageSchema>) {
@@ -513,42 +599,129 @@ function setupEventListeners() {
     });
   });
 
-  // OpenAI API key
-  document.getElementById('openaiApiKey')!.addEventListener('change', (e) => { (async () => {
-    const key = (e.target as HTMLInputElement).value.trim();
-    await setStorage({ openaiApiKey: key });
-    const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'openaiApiBase', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
-    updateApiProviderStates(data);
-    renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
-    if (key) {
-      void fetchAndApplyModels('openai', key, data.openaiApiBase);
-    }
-  })().catch(err => console.error('[Popup] openaiApiKey change failed:', err)); });
+  // OpenAI API key & Base URL validation and enable/disable
+  const openaiKeyInput = document.getElementById('openaiApiKey') as HTMLInputElement;
+  const openaiBaseInput = document.getElementById('openaiApiBase') as HTMLInputElement;
+  const openaiEnableBtn = document.getElementById('openaiEnableBtn') as HTMLButtonElement;
+  const openaiErrorEl = document.getElementById('openaiError')!;
 
-  // OpenAI API base URL
-  document.getElementById('openaiApiBase')!.addEventListener('change', (e) => { (async () => {
-    const base = (e.target as HTMLInputElement).value.trim();
+  openaiKeyInput.addEventListener('input', () => {
+    openaiEnableBtn.disabled = !openaiKeyInput.value.trim();
+    openaiErrorEl.style.display = 'none';
+  });
+
+  openaiBaseInput.addEventListener('change', () => { (async () => {
+    const base = openaiBaseInput.value.trim();
     await setStorage({ openaiApiBase: base });
   })().catch(err => console.error('[Popup] openaiApiBase change failed:', err)); });
 
-  // Anthropic API key - enable/disable button to input field
+  openaiEnableBtn.addEventListener('click', () => { (async () => {
+    const key = openaiKeyInput.value.trim();
+    if (!key) return;
+
+    const base = (openaiBaseInput.value.trim() || 'https://api.openai.com/v1').replace(/\/+$/, '');
+    openaiErrorEl.style.display = 'none';
+    setButtonVerifying(openaiEnableBtn, true, OPENAI_BTN_ICON);
+
+    try {
+      const response = await fetch(`${base}/models`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${key}`
+        }
+      });
+
+      if (!response.ok) {
+        const body = await response.text();
+        let msg = 'Invalid API key';
+        if (response.status === 401 || response.status === 403) {
+          msg = 'Invalid API key. Check that your key is correct.';
+        } else if (response.status === 429) {
+          msg = 'Rate limited. Key looks valid — try again shortly.';
+        } else {
+          try {
+            const parsed = JSON.parse(body) as { error?: { message?: string } };
+            msg = parsed.error?.message || `API error (${response.status})`;
+          } catch {
+            msg = `API error (${response.status})`;
+          }
+        }
+
+        if (response.status === 429) {
+          const authErrors429 = (await getStorage(['authErrorApis'])).authErrorApis || {};
+          if (authErrors429.openai) {
+            delete authErrors429.openai;
+            await setStorage({ authErrorApis: authErrors429 });
+          }
+          await setStorage({ openaiApiKey: key, openaiApiBase: openaiBaseInput.value.trim() });
+          const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
+          updateApiProviderStates(data);
+          updateOpenAIEnabledUI(true);
+          renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+          void fetchAndApplyModels('openai', key, data.openaiApiBase);
+        } else {
+          openaiErrorEl.textContent = msg;
+          openaiErrorEl.style.display = 'block';
+          openaiEnableBtn.disabled = false;
+        }
+      } else {
+        const authErrorsOk = (await getStorage(['authErrorApis'])).authErrorApis || {};
+        if (authErrorsOk.openai) {
+          delete authErrorsOk.openai;
+          await setStorage({ authErrorApis: authErrorsOk });
+        }
+        await setStorage({ openaiApiKey: key, openaiApiBase: openaiBaseInput.value.trim() });
+        const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
+        updateApiProviderStates(data);
+        updateOpenAIEnabledUI(true);
+        renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+        void fetchAndApplyModels('openai', key, data.openaiApiBase);
+      }
+    } catch (err) {
+      console.error('[OpenAI] Network error during verification:', err);
+      openaiErrorEl.textContent = 'Network error. Could not reach OpenAI API.';
+      openaiErrorEl.style.display = 'block';
+      openaiEnableBtn.disabled = false;
+    } finally {
+      const data = await getStorage(['openaiApiKey']);
+      const isEnabled = !!data.openaiApiKey;
+      setButtonVerifying(openaiEnableBtn, false, OPENAI_BTN_ICON, isEnabled ? 'Update' : 'Enable');
+      openaiEnableBtn.disabled = !openaiKeyInput.value.trim();
+    }
+  })().catch(err => console.error('[Popup] OpenAI enable failed:', err)); });
+
+  document.getElementById('openaiDisableBtn')!.addEventListener('click', () => { (async () => {
+    await removeStorage('openaiApiKey');
+    openaiKeyInput.value = '';
+    updateOpenAIEnabledUI(false);
+    const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
+    updateApiProviderStates(data);
+    renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+  })().catch(err => console.error('[Popup] OpenAI disable failed:', err)); });
+
+  // Anthropic API key & Base URL validation and enable/disable
   const anthropicKeyInput = document.getElementById('anthropicApiKey') as HTMLInputElement;
+  const anthropicBaseInput = document.getElementById('anthropicApiBase') as HTMLInputElement;
   const anthropicEnableBtn = document.getElementById('anthropicEnableBtn') as HTMLButtonElement;
+  const anthropicErrorEl = document.getElementById('anthropicError')!;
 
   anthropicKeyInput.addEventListener('input', () => {
     anthropicEnableBtn.disabled = !anthropicKeyInput.value.trim();
-    document.getElementById('anthropicError')!.style.display = 'none';
+    anthropicErrorEl.style.display = 'none';
   });
+
+  anthropicBaseInput.addEventListener('change', () => { (async () => {
+    const base = anthropicBaseInput.value.trim();
+    await setStorage({ anthropicApiBase: base });
+  })().catch(err => console.error('[Popup] anthropicApiBase change failed:', err)); });
 
   anthropicEnableBtn.addEventListener('click', () => { (async () => {
     const key = anthropicKeyInput.value.trim();
     if (!key) return;
 
-    const errorEl = document.getElementById('anthropicError')!;
-    errorEl.style.display = 'none';
-    anthropicEnableBtn.disabled = true;
-    anthropicEnableBtn.classList.add('verifying');
-    anthropicEnableBtn.textContent = 'Verifying...';
+    const base = (anthropicBaseInput.value.trim() || 'https://api.anthropic.com/v1').replace(/\/+$/, '');
+    anthropicErrorEl.style.display = 'none';
+    setButtonVerifying(anthropicEnableBtn, true, ANTHROPIC_BTN_ICON);
 
     try {
       const requestBody = {
@@ -562,7 +735,7 @@ function setupEventListeners() {
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       };
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch(`${base}/messages`, {
         method: 'POST',
         headers: requestHeaders,
         body: JSON.stringify(requestBody)
@@ -584,47 +757,46 @@ function setupEventListeners() {
 
         // 429 means the key is valid, just rate limited — allow enabling
         if (response.status === 429) {
-          // Clear any stale auth error for anthropic
           const authErrors429 = (await getStorage(['authErrorApis'])).authErrorApis || {};
           if (authErrors429.anthropic) {
             delete authErrors429.anthropic;
             await setStorage({ authErrorApis: authErrors429 });
           }
-          await setStorage({ anthropicApiKey: key });
-          const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
+          await setStorage({ anthropicApiKey: key, anthropicApiBase: anthropicBaseInput.value.trim() });
+          const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
           updateApiProviderStates(data);
           updateAnthropicEnabledUI(true);
           renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
-          void fetchAndApplyModels('anthropic', key);
+          void fetchAndApplyModels('anthropic', key, data.anthropicApiBase);
         } else {
-          errorEl.textContent = msg;
-          errorEl.style.display = 'block';
+          anthropicErrorEl.textContent = msg;
+          anthropicErrorEl.style.display = 'block';
           anthropicEnableBtn.disabled = false;
         }
       } else {
-        // Clear any stale auth error for anthropic
         const authErrorsOk = (await getStorage(['authErrorApis'])).authErrorApis || {};
         if (authErrorsOk.anthropic) {
           delete authErrorsOk.anthropic;
           await setStorage({ authErrorApis: authErrorsOk });
         }
-        // Success — save the key
-        await setStorage({ anthropicApiKey: key });
-        const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
+        await setStorage({ anthropicApiKey: key, anthropicApiBase: anthropicBaseInput.value.trim() });
+        const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
         updateApiProviderStates(data);
         updateAnthropicEnabledUI(true);
         renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
-        void fetchAndApplyModels('anthropic', key);
+        void fetchAndApplyModels('anthropic', key, data.anthropicApiBase);
       }
     } catch (err) {
       console.error('[Anthropic] Network error during verification:', err);
-      errorEl.textContent = 'Network error. Could not reach Anthropic API.';
-      errorEl.style.display = 'block';
+      anthropicErrorEl.textContent = 'Network error. Could not reach Anthropic API.';
+      anthropicErrorEl.style.display = 'block';
       anthropicEnableBtn.disabled = false;
+    } finally {
+      const data = await getStorage(['anthropicApiKey']);
+      const isEnabled = !!data.anthropicApiKey;
+      setButtonVerifying(anthropicEnableBtn, false, ANTHROPIC_BTN_ICON, isEnabled ? 'Update' : 'Enable');
+      anthropicEnableBtn.disabled = !anthropicKeyInput.value.trim();
     }
-
-    anthropicEnableBtn.classList.remove('verifying');
-    anthropicEnableBtn.textContent = 'Enable';
   })().catch(err => console.error('[Popup] Anthropic enable failed:', err)); });
 
   // Anthropic disable button
@@ -632,22 +804,128 @@ function setupEventListeners() {
     await removeStorage('anthropicApiKey');
     anthropicKeyInput.value = '';
     updateAnthropicEnabledUI(false);
-    const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
+    const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
     updateApiProviderStates(data);
     renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
   })().catch(err => console.error('[Popup] Anthropic disable failed:', err)); });
 
-  // Gemini API key
-  document.getElementById('geminiApiKey')!.addEventListener('change', (e) => { (async () => {
-    const key = (e.target as HTMLInputElement).value.trim();
-    await setStorage({ geminiApiKey: key });
-    const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
+  // Gemini API key & Base URL validation and enable/disable
+  const geminiKeyInput = document.getElementById('geminiApiKey') as HTMLInputElement;
+  const geminiBaseInput = document.getElementById('geminiApiBase') as HTMLInputElement;
+  const geminiEnableBtn = document.getElementById('geminiEnableBtn') as HTMLButtonElement;
+  const geminiErrorEl = document.getElementById('geminiError')!;
+
+  geminiKeyInput.addEventListener('input', () => {
+    geminiEnableBtn.disabled = !geminiKeyInput.value.trim();
+    geminiErrorEl.style.display = 'none';
+  });
+
+  geminiBaseInput.addEventListener('change', () => { (async () => {
+    const base = geminiBaseInput.value.trim();
+    await setStorage({ geminiApiBase: base });
+  })().catch(err => console.error('[Popup] geminiApiBase change failed:', err)); });
+
+  geminiEnableBtn.addEventListener('click', () => { (async () => {
+    const key = geminiKeyInput.value.trim();
+    if (!key) return;
+
+    const customBase = geminiBaseInput.value.trim();
+    const base = (customBase || 'https://generativelanguage.googleapis.com/v1beta/openai').replace(/\/+$/, '');
+    geminiErrorEl.style.display = 'none';
+    setButtonVerifying(geminiEnableBtn, true, GEMINI_BTN_ICON);
+
+    try {
+      let response = await fetch(`${base}/models`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${key}`
+        }
+      });
+
+      if (!response.ok && !customBase && response.status !== 400) {
+        try {
+          const fallbackRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+          if (fallbackRes.ok || fallbackRes.status === 429) {
+            response = fallbackRes;
+          }
+        } catch {
+          // ignore fallback error
+        }
+      }
+
+      if (!response.ok) {
+        const body = await response.text();
+        let msg = 'Invalid API key';
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          try {
+            const parsed = JSON.parse(body) as { error?: { message?: string } };
+            msg = parsed.error?.message || 'Invalid API key. Check that your key is correct.';
+          } catch {
+            msg = 'Invalid API key. Check that your key is correct.';
+          }
+        } else if (response.status === 429) {
+          msg = 'Rate limited. Key looks valid — try again shortly.';
+        } else {
+          try {
+            const parsed = JSON.parse(body) as { error?: { message?: string } };
+            msg = parsed.error?.message || `API error (${response.status})`;
+          } catch {
+            msg = `API error (${response.status})`;
+          }
+        }
+
+        if (response.status === 429) {
+          const authErrors429 = (await getStorage(['authErrorApis'])).authErrorApis || {};
+          if (authErrors429.gemini) {
+            delete authErrors429.gemini;
+            await setStorage({ authErrorApis: authErrors429 });
+          }
+          await setStorage({ geminiApiKey: key, geminiApiBase: customBase });
+          const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
+          updateApiProviderStates(data);
+          updateGeminiEnabledUI(true);
+          renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+          void fetchAndApplyModels('gemini', key, customBase);
+        } else {
+          geminiErrorEl.textContent = msg;
+          geminiErrorEl.style.display = 'block';
+          geminiEnableBtn.disabled = false;
+        }
+      } else {
+        const authErrorsOk = (await getStorage(['authErrorApis'])).authErrorApis || {};
+        if (authErrorsOk.gemini) {
+          delete authErrorsOk.gemini;
+          await setStorage({ authErrorApis: authErrorsOk });
+        }
+        await setStorage({ geminiApiKey: key, geminiApiBase: customBase });
+        const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
+        updateApiProviderStates(data);
+        updateGeminiEnabledUI(true);
+        renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
+        void fetchAndApplyModels('gemini', key, customBase);
+      }
+    } catch (err) {
+      console.error('[Gemini] Network error during verification:', err);
+      geminiErrorEl.textContent = 'Network error. Could not reach Gemini API.';
+      geminiErrorEl.style.display = 'block';
+      geminiEnableBtn.disabled = false;
+    } finally {
+      const data = await getStorage(['geminiApiKey']);
+      const isEnabled = !!data.geminiApiKey;
+      setButtonVerifying(geminiEnableBtn, false, GEMINI_BTN_ICON, isEnabled ? 'Update' : 'Enable');
+      geminiEnableBtn.disabled = !geminiKeyInput.value.trim();
+    }
+  })().catch(err => console.error('[Popup] Gemini enable failed:', err)); });
+
+  // Gemini disable button
+  document.getElementById('geminiDisableBtn')!.addEventListener('click', () => { (async () => {
+    await removeStorage('geminiApiKey');
+    geminiKeyInput.value = '';
+    updateGeminiEnabledUI(false);
+    const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
     updateApiProviderStates(data);
     renderModelDropdown(data.customModels || [], data.selectedModel || DEFAULT_MODEL);
-    if (key) {
-      void fetchAndApplyModels('gemini', key);
-    }
-  })().catch(err => console.error('[Popup] geminiApiKey change failed:', err)); });
+  })().catch(err => console.error('[Popup] Gemini disable failed:', err)); });
 
   // OpenRouter: Safari has no chrome.identity, so launchWebAuthFlow throws.
   // Show the API-key paste input instead and hide the OAuth button. The
@@ -842,7 +1120,7 @@ async function refreshDynamicModels(data: Partial<StorageSchema>) {
 
     // 3. Anthropic
     if (data.anthropicApiKey && !current.anthropic?.length) {
-      const models = await fetchProviderModels('anthropic', data.anthropicApiKey);
+      const models = await fetchProviderModels('anthropic', data.anthropicApiKey, data.anthropicApiBase);
       if (models.length > 0) {
         current.anthropic = models;
         changed = true;
@@ -851,7 +1129,7 @@ async function refreshDynamicModels(data: Partial<StorageSchema>) {
 
     // 4. Gemini
     if (data.geminiApiKey && !current.gemini?.length) {
-      const models = await fetchProviderModels('gemini', data.geminiApiKey);
+      const models = await fetchProviderModels('gemini', data.geminiApiKey, data.geminiApiBase);
       if (models.length > 0) {
         current.gemini = models;
         changed = true;
@@ -1593,7 +1871,7 @@ async function saveModelKwargs(modelKey: string, kwargs: Record<string, unknown>
 async function startOpenRouterOAuth() {
   const signInBtn = document.getElementById('openrouterSignIn') as HTMLButtonElement;
   signInBtn.disabled = true;
-  signInBtn.textContent = 'Signing in...';
+  signInBtn.replaceChildren(parseHTML(`${BTN_SPINNER_ICON}<span>Signing in...</span>`));
 
   try {
     const response: { success?: boolean; error?: string; cancelled?: boolean } =
@@ -1612,26 +1890,21 @@ async function startOpenRouterOAuth() {
       <svg class="openrouter-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path d="M18.654 3.87a5.087 5.087 0 1 1 0 10.174L23.7 19.09c.64.641.187 1.737-.72 1.737H8.48a8.479 8.479 0 0 1 0-16.958h10.175zM8.479 7.26a5.087 5.087 0 1 0 0 10.176 5.087 5.087 0 0 0 0-10.175z"/>
       </svg>
-      Sign in with OpenRouter
+      <span>Sign in with OpenRouter</span>
     `));
   }
 }
 
 // Update the UI to show OpenRouter connection status
 async function updateOpenRouterStatus() {
-  const data = await getStorage(['openrouterApiKey', 'openaiApiKey', 'geminiApiKey', 'anthropicApiKey', 'customModels', 'selectedModel', 'authErrorApis']);
+  const data = await getStorage(ALL_PROVIDER_STORAGE_KEYS);
   const signedOutSection = document.getElementById('openrouterSignedOut')!;
   const signedInSection = document.getElementById('openrouterSignedIn')!;
 
   const isSignedIn = !!data.openrouterApiKey;
 
-  if (isSignedIn) {
-    signedOutSection.style.display = 'none';
-    signedInSection.style.display = 'block';
-  } else {
-    signedOutSection.style.display = 'block';
-    signedInSection.style.display = 'none';
-  }
+  signedOutSection.style.display = isSignedIn ? 'none' : 'flex';
+  signedInSection.style.display = isSignedIn ? 'block' : 'none';
 
   // Update all API provider states
   updateApiProviderStates(data);
