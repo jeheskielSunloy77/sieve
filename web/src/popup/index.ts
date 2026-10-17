@@ -1268,18 +1268,6 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
     `));
     group.appendChild(header);
 
-    // If download is required, clicking the badge directs to the download panel
-    if (api === 'local' && groupBadgeHtml) {
-      header.querySelector('.model-dropdown-group-badge')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        pendingLocalSelection = LOCAL_RADIO_MODEL_KEY;
-        setStorage({ pendingLocalModelSelection: LOCAL_RADIO_MODEL_KEY }).catch(console.error);
-        updateLocalModelSectionVisibility();
-        updateLocalModelSectionUI();
-        closeDropdown(true);
-        document.getElementById('localModelSection')?.scrollIntoView({ behavior: 'smooth' });
-      });
-    }
 
     const itemsWrap = document.createElement('div');
     itemsWrap.className = 'model-dropdown-group-items';
