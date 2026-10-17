@@ -1,40 +1,13 @@
 /* Threads uses generated class names; keep all overrides scoped to Sieve. */
 
-body.sieve-disabled .filter-phrases-banner--threads,
-body.postpatrol-disabled .filter-phrases-banner--threads,
+body.sieve-disabled .filter-phrases-bottom,
+body.postpatrol-disabled .filter-phrases-bottom,
 body.sieve-disabled .ff-why-annoying-btn--threads,
 body.postpatrol-disabled .ff-why-annoying-btn--threads {
   display: none !important;
 }
 
-.filter-phrases-banner.filter-phrases-banner--threads {
-  display: block;
-  /* Threads sometimes exposes a very wide empty right-column wrapper. Keep
-     Sieve card-sized within it instead of stretching across the gutter. */
-  width: min(336px, calc(100vw - 32px));
-  max-width: 100%;
-  margin: 0 0 12px;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  position: sticky;
-  top: 72px;
-  z-index: 3;
-}
-
-.sieve-threads-right-rail,
-.postpatrol-threads-right-rail {
-  position: fixed;
-  z-index: 20;
-}
-
-.sieve-threads-right-rail .filter-phrases-banner--threads,
-.postpatrol-threads-right-rail .filter-phrases-banner--threads {
-  position: static;
-  width: 100%;
-  margin: 0;
-}
-
+/* In-feed action button on Threads */
 .ff-why-annoying-btn.ff-why-annoying-btn--threads {
   width: 36px;
   height: 36px;
@@ -48,24 +21,41 @@ body.postpatrol-disabled .ff-why-annoying-btn--threads {
   color: var(--pp-text);
 }
 
+/* On mobile/narrow screens, suppress the before-nav mobile box in favor of the bottom sheet */
 body.site-threads .filter-phrases-mobile {
   display: none !important;
 }
 
-@media (min-width: 1280px) {
-  body.site-threads .filter-phrases-bottom {
-    display: none !important;
-  }
-  body.site-threads .filter-phrases-banner--threads {
-    display: block !important;
-  }
+body.site-threads .filter-phrases-bottom {
+  display: block !important;
 }
 
-@media (max-width: 1279px) {
-  body.site-threads .filter-phrases-banner--threads {
-    display: none !important;
-  }
-  body.site-threads .filter-phrases-bottom {
-    display: block !important;
-  }
+/* On desktop (>= 1280px), the filter box sits in the right gutter beside the feed.
+   Style it to match X (Twitter)'s sidebar card exactly:
+   - Hide the mobile collapse handle (▼)
+   - Remove the outer container background and thick bottom border
+   - Apply frosted glass blur, 1px hairline border, 12px radius, and monotone tokens */
+body.site-threads .filter-phrases-bottom.filter-phrases-right-gutter {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+body.site-threads .filter-phrases-bottom.filter-phrases-right-gutter .filter-collapse-handle {
+  display: none !important;
+}
+
+body.site-threads .filter-phrases-bottom.filter-phrases-right-gutter .filter-phrases-container {
+  padding: 12px 14px !important;
+  background-color: var(--pp-bg-glass) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--pp-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--pp-shadow) !important;
+  max-height: none !important;
+  overflow: visible !important;
 }

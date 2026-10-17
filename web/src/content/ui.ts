@@ -632,6 +632,18 @@ function updateBottomFilterPosition() {
     const borderRight = parseFloat(style.borderRightWidth) || 0;
     const rect = primaryColumn.getBoundingClientRect();
 
+    const isThreadsDesktop = _deps.adapter.siteId === 'threads'
+      && window.innerWidth >= 1280
+      && window.innerWidth - rect.right >= 300;
+    if (isThreadsDesktop) {
+      bottomFilterContainer.classList.add('filter-phrases-right-gutter');
+      bottomFilterContainer.style.left = `${Math.round(rect.right + 16)}px`;
+      bottomFilterContainer.style.top = '72px';
+      bottomFilterContainer.style.bottom = 'auto';
+      bottomFilterContainer.style.width = `${Math.round(Math.min(336, window.innerWidth - rect.right - 24))}px`;
+      return;
+    }
+
     bottomFilterContainer.classList.remove('filter-phrases-right-gutter');
     bottomFilterContainer.style.removeProperty('top');
     bottomFilterContainer.style.removeProperty('bottom');
@@ -784,13 +796,7 @@ function updateBannerFilterVisibility() {
   // adapter's chosen anchor, tear it down so `handleDOMMutation` can
   // re-inject at the right location.
   const expected = _deps.adapter.getFilterBoxAnchor?.();
-  if (!expected) {
-    if (_deps.adapter.siteId === 'threads') {
-      filterPhrasesContainer.remove();
-      filterPhrasesContainer = null;
-    }
-    return;
-  }
+  if (!expected) return;
   if (filterPhrasesContainer.parentElement !== expected.parent) {
     filterPhrasesContainer.remove();
     filterPhrasesContainer = null;
@@ -3423,18 +3429,16 @@ export function handleDOMMutation() {
     mobileFilterContainer = null;
   }
   if (_deps.adapter.filterBoxPlacement === 'banner') {
-    if (!filterPhrasesContainer) {
-      injectBannerFilterBox();
-    } else {
-      updateBannerFilterVisibility();
-    }
     if (_deps.adapter.siteId === 'threads') {
-      if (!bottomFilterContainer) {
-        injectBottomFilterBox();
-      } else {
+      if (!bottomFilterContainer) injectBottomFilterBox();
+      else {
         updateBottomFilterPosition();
         updateBottomFilterVisibility();
       }
+    } else if (!filterPhrasesContainer) {
+      injectBannerFilterBox();
+    } else {
+      updateBannerFilterVisibility();
     }
     return;
   }
