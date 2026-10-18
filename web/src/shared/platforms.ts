@@ -75,7 +75,7 @@ const PLATFORM_RUNTIME: Record<SiteId, PlatformRuntimeOnly> = {
   },
   threads: {
     displayName: 'Threads',
-    hostPattern: /(^|\.)threads\.com$/i,
+    hostPattern: /(^|\.)threads\.(com|net)$/i,
     feedUrl: 'https://www.threads.com/',
   },
 };

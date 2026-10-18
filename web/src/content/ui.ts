@@ -3397,10 +3397,12 @@ export function setupDropdownMenuObserver() {
     if (!target) return;
 
     const caretSelector = _deps?.adapter?.selectors?.caret
-      || '[data-testid="caret"], button[aria-label*="More" i], button[aria-label^="Open control menu" i], button[aria-label^="Open menu" i], [aria-label="Action menu" i]';
+      || '[data-testid="caret"], [role="button"][aria-haspopup="menu"], button[aria-label*="More" i], button[aria-label^="Open control menu" i], button[aria-label^="Open menu" i], [aria-label="Action menu" i]';
 
     const caretBtn = target.closest(caretSelector)
-      || (target.closest('button, [role="button"]') && target.closest('button, [role="button"]')?.querySelector('svg[aria-label*="More" i]'));
+      || (target.closest('button, [role="button"]') && (
+        target.closest('button, [role="button"]')?.querySelector('svg[aria-label*="More" i], svg[title*="More" i], svg title')
+      ));
 
     if (caretBtn && _deps?.adapter?.selectors?.post) {
       const post = caretBtn.closest<HTMLElement>(_deps.adapter.selectors.post);
@@ -3413,6 +3415,8 @@ export function setupDropdownMenuObserver() {
   };
 
   document.addEventListener('pointerdown', onCaretActivate, true);
+  document.addEventListener('mousedown', onCaretActivate, true);
+  document.addEventListener('click', onCaretActivate, true);
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       onCaretActivate(e);
@@ -3420,36 +3424,72 @@ export function setupDropdownMenuObserver() {
   }, true);
 
   const observer = new MutationObserver(() => {
-    if (!isFilteringDropdownActive || !lastCaretPost) return;
-    if (Date.now() - lastCaretTime > 6000) return;
+    if (!isFilteringDropdownActive) return;
+    // Never allow more than one Sieve dropdown item on the page at any time
+    if (document.querySelector('.sieve-dropdown-item')) return;
+
+    let targetPost = lastCaretPost;
+    let targetRect = lastCaretRect;
+
+    if (!targetPost || (Date.now() - lastCaretTime > 8000)) {
+      const openCaret = document.querySelector<HTMLElement>(
+        '[aria-expanded="true"][aria-haspopup="menu"], [aria-expanded="true"][data-testid="caret"], [aria-expanded="true"][aria-label*="More" i], button[aria-expanded="true"][aria-label^="Open control menu" i], button[aria-expanded="true"][aria-label^="Open menu" i], [role="button"][aria-expanded="true"], button[aria-expanded="true"]'
+      );
+      if (openCaret && _deps?.adapter?.selectors?.post) {
+        const inferredPost = openCaret.closest<HTMLElement>(_deps.adapter.selectors.post);
+        if (inferredPost) {
+          targetPost = inferredPost;
+          targetRect = openCaret.getBoundingClientRect();
+          lastCaretPost = targetPost;
+          lastCaretRect = targetRect;
+          lastCaretTime = Date.now();
+        }
+      }
+    }
+
+    if (!targetPost) return;
 
     const dropdownSelector = _deps?.adapter?.selectors?.dropdown
-      || '[data-testid="Dropdown"], [role="menu"], .feed-shared-control-menu__content, .artdeco-dropdown__content';
+      || '[data-testid="Dropdown"] [role="menu"], div[role="menu"], .feed-shared-control-menu__content, .artdeco-dropdown__content';
 
     const dropdowns = document.querySelectorAll<HTMLElement>(dropdownSelector);
-    dropdowns.forEach((dropdown) => {
-      if (dropdown.querySelector('.sieve-dropdown-item')) return;
-      if (!dropdown.isConnected) return;
+    for (const dropdown of dropdowns) {
+      if (!dropdown.isConnected) continue;
+
+      // Dropdown menus for posts should not be inside navigation or sidebars
+      if (dropdown.closest('aside, nav, header')) continue;
+
+      // Distance check from caret button to prevent injecting into unrelated menus
+      if (targetRect) {
+        const dRect = dropdown.getBoundingClientRect();
+        if (dRect.width > 0 && dRect.height > 0) {
+          if (Math.abs(dRect.top - targetRect.bottom) > 800 || Math.abs(dRect.right - targetRect.right) > 500) {
+            continue;
+          }
+        }
+      }
+
+      // Prefer innermost container that holds role="menu" or menuitems
+      const targetMenu = dropdown.querySelector<HTMLElement>('[role="menu"]') || dropdown;
+      if (targetMenu.querySelector('.sieve-dropdown-item')) continue;
 
       const item = document.createElement('div');
       item.className = 'sieve-dropdown-item';
       item.setAttribute('role', 'menuitem');
       item.setAttribute('tabindex', '0');
 
-      const logoSvg = getSieveLogoHTML('sieve-dropdown-badge-svg');
+      const logoSvg = getSieveLogoHTML('sieve-dropdown-logo-svg');
+      const actionText = 'Filter similar posts';
       const itemContent = `
         <div class="sieve-dropdown-item-left">
           <span class="sieve-dropdown-item-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
             </svg>
           </span>
-          <span class="sieve-dropdown-item-text">Filter out similar posts</span>
+          <span class="sieve-dropdown-item-text">${actionText}</span>
         </div>
-        <div class="sieve-dropdown-item-badge">
-          <span class="sieve-dropdown-badge-logo" aria-hidden="true">${logoSvg}</span>
-          <span class="sieve-dropdown-badge-name">Sieve</span>
-        </div>
+        <span class="sieve-dropdown-item-logo" aria-hidden="true" title="Sieve">${logoSvg}</span>
       `;
       item.replaceChildren(parseHTML(itemContent));
 
@@ -3457,20 +3497,20 @@ export function setupDropdownMenuObserver() {
         e.preventDefault();
         e.stopPropagation();
 
-        const targetPost = lastCaretPost;
-        const targetRect = lastCaretRect;
+        const activePost = targetPost;
+        const activeRect = targetRect;
 
         // Dismiss native menu
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
 
-        const menuLayer = dropdown.closest('[role="menu"], [data-testid="Dropdown"], [role="dialog"], #layers > div');
+        const menuLayer = targetMenu.closest('[role="menu"], [data-testid="Dropdown"], [role="dialog"], #layers > div, div[style*="z-index"]');
         if (menuLayer instanceof HTMLElement) {
           menuLayer.style.display = 'none';
         }
         item.remove();
 
-        if (targetPost) {
-          openFilterReasonDialog(targetPost, targetRect);
+        if (activePost) {
+          openFilterReasonDialog(activePost, activeRect);
         }
       };
 
@@ -3482,8 +3522,19 @@ export function setupDropdownMenuObserver() {
         }
       });
 
-      dropdown.insertBefore(item, dropdown.firstElementChild);
-    });
+      let insertParent: HTMLElement = targetMenu;
+      let referenceNode: HTMLElement | null = targetMenu.firstElementChild as HTMLElement | null;
+
+      const firstItem = targetMenu.querySelector<HTMLElement>('[role="menuitem"]');
+      if (firstItem && firstItem.parentElement && targetMenu.contains(firstItem.parentElement)) {
+        insertParent = firstItem.parentElement;
+        referenceNode = firstItem;
+      }
+
+      insertParent.insertBefore(item, referenceNode);
+      // Once inserted, break out of loop so only one item is added
+      break;
+    }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });

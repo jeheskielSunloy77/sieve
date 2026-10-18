@@ -49,7 +49,7 @@ const SieveTwitterAdapter = class TwitterAdapter implements PlatformAdapter {
     mutations: '[data-testid="tweetText"]',
     textContent: '[data-testid="tweetText"]',
     caret: '[data-testid="caret"], button[aria-label="More"]',
-    dropdown: '[data-testid="Dropdown"], [role="menu"]',
+    dropdown: '[data-testid="Dropdown"] [role="menu"], div[role="menu"]',
   };
 
   private _fiberExtractorReady = false;

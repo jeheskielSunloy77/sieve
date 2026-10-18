@@ -23,8 +23,8 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
     bottomBar: '',
     mutations: 'span[dir="auto"], img, video',
     textContent: 'span[dir="auto"]',
-    caret: 'svg[aria-label="More"], [role="button"][aria-label="More"]',
-    dropdown: '[role="dialog"], [role="menu"]',
+    caret: '[role="button"][aria-haspopup="menu"], svg[title="More"], [role="button"][aria-label="More"], [aria-label="More"]',
+    dropdown: '[role="menu"], [role="dialog"]',
   };
 
   constructor() {
@@ -275,7 +275,11 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
   }
 
   getCaretButton(article: HTMLElement): HTMLElement | null {
-    const svg = article.querySelector('svg[aria-label="More"]');
+    const btn = article.querySelector<HTMLElement>('[role="button"][aria-haspopup="menu"]')
+      || article.querySelector<HTMLElement>('[role="button"]:has(svg[title="More"])')
+      || article.querySelector<HTMLElement>('[role="button"]:has(title)');
+    if (btn) return btn;
+    const svg = article.querySelector('svg[aria-label="More"], svg[title="More"]');
     if (svg) return svg.closest<HTMLElement>('[role="button"]') || svg.parentElement;
     return article.querySelector<HTMLElement>('[role="button"][aria-label="More"]');
   }
@@ -383,7 +387,7 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
   }
 };
 
-if (/(^|\.)threads\.com$/i.test(location.hostname)) {
+if (/(^|\.)threads\.(com|net)$/i.test(location.hostname)) {
   window.SieveAdapter = SieveThreadsAdapter;
   window.PostPatrolAdapter = SieveThreadsAdapter;
 }
