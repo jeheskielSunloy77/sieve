@@ -23,6 +23,8 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
     bottomBar: '',
     mutations: 'span[dir="auto"], img, video',
     textContent: 'span[dir="auto"]',
+    caret: 'svg[aria-label="More"], [role="button"][aria-label="More"]',
+    dropdown: '[role="dialog"], [role="menu"]',
   };
 
   constructor() {
@@ -270,6 +272,12 @@ const SieveThreadsAdapter = class ThreadsAdapter implements PlatformAdapter {
     const comment = article.querySelector<SVGElement>('svg[aria-label="Comment"]');
     const actionRow = comment?.closest<HTMLElement>('[role="button"]')?.parentElement?.parentElement;
     (actionRow ?? article).appendChild(button);
+  }
+
+  getCaretButton(article: HTMLElement): HTMLElement | null {
+    const svg = article.querySelector('svg[aria-label="More"]');
+    if (svg) return svg.closest<HTMLElement>('[role="button"]') || svg.parentElement;
+    return article.querySelector<HTMLElement>('[role="button"][aria-label="More"]');
   }
 
   getSearchForm(): HTMLElement | null {

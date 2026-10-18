@@ -276,6 +276,8 @@ export interface PlatformSelectors {
   bottomBar: string;
   mutations: string;
   textContent: string;
+  caret?: string;
+  dropdown?: string;
 }
 
 export interface PlatformAdapter {
@@ -313,6 +315,7 @@ export interface PlatformAdapter {
   cleanupFilteredPostHtml(tweetContent: HTMLElement, imageUrls: string[]): void;
   getShareButton(article: HTMLElement): HTMLElement | null;
   insertActionButton(article: HTMLElement, button: HTMLElement): void;
+  getCaretButton?(article: HTMLElement): HTMLElement | null;
   getSearchForm(): HTMLElement | null;
 }
 

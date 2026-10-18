@@ -37,6 +37,9 @@ export function initUI(deps: ContentUIDeps) {
   // Register the single page-wide tooltip-dismissal listener (replaces a
   // per-post capture-phase listener that used to accumulate with each post).
   setupAnnoyingTooltipCloser();
+
+  // Observe post 3-dot caret clicks and dropdown menu appearances
+  setupDropdownMenuObserver();
 }
 
 
@@ -189,6 +192,10 @@ export function restoreAllFilteredPosts(): void {
     _deps.processedPosts.delete(article);
     _deps.pendingPosts.delete(article);
   });
+  // Clean up any injected action buttons, open tooltips, or dropdown menu items
+  document.querySelectorAll('.ff-why-annoying-btn').forEach(b => b.remove());
+  document.querySelectorAll('.ff-annoying-tooltip').forEach(t => t.remove());
+  document.querySelectorAll('.sieve-dropdown-item').forEach(m => m.remove());
   clearFilteredPosts();
 }
 
@@ -3063,139 +3070,113 @@ async function ensureFilterRepliesEnabled(article: HTMLElement) {
   }
 }
 
-// Add inline "why annoying" button next to Share post button
-export function addWhyAnnoyingButton(article: HTMLElement) {
-  if (!_deps.adapter.getShareButton(article)) {
-    return;
-  }
-  // Don't add twice
-  if (article.querySelector('.ff-why-annoying-btn')) {
-    return;
-  }
+// Open filter reason dialog / diagnosis popup relative to anchor rect or article
+export function openFilterReasonDialog(
+  article: HTMLElement,
+  anchorRect?: DOMRect | { left: number; top: number; right: number; bottom: number; width: number; height: number } | null
+) {
+  // Close any other open tooltips
+  document.querySelectorAll('.ff-annoying-tooltip').forEach(t => t.remove());
 
-  const btn = document.createElement('div');
-  btn.className = 'ff-why-annoying-btn';
-  btn.setAttribute('role', 'button');
-  btn.title = 'Bounce this tweet';
-  btn.replaceChildren(parseHTML(`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M5 6v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/></svg>`));
+  const content = _deps.extractPostContent(article);
 
-  _deps.adapter.insertActionButton(article, btn);
+  // Create tooltip — append to body with fixed positioning so it escapes
+  // any overflow:hidden ancestors in Twitter's DOM
+  const tooltip = document.createElement('div');
+  tooltip.className = 'ff-annoying-tooltip';
+  document.body.appendChild(tooltip);
 
-  // Track tooltip reference on the button element
-  let btnTooltip: HTMLElement | null = null;
+  const getAnchor = () => anchorRect || article.getBoundingClientRect();
 
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Position the tooltip above the button/anchor
+  const positionTooltip = () => {
+    const rect = getAnchor();
+    const viewportW = document.documentElement.clientWidth;
+    const edgeMargin = 8;
+    const tipW = tooltip.offsetWidth;
+    tooltip.style.position = 'fixed';
+    // Horizontal: three-way fit check.
+    //  1. Right-align (default): tooltip extends leftward from rect.right.
+    //  2. Left-align: tooltip extends rightward from rect.left (used when the
+    //     button is close to the left edge — common on narrow YouTube mobile).
+    //  3. Center-align: neither directional placement fits; clamp the tooltip
+    //     into the viewport and slide the notch inline so it still points at
+    //     the button.
+    tooltip.style.left = '';
+    tooltip.style.right = '';
+    tooltip.classList.remove('ff-annoying-tooltip--align-left');
+    tooltip.classList.remove('ff-annoying-tooltip--align-center');
+    tooltip.style.removeProperty('--ff-notch-x');
+    const fitsRightAligned = rect.right - tipW >= edgeMargin;
+    const fitsLeftAligned = rect.left + tipW <= viewportW - edgeMargin;
+    if (fitsRightAligned) {
+      tooltip.style.right = `${viewportW - rect.right}px`;
+    } else if (fitsLeftAligned) {
+      tooltip.style.left = `${Math.max(edgeMargin, rect.left)}px`;
+      tooltip.classList.add('ff-annoying-tooltip--align-left');
+    } else {
+      const btnCenterX = rect.left + rect.width / 2;
+      const idealLeft = btnCenterX - tipW / 2;
+      const clampedLeft = Math.min(
+        Math.max(edgeMargin, idealLeft),
+        viewportW - edgeMargin - tipW,
+      );
+      tooltip.style.left = `${clampedLeft}px`;
+      tooltip.classList.add('ff-annoying-tooltip--align-center');
+      // Notch x measured from tooltip's own left edge; center of the 10px
+      // notch lands on btnCenterX in viewport coords. Clamp inside the
+      // rounded corners so the notch never draws into the border-radius arc.
+      const notchInset = 12;
+      const rawNotchX = btnCenterX - clampedLeft - 5;
+      const notchX = Math.min(
+        Math.max(notchInset, rawNotchX),
+        tipW - notchInset - 10,
+      );
+      tooltip.style.setProperty('--ff-notch-x', `${notchX}px`);
+    }
+    // Place above the button; if clipped, place below
+    tooltip.style.bottom = '';
+    tooltip.style.top = '';
+    const tentativeTop = rect.top - tooltip.offsetHeight - 8;
+    if (tentativeTop < 0) {
+      tooltip.style.top = `${rect.bottom + 8}px`;
+      tooltip.classList.add('ff-annoying-tooltip--flipped');
+    } else {
+      tooltip.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+      tooltip.classList.remove('ff-annoying-tooltip--flipped');
+    }
+  };
+  requestAnimationFrame(positionTooltip);
 
-    // If tooltip already open on this button, close it
-    if (btnTooltip && btnTooltip.isConnected) {
-      btnTooltip.remove();
-      btnTooltip = null;
+  // Reposition on scroll; dismiss if anchor leaves viewport
+  const onScroll = () => {
+    if (!tooltip.isConnected) {
+      window.removeEventListener('scroll', onScroll, true);
       return;
     }
-
-    // Close any other open tooltips
-    document.querySelectorAll('.ff-annoying-tooltip').forEach(t => t.remove());
-
-    const content = _deps.extractPostContent(article);
-
-    // Create tooltip — append to body with fixed positioning so it escapes
-    // any overflow:hidden ancestors in Twitter's DOM
-    const tooltip = document.createElement('div');
-    tooltip.className = 'ff-annoying-tooltip';
-    document.body.appendChild(tooltip);
-    btnTooltip = tooltip;
-
-    // Position the tooltip above the button
-    const positionTooltip = () => {
-      const btnRect = btn.getBoundingClientRect();
-      const viewportW = document.documentElement.clientWidth;
-      const edgeMargin = 8;
-      const tipW = tooltip.offsetWidth;
-      tooltip.style.position = 'fixed';
-      // Horizontal: three-way fit check.
-      //  1. Right-align (default): tooltip extends leftward from btn.right.
-      //  2. Left-align: tooltip extends rightward from btn.left (used when the
-      //     button is close to the left edge — common on narrow YouTube mobile).
-      //  3. Center-align: neither directional placement fits; clamp the tooltip
-      //     into the viewport and slide the notch inline so it still points at
-      //     the button.
-      tooltip.style.left = '';
-      tooltip.style.right = '';
-      tooltip.classList.remove('ff-annoying-tooltip--align-left');
-      tooltip.classList.remove('ff-annoying-tooltip--align-center');
-      tooltip.style.removeProperty('--ff-notch-x');
-      const fitsRightAligned = btnRect.right - tipW >= edgeMargin;
-      const fitsLeftAligned = btnRect.left + tipW <= viewportW - edgeMargin;
-      if (fitsRightAligned) {
-        tooltip.style.right = `${viewportW - btnRect.right}px`;
-      } else if (fitsLeftAligned) {
-        tooltip.style.left = `${Math.max(edgeMargin, btnRect.left)}px`;
-        tooltip.classList.add('ff-annoying-tooltip--align-left');
-      } else {
-        const btnCenterX = btnRect.left + btnRect.width / 2;
-        const idealLeft = btnCenterX - tipW / 2;
-        const clampedLeft = Math.min(
-          Math.max(edgeMargin, idealLeft),
-          viewportW - edgeMargin - tipW,
-        );
-        tooltip.style.left = `${clampedLeft}px`;
-        tooltip.classList.add('ff-annoying-tooltip--align-center');
-        // Notch x measured from tooltip's own left edge; center of the 10px
-        // notch lands on btnCenterX in viewport coords. Clamp inside the
-        // rounded corners so the notch never draws into the border-radius arc.
-        const notchInset = 12;
-        const rawNotchX = btnCenterX - clampedLeft - 5;
-        const notchX = Math.min(
-          Math.max(notchInset, rawNotchX),
-          tipW - notchInset - 10,
-        );
-        tooltip.style.setProperty('--ff-notch-x', `${notchX}px`);
-      }
-      // Place above the button; if clipped, place below
-      tooltip.style.bottom = '';
-      tooltip.style.top = '';
-      const tentativeTop = btnRect.top - tooltip.offsetHeight - 8;
-      if (tentativeTop < 0) {
-        tooltip.style.top = `${btnRect.bottom + 8}px`;
-        tooltip.classList.add('ff-annoying-tooltip--flipped');
-      } else {
-        tooltip.style.bottom = `${window.innerHeight - btnRect.top + 8}px`;
-        tooltip.classList.remove('ff-annoying-tooltip--flipped');
-      }
-    };
-    requestAnimationFrame(positionTooltip);
-
-    // Reposition on scroll; dismiss if button leaves viewport
-    const onScroll = () => {
-      if (!tooltip.isConnected) {
-        window.removeEventListener('scroll', onScroll, true);
-        return;
-      }
-      const btnRect = btn.getBoundingClientRect();
-      if (btnRect.bottom < 0 || btnRect.top > window.innerHeight) {
-        tooltip.remove();
-        window.removeEventListener('scroll', onScroll, true);
-        return;
-      }
-      positionTooltip();
-    };
-    window.addEventListener('scroll', onScroll, true);
-
-    // Use prefetched result if available, otherwise fire a new request
-    let cachedPromise = annoyingReasonsCache.get(article);
-    if (!cachedPromise) {
-      cachedPromise = chrome.runtime.sendMessage({
-        type: 'suggestAnnoyingReasons',
-        post: content.text,
-        imageUrls: content.imageUrls || [],
-        siteId: _deps.adapter.siteId
-      });
-      annoyingReasonsCache.set(article, cachedPromise);
+    const rect = getAnchor();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+      tooltip.remove();
+      window.removeEventListener('scroll', onScroll, true);
+      return;
     }
+    positionTooltip();
+  };
+  window.addEventListener('scroll', onScroll, true);
 
-    (async () => {
+  // Use prefetched result if available, otherwise fire a new request
+  let cachedPromise = annoyingReasonsCache.get(article);
+  if (!cachedPromise) {
+    cachedPromise = chrome.runtime.sendMessage({
+      type: 'suggestAnnoyingReasons',
+      post: content.text,
+      imageUrls: content.imageUrls || [],
+      siteId: _deps.adapter.siteId
+    });
+    annoyingReasonsCache.set(article, cachedPromise);
+  }
+
+  (async () => {
     // Check if the promise is already resolved (settled) by racing with an instant resolve
     let response: { reasons: string[]; hadImages?: boolean } | null = null;
     const settled = await Promise.race([
@@ -3341,40 +3322,171 @@ export function addWhyAnnoyingButton(article: HTMLElement) {
     } else {
       tooltip.replaceChildren(parseHTML('<span class="ff-annoying-empty">No suggestions</span>'));
     }
-      // "Should have been filtered" link
-      const missedLink = document.createElement('a');
-      missedLink.className = 'ff-missed-link';
-      missedLink.textContent = 'This should already be filtered';
-      missedLink.href = '#';
-      missedLink.addEventListener('click', (linkEvent) => {
-        linkEvent.preventDefault();
-        linkEvent.stopPropagation();
-        tooltip.remove();
-        storeFilteredPost(article, content, 'User reported: should have been filtered');
-        article.style.transition = 'opacity 0.3s ease';
-        article.style.opacity = '0';
-        setTimeout(() => hidePost(article), 300);
-        chrome.runtime.sendMessage({
-          type: 'overrideCacheEntry',
-          post: formatPostForEvaluation(content),
-          imageUrls: content.imageUrls || [],
-          postUrl: content.postUrl || null,
-          siteId: _deps.adapter.siteId,
-          shouldHide: true,
-          reasoning: 'User reported: should have been filtered'
-        }).catch(err => console.error('[Sieve] Override cache error:', err));
-      });
-      tooltip.appendChild(missedLink);
+    // "Should have been filtered" link
+    const missedLink = document.createElement('a');
+    missedLink.className = 'ff-missed-link';
+    missedLink.textContent = 'This should already be filtered';
+    missedLink.href = '#';
+    missedLink.addEventListener('click', (linkEvent) => {
+      linkEvent.preventDefault();
+      linkEvent.stopPropagation();
+      tooltip.remove();
+      storeFilteredPost(article, content, 'User reported: should have been filtered');
+      article.style.transition = 'opacity 0.3s ease';
+      article.style.opacity = '0';
+      setTimeout(() => hidePost(article), 300);
+      chrome.runtime.sendMessage({
+        type: 'overrideCacheEntry',
+        post: formatPostForEvaluation(content),
+        imageUrls: content.imageUrls || [],
+        postUrl: content.postUrl || null,
+        siteId: _deps.adapter.siteId,
+        shouldHide: true,
+        reasoning: 'User reported: should have been filtered'
+      }).catch(err => console.error('[Sieve] Override cache error:', err));
+    });
+    tooltip.appendChild(missedLink);
 
     // Reposition after content change (height may differ from spinner)
     requestAnimationFrame(positionTooltip);
-    })().catch(err => console.error('[UI] annoying reasons tooltip failed:', err));
+  })().catch(err => console.error('[UI] annoying reasons tooltip failed:', err));
+}
+
+// Add inline "why annoying" button next to Share post button (retained for backward compatibility / adapters that use it)
+export function addWhyAnnoyingButton(article: HTMLElement) {
+  if (!_deps.adapter.getShareButton(article)) {
+    return;
+  }
+  // Don't add twice
+  if (article.querySelector('.ff-why-annoying-btn')) {
+    return;
+  }
+
+  const btn = document.createElement('div');
+  btn.className = 'ff-why-annoying-btn';
+  btn.setAttribute('role', 'button');
+  btn.title = 'Filter out similar posts';
+  btn.replaceChildren(parseHTML(`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M5 6v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/></svg>`));
+
+  _deps.adapter.insertActionButton(article, btn);
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openFilterReasonDialog(article, btn.getBoundingClientRect());
+  });
+}
+
+// ==================== Dropdown 3-dot Menu Integration ====================
+
+let lastCaretPost: HTMLElement | null = null;
+let lastCaretRect: DOMRect | null = null;
+let lastCaretTime = 0;
+let isFilteringDropdownActive = true;
+
+export function setDropdownFilteringEnabled(enabled: boolean) {
+  isFilteringDropdownActive = enabled;
+  if (!enabled) {
+    document.querySelectorAll('.sieve-dropdown-item').forEach(el => el.remove());
+  }
+}
+
+export function setupDropdownMenuObserver() {
+  const onCaretActivate = (e: Event) => {
+    const target = e.target as Element | null;
+    if (!target) return;
+
+    const caretSelector = _deps?.adapter?.selectors?.caret
+      || '[data-testid="caret"], button[aria-label*="More" i], button[aria-label^="Open control menu" i], button[aria-label^="Open menu" i], [aria-label="Action menu" i]';
+
+    const caretBtn = target.closest(caretSelector)
+      || (target.closest('button, [role="button"]') && target.closest('button, [role="button"]')?.querySelector('svg[aria-label*="More" i]'));
+
+    if (caretBtn && _deps?.adapter?.selectors?.post) {
+      const post = caretBtn.closest<HTMLElement>(_deps.adapter.selectors.post);
+      if (post) {
+        lastCaretPost = post;
+        lastCaretRect = caretBtn.getBoundingClientRect();
+        lastCaretTime = Date.now();
+      }
+    }
+  };
+
+  document.addEventListener('pointerdown', onCaretActivate, true);
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      onCaretActivate(e);
+    }
+  }, true);
+
+  const observer = new MutationObserver(() => {
+    if (!isFilteringDropdownActive || !lastCaretPost) return;
+    if (Date.now() - lastCaretTime > 6000) return;
+
+    const dropdownSelector = _deps?.adapter?.selectors?.dropdown
+      || '[data-testid="Dropdown"], [role="menu"], .feed-shared-control-menu__content, .artdeco-dropdown__content';
+
+    const dropdowns = document.querySelectorAll<HTMLElement>(dropdownSelector);
+    dropdowns.forEach((dropdown) => {
+      if (dropdown.querySelector('.sieve-dropdown-item')) return;
+      if (!dropdown.isConnected) return;
+
+      const item = document.createElement('div');
+      item.className = 'sieve-dropdown-item';
+      item.setAttribute('role', 'menuitem');
+      item.setAttribute('tabindex', '0');
+
+      const logoSvg = getSieveLogoHTML('sieve-dropdown-badge-svg');
+      const itemContent = `
+        <div class="sieve-dropdown-item-left">
+          <span class="sieve-dropdown-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+          </span>
+          <span class="sieve-dropdown-item-text">Filter out similar posts</span>
+        </div>
+        <div class="sieve-dropdown-item-badge">
+          <span class="sieve-dropdown-badge-logo" aria-hidden="true">${logoSvg}</span>
+          <span class="sieve-dropdown-badge-name">Sieve</span>
+        </div>
+      `;
+      item.replaceChildren(parseHTML(itemContent));
+
+      const handleClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const targetPost = lastCaretPost;
+        const targetRect = lastCaretRect;
+
+        // Dismiss native menu
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+
+        const menuLayer = dropdown.closest('[role="menu"], [data-testid="Dropdown"], [role="dialog"], #layers > div');
+        if (menuLayer instanceof HTMLElement) {
+          menuLayer.style.display = 'none';
+        }
+        item.remove();
+
+        if (targetPost) {
+          openFilterReasonDialog(targetPost, targetRect);
+        }
+      };
+
+      item.addEventListener('click', handleClick);
+      item.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick(e);
+        }
+      });
+
+      dropdown.insertBefore(item, dropdown.firstElementChild);
+    });
   });
 
-  // Outside-click tooltip dismissal is handled by a single module-level
-  // listener registered via setupAnnoyingTooltipCloser — do NOT register a
-  // per-button document listener here (it would accumulate one per post and
-  // fire for every click on the page).
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 // Close any open .ff-annoying-tooltip when the user clicks outside of its
@@ -3384,9 +3496,9 @@ export function addWhyAnnoyingButton(article: HTMLElement) {
 export function setupAnnoyingTooltipCloser() {
   document.addEventListener('click', (e) => {
     const target = e.target as Node;
-    // If the click is on any why-annoying button, let that button's own
+    // If the click is on any why-annoying button or dropdown item, let that button's own
     // click handler manage the tooltip. Skip.
-    if (target instanceof Element && target.closest('.ff-why-annoying-btn')) return;
+    if (target instanceof Element && (target.closest('.ff-why-annoying-btn') || target.closest('.sieve-dropdown-item'))) return;
     const tooltips = document.querySelectorAll('.ff-annoying-tooltip');
     if (tooltips.length === 0) return;
     let removedAny = false;

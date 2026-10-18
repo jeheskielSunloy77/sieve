@@ -33,6 +33,7 @@ import {
   updateDetectorState,
   refreshAiIndicatorUI,
   restoreAllFilteredPosts,
+  setDropdownFilteringEnabled,
 } from './ui';
 
 import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/utils';
@@ -463,8 +464,10 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
 
     addContextMenuHandler(article);
 
-    // Add inline "why annoying" trash-can button next to Share
-    addWhyAnnoyingButton(article);
+    // On YouTube, add inline button next to video actions; on X, LinkedIn, Threads it is embedded in 3-dot dropdown
+    if (adapter.siteId === 'youtube') {
+      addWhyAnnoyingButton(article);
+    }
 
     if (forceForYou || adapter.shouldProcessCurrentPage()) {
       evaluatePost(article).catch(err => console.error('[Sieve] evaluatePost failed:', err));
@@ -583,7 +586,7 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
         // containing post and re-attach the trash button if it's been
         // wiped. The button-add call is idempotent, so this is a no-op
         // when nothing was lost.
-        if (mutation.target instanceof Element && mutation.addedNodes.length > 0) {
+        if (adapter.siteId === 'youtube' && mutation.target instanceof Element && mutation.addedNodes.length > 0) {
           const containerPost = mutation.target.closest<HTMLElement>(adapter.selectors.post);
           if (containerPost && !containerPost.querySelector('.ff-why-annoying-btn')) {
             addWhyAnnoyingButton(containerPost);
@@ -610,7 +613,9 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
                 // Re-hydration may have wiped out our trash button (its anchor
                 // is a child of the freshly rendered lockup). Re-inject — the
                 // call is idempotent, so it's a no-op when the button survives.
-                addWhyAnnoyingButton(article);
+                if (adapter.siteId === 'youtube') {
+                  addWhyAnnoyingButton(article);
+                }
               }
             });
         }
@@ -636,6 +641,8 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     const hasModel = typeof data.selectedModel === 'string' && data.selectedModel.trim().length > 0;
     let platformEnabled = data[platformKey] !== false && hasModel;
     enabled = globalEnabled && platformEnabled;
+    document.body.classList.toggle('sieve-disabled', !enabled);
+    setDropdownFilteringEnabled(enabled);
     // Treat undefined as true so users on builds released before this
     // setting existed keep their current behavior.
     filterReplies = data.filterReplies !== false;
@@ -700,6 +707,8 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
           const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
           platformEnabled = changes[platformKey].newValue !== false && hasModel;
           enabled = globalEnabled && platformEnabled;
+          document.body.classList.toggle('sieve-disabled', !enabled);
+          setDropdownFilteringEnabled(enabled);
           document.querySelectorAll<HTMLElement>('.filter-phrases-container').forEach(box => {
             box.classList.toggle('filtering-disabled', !platformEnabled);
             const input = box.querySelector<HTMLInputElement>('.filter-platform-switch-input');
@@ -719,9 +728,13 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
           const hasModel = typeof selectedModel === 'string' && selectedModel.trim().length > 0;
           globalEnabled = changes.enabled.newValue !== false;
           enabled = globalEnabled && platformEnabled && hasModel;
+          document.body.classList.toggle('sieve-disabled', !enabled);
+          setDropdownFilteringEnabled(enabled);
           if (enabled) {
             observePosts();
             processExistingPosts();
+          } else {
+            restoreAllFilteredPosts();
           }
         }).catch(err => console.error('[Content] Error checking selectedModel on global enabled change:', err));
       }
@@ -732,6 +745,8 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
         if (!hasModel && enabled) {
           enabled = false;
           platformEnabled = false;
+          document.body.classList.toggle('sieve-disabled', true);
+          setDropdownFilteringEnabled(false);
           restoreAllFilteredPosts();
           document.querySelectorAll<HTMLElement>('.filter-phrases-container').forEach(box => {
             box.classList.toggle('filtering-disabled', true);

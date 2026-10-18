@@ -48,6 +48,8 @@ const SieveTwitterAdapter = class TwitterAdapter implements PlatformAdapter {
     bottomBar: 'div[data-testid="BottomBar"]',
     mutations: '[data-testid="tweetText"]',
     textContent: '[data-testid="tweetText"]',
+    caret: '[data-testid="caret"], button[aria-label="More"]',
+    dropdown: '[data-testid="Dropdown"], [role="menu"]',
   };
 
   private _fiberExtractorReady = false;
@@ -599,6 +601,10 @@ const SieveTwitterAdapter = class TwitterAdapter implements PlatformAdapter {
     } else {
       shareBtn.insertAdjacentElement('afterend', button);
     }
+  }
+
+  getCaretButton(article: HTMLElement): HTMLElement | null {
+    return article.querySelector<HTMLElement>(this.selectors.caret || '[data-testid="caret"]');
   }
 
   getSearchForm(): HTMLElement | null {

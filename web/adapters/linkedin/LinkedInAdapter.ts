@@ -55,6 +55,8 @@ const SieveLinkedInAdapter = class LinkedInAdapter implements PlatformAdapter {
     mutations: '[data-testid="mainFeed"], .attributed-text-segment-list__content, .update-components-text',
     // Post body text.
     textContent: '[data-testid="expandable-text-box"], .attributed-text-segment-list__content, .update-components-text',
+    caret: 'button[aria-label^="Open control menu"], button[aria-label^="Open menu"]',
+    dropdown: '.feed-shared-control-menu__content, .artdeco-dropdown__content, [role="menu"]',
   };
 
   constructor() {
@@ -738,6 +740,10 @@ const SieveLinkedInAdapter = class LinkedInAdapter implements PlatformAdapter {
       return;
     }
     article.appendChild(button);
+  }
+
+  getCaretButton(article: HTMLElement): HTMLElement | null {
+    return this._getOverflowButton(article);
   }
 
   getSearchForm(): HTMLElement | null {
