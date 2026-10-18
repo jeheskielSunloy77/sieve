@@ -12,6 +12,7 @@ import {
 } from './providers';
 import { runDetectors, type Detector, type DetectorResult } from './detectors';
 import { callLocalInference, localEngine } from './local-model';
+import { stage1Embedder } from './stage1-embedder';
 import { iosLocalClassify, iosLocalGenerate, iosLocalAiTextDetect } from './ios-local-bridge';
 import { getStorage, setStorage, removeStorage, getDescriptions, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentActiveForSite, DEFAULT_AI_TEXT_DETECTION_THRESHOLD, DEFAULT_AI_IMAGE_DETECTION_THRESHOLD } from '../shared/storage';
 import { canJudgeAiIntent } from './ai-intent';
@@ -950,12 +951,37 @@ async function processBatch(): Promise<void> {
 
     // The user-selected filter pipeline. Returns whether the user's filter rules apply.
     const runFilter = async (): Promise<DetectorResult> => {
+      // Stage 1: Fast local embedding & lexical pre-filter
+      if (filterEnabled && settings.effectiveDescriptions && settings.effectiveDescriptions.length > 0) {
+        const stage1 = await stage1Embedder.evaluatePost(postData.text, settings.effectiveDescriptions);
+        if (!stage1.isMatch) {
+          return {
+            shouldHide: false,
+            reasoning: 'Pre-filter: No semantic match with filter topics',
+            category: null,
+          };
+        }
+      }
+
       if (isLocalModel) {
         const postUrl = item.postUrl;
         const onInferenceStart = postUrl
           ? () => { void sendToTab(batchTabId, { type: 'processingPost', postUrl }); }
           : undefined;
-        return await callLocalInference(postData, settings.effectiveDescriptions, apiConfig.modelConfig as LocalModelDef | null, apiConfig.modelName, { onInferenceStart });
+
+        let effectiveModelConfig = apiConfig.modelConfig as LocalModelDef | null;
+        let effectiveModelName = apiConfig.modelName;
+
+        // Multimodal routing: if post contains images and local model lacks vision, route to SmolVLM
+        if (effectiveImageUrls.length > 0 && !effectiveModelConfig?.supportsImages) {
+          const vlmDef = PREDEFINED_MODELS.local?.find(m => m.name === 'smolvlm-500m-instruct');
+          if (vlmDef) {
+            effectiveModelConfig = vlmDef;
+            effectiveModelName = 'smolvlm-500m-instruct';
+          }
+        }
+
+        return await callLocalInference(postData, settings.effectiveDescriptions, effectiveModelConfig, effectiveModelName, { onInferenceStart });
       } else if (apiConfig.apiName === 'iosLocal') {
         return await iosLocalClassify(postData, settings.effectiveDescriptions, apiConfig.modelConfig as LocalModelDef | null);
       } else if (apiConfig.apiName === 'anthropic') {

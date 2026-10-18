@@ -20,7 +20,7 @@
 
 | Provider | Models                                     | Requires |
 |----------|--------------------------------------------|----------|
-| **Local (WebGPU)** | Gemma 4 E4B (Instruct)                     | WebGPU-capable browser |
+| **Local (On-Device)** | Chrome Built-in AI (Gemini Nano), Qwen 2.5 (0.5B/1.5B), SmolVLM 500M (Multimodal), Gemma 4 | WebGPU / Chrome Built-in AI |
 | **OpenAI** | GPT-5 Nano, gpt-oss-20b                    | API key |
 | **Google Gemini** | 2.5 Flash Lite, 2.5 Flash, 3 Flash Preview | API key |
 | **Anthropic** | Claude Haiku 4.5 | API key |

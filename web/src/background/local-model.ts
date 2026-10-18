@@ -18,6 +18,8 @@ import { inferenceQueue } from './inference-queue';
 import { getStorage, setStorage } from '../shared/storage';
 import type { LocalBackend } from './backends/types';
 import { LitertlmBackend, isLitertlmCached } from './backends/litertlm-backend';
+import { ChromeBuiltinBackend } from './backends/chrome-builtin-backend';
+import { TransformersBackend, isTransformersCached } from './backends/transformers-backend';
 
 declare global {
   interface Navigator {
@@ -44,12 +46,24 @@ const DOWNLOAD_RETRY_DELAY_MS = 2000;
 
 // ==================== Pure helpers ====================
 
-function selectBackend(_modelDef: LocalModelDef): LocalBackend {
+function selectBackend(modelDef: LocalModelDef): LocalBackend {
+  if (modelDef.backend === 'chrome-builtin') {
+    return new ChromeBuiltinBackend();
+  }
+  if (modelDef.backend === 'transformers') {
+    return new TransformersBackend();
+  }
   return new LitertlmBackend();
 }
 
 // Probe whether a model's weights are already on disk, without loading them.
 async function backendIsCached(modelDef: LocalModelDef): Promise<boolean> {
+  if (modelDef.backend === 'chrome-builtin') {
+    return ChromeBuiltinBackend.isAvailable();
+  }
+  if (modelDef.backend === 'transformers') {
+    return isTransformersCached(modelDef);
+  }
   return isLitertlmCached(modelDef);
 }
 

@@ -68,7 +68,10 @@ for (const [key, value] of Object.entries(config)) {
   define[`process.env.${key}`] = JSON.stringify(value);
 }
 
-const litertlmStub = { '@litert-lm/core': path.join(__dirname, 'litertlm-stub.js') };
+const iosStubs = {
+  '@litert-lm/core': path.join(__dirname, 'litertlm-stub.js'),
+  '@huggingface/transformers': path.join(__dirname, 'transformers-stub.js'),
+};
 
 const adapters = [
   { name: 'TwitterAdapter', path: path.join(__dirname, 'adapters/twitter/TwitterAdapter.ts') },
@@ -78,12 +81,7 @@ const adapters = [
 ].filter((a) => fs.existsSync(a.path));
 
 // Copy LiteRT-LM's wasm loader + binaries into dist/litertlm-wasm/ so the
-// offscreen document can resolve them via chrome.runtime.getURL(...). The
-// runtime feature-detects relaxed-SIMD and loads either litertlm_wasm_internal
-// or litertlm_wasm_compat_internal; each .js fetches its sibling .wasm, so
-// all four files need to sit at the same URL prefix. By default the package
-// resolves these from a jsdelivr CDN URL, which the extension CSP blocks —
-// loadLiteRtLm() in the runtime points at this local directory instead.
+// offscreen document can resolve them via chrome.runtime.getURL(...).
 function copyLitertlmAssets() {
   const srcDir = path.join(__dirname, 'node_modules/@litert-lm/core/wasm');
   const dstDir = path.join(__dirname, 'dist/litertlm-wasm');
@@ -98,6 +96,42 @@ function copyLitertlmAssets() {
   console.log('Copied LiteRT-LM wasm assets into dist/litertlm-wasm/');
 }
 
+// Copy ONNX Runtime Web wasm binaries into dist/ort-wasm/
+function copyOrtAssets() {
+  const srcDir = path.join(__dirname, 'node_modules/onnxruntime-web/dist');
+  const dstDir = path.join(__dirname, 'dist/ort-wasm');
+  if (!fs.existsSync(srcDir)) {
+    console.warn('onnxruntime-web dist dir not found — skipping copy');
+    return;
+  }
+  fs.mkdirSync(dstDir, { recursive: true });
+  const neededFiles = [
+    'ort-wasm-simd-threaded.wasm',
+    'ort-wasm-simd-threaded.jsep.wasm',
+    'ort-wasm-simd-threaded.mjs',
+    'ort-wasm-simd-threaded.jsep.mjs',
+    'ort-wasm.wasm',
+    'ort-wasm.min.js',
+    'ort.webgpu.bundle.min.mjs',
+  ];
+  for (const name of neededFiles) {
+    const srcFile = path.join(srcDir, name);
+    if (fs.existsSync(srcFile)) {
+      fs.copyFileSync(srcFile, path.join(dstDir, name));
+    }
+  }
+  console.log('Copied ONNX Runtime Web assets into dist/ort-wasm/');
+}
+
+// Copy pre-bundled local models (e.g. all-MiniLM-L6-v2) into dist/models/
+function copyBundledModels() {
+  const srcDir = path.join(__dirname, 'models');
+  const dstDir = path.join(__dirname, 'dist/models');
+  if (!fs.existsSync(srcDir)) return;
+  fs.cpSync(srcDir, dstDir, { recursive: true });
+  console.log('Copied bundled model assets into dist/models/');
+}
+
 async function build() {
   console.log(`Building Sieve (env: ${env}, target: ${target})`);
 
@@ -105,6 +139,8 @@ async function build() {
   generateManifest(target);
 
   copyLitertlmAssets();
+  copyOrtAssets();
+  copyBundledModels();
 
   // 1. Background: bundles the LiteRT-LM SDK directly so the SW-side proxy can
   //    ship its message protocol without a second chunk. The actual Engine
@@ -178,7 +214,7 @@ async function build() {
         sourcemap: false,
         external: ['url'],
         define,
-        alias: { ...litertlmStub },
+        alias: { ...iosStubs },
       })
     )
   );

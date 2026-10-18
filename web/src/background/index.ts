@@ -306,13 +306,16 @@ async function handleMessage(
         const isLoading = currentStatus?.state === 'downloading' || currentStatus?.state === 'initializing';
 
         if (!isLoading) {
-          if (!webgpuSupported) {
+          if (!webgpuSupported && model.backend !== 'chrome-builtin') {
             statuses[model.name] = { state: 'unsupported', reason: 'WebGPU not supported' };
           } else if (localEngine.isModelLoaded(model.name)) {
-            // Model is currently loaded in GPU memory
+            // Model is currently loaded in memory
             statuses[model.name] = { state: 'ready' };
+          } else if (currentStatus?.state === 'error') {
+            // Preserve error state so the user can inspect the message/hint
+            statuses[model.name] = currentStatus;
           } else {
-            // Check if model is in cache
+            // Check if model is in cache or available
             const cached = await localEngine.checkCached(model.name);
             statuses[model.name] = { state: cached ? 'cached' : 'not_downloaded' };
           }

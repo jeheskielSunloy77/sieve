@@ -137,7 +137,7 @@ export interface ModelDef {
 /** A local model with backend-specific configuration. */
 export interface LocalModelDef extends ModelDef {
   isLocal?: boolean;
-  backend?: 'litertlm';
+  backend?: 'litertlm' | 'transformers' | 'chrome-builtin';
   extraBody?: Record<string, unknown>;
   inferenceParams?: Record<string, unknown>;
   // iOS on-device entries only — carried over from the native registry
@@ -154,6 +154,13 @@ export interface LocalModelDef extends ModelDef {
     // Sampler knobs forwarded to SessionConfig.samplerParams. inferenceParams
     // override these per-call via the existing LocalBackend.generate(params) channel.
     topK?: number;
+  };
+  transformersConfig?: {
+    modelId: string;
+    task?: 'text-generation' | 'image-to-text';
+    dtype?: string;
+    quantized?: boolean;
+    maxTokens?: number;
   };
 }
 

@@ -1,6 +1,6 @@
 // Sieve - Popup Script
 
-import type { ModelDef, LocalModelStatus, StorageSchema } from '../types';
+import type { ModelDef, LocalModelDef, LocalModelStatus, StorageSchema } from '../types';
 import { PREDEFINED_MODELS, DEFAULT_MODEL, FREE_MODELS, getFreeModel } from '../shared/models';
 import { fetchProviderModels, isExcludedModel } from '../shared/model-fetcher';
 import { escapeHtml, parseHTML } from '../shared/utils';
@@ -80,9 +80,11 @@ const isInAppMode = typeof chrome !== 'undefined' && chrome._polyfilled;
 // the Swift registry — see shared/models.ts), everywhere else it's the
 // WebGPU litert-lm web build (local:).
 const IOS_LOCAL_MODEL = PREDEFINED_MODELS.iosLocal[0];
+const hasChromeBuiltinAi = typeof window !== 'undefined' && !!(window as unknown as { ai?: { languageModel?: unknown } }).ai?.languageModel;
+const defaultDesktopLocalModel = hasChromeBuiltinAi ? 'local:gemini-nano' : 'local:qwen-2.5-0.5b-instruct';
 const LOCAL_RADIO_MODEL_KEY = isInAppMode && IOS_LOCAL_MODEL
   ? `iosLocal:${IOS_LOCAL_MODEL.name}`
-  : 'local:gemma-4-E2B-it-web';
+  : defaultDesktopLocalModel;
 
 // User-friendly error message mapping for local-model errors
 const LOCAL_ERROR_MESSAGES: Record<string, { display: string; hint: string }> = {
@@ -129,6 +131,18 @@ const LOCAL_ERROR_MESSAGES: Record<string, { display: string; hint: string }> = 
   'inference timeout': {
     display: 'Inference timeout',
     hint: 'The model was too slow. Try again or switch to a smaller model.'
+  },
+  'chrome built-in': {
+    display: 'Chrome Built-in AI not enabled',
+    hint: 'Requires Google Chrome 128+ with Prompt API flags enabled. On Thorium or other browsers, use Qwen 2.5 instead.'
+  },
+  'gemini nano': {
+    display: 'Gemini Nano not enabled',
+    hint: 'Requires Google Chrome with Prompt API enabled in chrome://flags. Switch to Qwen 2.5 instead.'
+  },
+  'not available on this device': {
+    display: 'Built-in AI not enabled',
+    hint: 'Requires Google Chrome with Prompt API enabled in chrome://flags. Switch to Qwen 2.5 instead.'
   }
 };
 
@@ -1607,14 +1621,12 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
     const freeItems: HTMLElement[] = [];
     FREE_MODELS.forEach(model => {
       const modelKey = `free:${model.id}`;
-      const badgeHtml = '<span class="free-badge">FREE</span>';
       freeItems.push(buildItem({
         modelKey,
         displayName: model.display,
         modelName: model.name,
         providerName: `${getApiDisplayName(model.provider)} · Sieve Cloud`,
         isSelected: selectedModel === modelKey,
-        badgeHtml,
       }));
     });
 
@@ -1630,18 +1642,18 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
       ? (PREDEFINED_MODELS.iosLocal || [])
       : (PREDEFINED_MODELS.local || []);
 
-    let hasUndownloaded = false;
-
     localPredefined.forEach(model => {
       const modelKey = (isInAppMode && IOS_LOCAL_MODEL ? 'iosLocal:' : 'local:') + model.name;
       const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
+      const isChromeBuiltin = model.backend === 'chrome-builtin';
       const isDownloaded = status.state === 'ready' || status.state === 'cached';
-      if (!isDownloaded) {
-        hasUndownloaded = true;
-      }
 
-      // Local models are free: use free badge, remove local badge & download icon
-      const badgeHtml = '<span class="free-badge">FREE</span>';
+      let badgeHtml = '';
+      if (!isDownloaded) {
+        badgeHtml = isChromeBuiltin
+          ? '<span class="model-dropdown-group-badge">Requires Chrome flags</span>'
+          : '<span class="model-dropdown-group-badge">Download required</span>';
+      }
 
       localItems.push(buildItem({
         modelKey,
@@ -1659,11 +1671,8 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
       const modelKey = `local:${model.name}`;
       const status = localModelStatuses[model.name] || { state: 'not_downloaded' };
       const isDownloaded = status.state === 'ready' || status.state === 'cached';
-      if (!isDownloaded) {
-        hasUndownloaded = true;
-      }
 
-      const badgeHtml = '<span class="free-badge">FREE</span>';
+      const badgeHtml = !isDownloaded ? '<span class="model-dropdown-group-badge">Download required</span>' : '';
 
       localItems.push(buildItem({
         modelKey,
@@ -1678,10 +1687,7 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
     });
 
     if (localItems.length > 0) {
-      const groupBadge = hasUndownloaded
-        ? '<span class="model-dropdown-group-badge">Download required</span>'
-        : '';
-      list.appendChild(buildGroup('local', 'On-Device', PROVIDER_LOGOS.local, localItems, groupBadge));
+      list.appendChild(buildGroup('local', 'On-Device (Free)', PROVIDER_LOGOS.local, localItems));
     }
   }
 
@@ -1694,14 +1700,12 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
 
     predefined.forEach(model => {
       const modelKey = `${api}:${model.name}`;
-      const freeBadge = model.isFree ? ' <span class="free-badge">FREE*</span>' : '';
       providerItems.push(buildItem({
         modelKey,
         displayName: model.display,
         modelName: model.name,
         providerName: getApiDisplayName(api),
         isSelected: selectedModel === modelKey,
-        badgeHtml: freeBadge
       }));
     });
 
@@ -2062,7 +2066,7 @@ async function updateLocalModelStatus() {
 }
 
 // Get the currently selected local model (if any)
-function getSelectedLocalModel(): ModelDef | null {
+function getSelectedLocalModel(): LocalModelDef | null {
   // A parked pending choice counts: the download panel below the radios
   // must describe/drive the model the user asked for before it's selected.
   // Defaults to the primary on-device model when none is actively selected.
@@ -2178,7 +2182,11 @@ function updateLocalModelSectionUI() {
   if (metaEl) {
     metaEl.style.display = 'flex';
     if (nameEl) nameEl.textContent = selectedLocalModel.display || selectedLocalModel.name;
-    if (sizeEl) sizeEl.textContent = selectedLocalModel.sizeGB ? `~${selectedLocalModel.sizeGB} GB` : 'Local storage';
+    if (sizeEl) {
+      sizeEl.textContent = selectedLocalModel.sizeGB === 0
+        ? '0 MB (Built-in)'
+        : (selectedLocalModel.sizeGB ? `~${selectedLocalModel.sizeGB} GB` : 'Local storage');
+    }
   }
 
   // Check if the model supports images and show warning if not
@@ -2209,16 +2217,28 @@ function updateLocalModelSectionUI() {
       break;
 
     case 'not_downloaded': {
-      badge.textContent = 'Not downloaded';
-      notDownloaded.style.display = 'block';
-      if (downloadHint) {
-        const sizeText = selectedLocalModel.sizeGB ? ` (~${selectedLocalModel.sizeGB}GB)` : '';
-        downloadHint.textContent = `One-time download${sizeText}. Stored locally in your browser.`;
+      if (selectedLocalModel.backend === 'chrome-builtin') {
+        badge.textContent = 'Not enabled';
+        notDownloaded.style.display = 'block';
+        if (downloadHint) {
+          downloadHint.textContent = 'Requires Google Chrome 128+ with Prompt API enabled in chrome://flags.';
+        }
+        const downloadBtn = document.getElementById('downloadLocalModel') as HTMLButtonElement;
+        downloadBtn.style.display = 'inline-flex';
+        downloadBtn.disabled = false;
+        downloadBtn.replaceChildren(parseHTML('<svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.5-3.8L2 6M2 2v4h4"/></svg><span>Check Availability</span>'));
+      } else {
+        badge.textContent = 'Not downloaded';
+        notDownloaded.style.display = 'block';
+        if (downloadHint) {
+          const sizeText = selectedLocalModel.sizeGB ? ` (~${selectedLocalModel.sizeGB}GB)` : '';
+          downloadHint.textContent = `One-time download${sizeText}. Stored locally in your browser.`;
+        }
+        const downloadBtn = document.getElementById('downloadLocalModel') as HTMLButtonElement;
+        downloadBtn.style.display = 'inline-flex';
+        downloadBtn.disabled = false;
+        downloadBtn.replaceChildren(parseHTML('<svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5M4.5 7l3.5 3.5 3.5-3.5M3 13.5h10"/></svg><span>Download Model</span>'));
       }
-      const downloadBtn = document.getElementById('downloadLocalModel') as HTMLButtonElement;
-      downloadBtn.style.display = 'inline-flex';
-      downloadBtn.disabled = false;
-      downloadBtn.replaceChildren(parseHTML('<svg class="download-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5M4.5 7l3.5 3.5 3.5-3.5M3 13.5h10"/></svg><span>Download Model</span>'));
       break;
     }
 

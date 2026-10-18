@@ -147,6 +147,59 @@ export const PREDEFINED_MODELS: PredefinedModelsMap = {
   free: FREE_MODELS,
   local: [
     {
+      name: "gemini-nano",
+      display: "Chrome Built-in AI (Gemini Nano)",
+      isLocal: true,
+      backend: 'chrome-builtin',
+      supportsImages: false,
+      sizeGB: 0,
+    },
+    {
+      name: "qwen-2.5-0.5b-instruct",
+      display: "Qwen 2.5 0.5B (Instruct)",
+      isLocal: true,
+      backend: 'transformers',
+      supportsImages: false,
+      sizeGB: 0.38,
+      inferenceParams: { temperature: 0.0 },
+      transformersConfig: {
+        modelId: "Qwen/Qwen2.5-0.5B-Instruct",
+        task: "text-generation",
+        dtype: "q4",
+        maxTokens: 1024,
+      }
+    },
+    {
+      name: "qwen-2.5-1.5b-instruct",
+      display: "Qwen 2.5 1.5B (Instruct)",
+      isLocal: true,
+      backend: 'transformers',
+      supportsImages: false,
+      sizeGB: 0.8,
+      inferenceParams: { temperature: 0.0 },
+      transformersConfig: {
+        modelId: "Qwen/Qwen2.5-1.5B-Instruct",
+        task: "text-generation",
+        dtype: "q4",
+        maxTokens: 1024,
+      }
+    },
+    {
+      name: "smolvlm-500m-instruct",
+      display: "SmolVLM 500M (Multimodal Vision)",
+      isLocal: true,
+      backend: 'transformers',
+      supportsImages: true,
+      sizeGB: 0.5,
+      inferenceParams: { temperature: 0.0 },
+      transformersConfig: {
+        modelId: "HuggingFaceTB/SmolVLM-500M-Instruct",
+        task: "image-to-text",
+        dtype: "q4",
+        maxTokens: 1024,
+      }
+    },
+    {
       name: "gemma-4-E2B-it-web",
       display: "Gemma 4 E2B (Instruct)",
       isLocal: true,
