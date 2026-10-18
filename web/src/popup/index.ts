@@ -1,7 +1,7 @@
 // Sieve - Popup Script
 
 import type { ModelDef, LocalModelStatus, StorageSchema } from '../types';
-import { PREDEFINED_MODELS, DEFAULT_MODEL } from '../shared/models';
+import { PREDEFINED_MODELS, DEFAULT_MODEL, FREE_MODELS, getFreeModel } from '../shared/models';
 import { fetchProviderModels, isExcludedModel } from '../shared/model-fetcher';
 import { escapeHtml, parseHTML } from '../shared/utils';
 import { getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentAutoActive } from '../shared/storage';
@@ -14,6 +14,7 @@ import { initLogoAnimation } from '../shared/logo';
 let predefinedModelKwargs: Record<string, Record<string, unknown>> = {};
 
 const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+  free: 'Sieve Cloud (Free)',
   local: 'On-Device',
   openrouter: 'OpenRouter',
   openai: 'OpenAI',
@@ -22,6 +23,7 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
 };
 
 const PROVIDER_LOGOS: Record<string, string> = {
+  free: '<svg class="provider-logo provider-logo-free" viewBox="0 0 512 512" width="14" height="14" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M 98 56 H 260 C 390 56 456 168 456 235 V 246 A 12 12 0 0 1 444 258 H 418 C 350 256 328 190 312 156 C 298 200 240 262 190 277 C 230 300 290 330 288 375 V 442 A 14 14 0 0 1 274 456 H 232 C 182 456 56 410 56 248 V 98 A 42 42 0 0 1 98 56 Z"/><path fill-rule="evenodd" d="M 336 375 C 340 335 350 308 420 302 H 436 A 20 20 0 0 1 456 322 V 422 A 34 34 0 0 1 422 456 H 350 A 14 14 0 0 1 336 442 Z"/></svg>',
   local: '<svg class="provider-logo provider-logo-local" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
   iosLocal: '<svg class="provider-logo provider-logo-local" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
   openrouter: '<svg class="provider-logo provider-logo-openrouter" viewBox="0 0 24 24" width="14" height="14" fill="#6366F1" aria-hidden="true"><path d="M18.654 3.87a5.087 5.087 0 1 1 0 10.174L23.7 19.09c.64.641.187 1.737-.72 1.737H8.48a8.479 8.479 0 0 1 0-16.958h10.175zM8.479 7.26a5.087 5.087 0 1 0 0 10.176 5.087 5.087 0 0 0 0-10.175z"/></svg>',
@@ -391,8 +393,17 @@ async function loadSettings() {
   // Model selection
   let selected = data.selectedModel || DEFAULT_MODEL;
   const [selApi, ...selParts] = selected.split(':');
-  if (selApi && isExcludedModel(selApi, selParts.join(':'))) {
+  if (selApi === 'free') {
+    const freeId = selParts.join(':');
+    if (!getFreeModel(freeId)) {
+      selected = DEFAULT_MODEL;
+      await setStorage({ selectedModel: DEFAULT_MODEL });
+    }
+  } else if (selApi && isExcludedModel(selApi, selParts.join(':'))) {
     selected = DEFAULT_MODEL;
+    await setStorage({ selectedModel: DEFAULT_MODEL });
+  }
+  if (!data.selectedModel && DEFAULT_MODEL) {
     await setStorage({ selectedModel: DEFAULT_MODEL });
   }
   renderModelDropdown(data.customModels || [], selected);
@@ -515,7 +526,8 @@ function updateApiProviderStates(data: Partial<StorageSchema>) {
     gemini: !!data.geminiApiKey,
     anthropic: !!data.anthropicApiKey,
     local: true,
-    iosLocal: true
+    iosLocal: true,
+    free: true
   };
 
   // Get providers with auth errors (object mapping provider name -> boolean)
@@ -574,7 +586,7 @@ function updateApiProviderStates(data: Partial<StorageSchema>) {
   }
 
   // Check if selected model's provider is still authenticated
-  if (dropdownState.selectedModel && !dropdownState.selectedModel.startsWith('local:') && !dropdownState.selectedModel.startsWith('iosLocal:')) {
+  if (dropdownState.selectedModel && !dropdownState.selectedModel.startsWith('local:') && !dropdownState.selectedModel.startsWith('iosLocal:') && !dropdownState.selectedModel.startsWith('free:')) {
     const [api] = dropdownState.selectedModel.split(':');
     if (!dropdownState.authenticatedApis[api]) {
       // Provider no longer authenticated, reset to default
@@ -1425,6 +1437,11 @@ function getModelDisplayLabel(selectedModel: string, customModels: ModelDef[]): 
   const [api, ...nameParts] = selectedModel.split(':');
   const modelName = nameParts.join(':');
 
+  if (api === 'free') {
+    const freeModel = getFreeModel(modelName);
+    return freeModel ? freeModel.display : modelName;
+  }
+
   // Check dynamic models first
   const dynamicModel = (dropdownState.dynamicModels?.[api] || []).find(m => m.name === modelName);
   if (dynamicModel) {
@@ -1585,7 +1602,28 @@ function renderModelDropdown(customModels: ModelDef[], selectedModel: string) {
     return group;
   };
 
-  // 1. On-Device / Local models
+  // 1. Free Models (only rendered if declared in env var)
+  if (FREE_MODELS.length > 0) {
+    const freeItems: HTMLElement[] = [];
+    FREE_MODELS.forEach(model => {
+      const modelKey = `free:${model.id}`;
+      const badgeHtml = '<span class="free-badge">FREE</span>';
+      freeItems.push(buildItem({
+        modelKey,
+        displayName: model.display,
+        modelName: model.name,
+        providerName: `${getApiDisplayName(model.provider)} · Sieve Cloud`,
+        isSelected: selectedModel === modelKey,
+        badgeHtml,
+      }));
+    });
+
+    if (freeItems.length > 0) {
+      list.appendChild(buildGroup('free', 'Sieve Cloud (Free)', PROVIDER_LOGOS.free, freeItems));
+    }
+  }
+
+  // 2. On-Device / Local models
   if ((webgpuSupported || isIOSDevice) && (PREDEFINED_MODELS.local || (isInAppMode && PREDEFINED_MODELS.iosLocal))) {
     const localItems: HTMLElement[] = [];
     const localPredefined = isInAppMode && IOS_LOCAL_MODEL

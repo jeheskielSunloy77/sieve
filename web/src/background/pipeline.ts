@@ -5,7 +5,7 @@ import {
   RATE_LIMIT_TYPE_CONFIG, API_ERROR_TYPE_CONFIG,
   AI_DETECTION_SEED_PHRASE,
 } from '../shared/utils';
-import { PREDEFINED_MODELS, API_DISPLAY_NAMES, DEFAULT_MODEL } from '../shared/models';
+import { PREDEFINED_MODELS, API_DISPLAY_NAMES, DEFAULT_MODEL, FREE_MODELS, getFreeModel } from '../shared/models';
 import { buildAPIMessages, parseTableYesnoResponse } from '../shared/prompts';
 import {
   callDirectAPI, callAnthropicAPI,
@@ -271,6 +271,53 @@ const API_KEY_SETTINGS: Record<string, keyof Settings> = {
   anthropic: 'anthropicApiKey'
 };
 
+export function buildApiConfigForModel(selectedModel: string, settings: Settings): APIConfig {
+  if (selectedModel.startsWith('free:')) {
+    const freeId = selectedModel.slice(5);
+    const freeModel = getFreeModel(freeId);
+    if (!freeModel) {
+      throw new Error(`Free model not found: ${freeId}`);
+    }
+    return {
+      modelName: freeModel.name,
+      apiName: freeModel.provider,
+      apiKey: freeModel.apiKey,
+      apiBase: freeModel.apiBase,
+      apiKwargs: freeModel.apiKwargs,
+      modelConfig: freeModel,
+    };
+  }
+
+  const [apiName, ...nameParts] = selectedModel.split(':');
+  const modelName = nameParts.join(':');
+  const apiKey = (settings[API_KEY_SETTINGS[apiName]] as string) || null;
+  const apiConfig: APIConfig = { modelName, apiName, apiKey };
+
+  if (apiName === 'openai' && settings.openaiApiBase) {
+    apiConfig.apiBase = settings.openaiApiBase;
+  } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
+    apiConfig.apiBase = settings.anthropicApiBase;
+  } else if (apiName === 'gemini' && settings.geminiApiBase) {
+    apiConfig.apiBase = settings.geminiApiBase;
+  }
+
+  let apiKwargs: Record<string, unknown> = {};
+  const predefinedModels = PREDEFINED_MODELS[apiName] || [];
+  const predefinedModel = predefinedModels.find(m => m.name === modelName);
+  if (predefinedModel) {
+    if (selectedModel in settings.predefinedModelKwargs) {
+      apiKwargs = { ...settings.predefinedModelKwargs[selectedModel] };
+    } else if (predefinedModel.apiKwargs) {
+      apiKwargs = { ...predefinedModel.apiKwargs };
+    }
+  }
+  const customModel = settings.customModels.find(m => m.api === apiName && m.name === modelName);
+  if (customModel?.apiKwargs) apiKwargs = customModel.apiKwargs;
+  if (Object.keys(apiKwargs).length > 0) apiConfig.apiKwargs = apiKwargs;
+
+  return apiConfig;
+}
+
 // ==================== Pipeline State ====================
 
 export let evaluationCache = new Map<string, EvaluationResult>();
@@ -530,7 +577,7 @@ export async function getSettings(siteId?: SiteId): Promise<Settings> {
 // Broadcast unified error status to all tabs
 export async function broadcastErrorStatus(): Promise<void> {
   const settings = await getSettings();
-  const hasAlternativeApis = !!(settings.openaiApiKey || settings.geminiApiKey || settings.openrouterApiKey || settings.anthropicApiKey);
+  const hasAlternativeApis = !!(settings.openaiApiKey || settings.geminiApiKey || settings.openrouterApiKey || settings.anthropicApiKey || FREE_MODELS.length > 0);
 
   const status: BackgroundToContentMessage = {
     type: 'errorStatusUpdate',
@@ -548,7 +595,7 @@ export async function broadcastErrorStatus(): Promise<void> {
 // Only clears the auth error for the current model's provider, preserving errors for other providers
 export async function clearErrorState(): Promise<void> {
   const settings = await getSettings();
-  if (settings.selectedModel && !settings.selectedModel.startsWith('local:') && !settings.selectedModel.startsWith('iosLocal:')) {
+  if (settings.selectedModel && !settings.selectedModel.startsWith('local:') && !settings.selectedModel.startsWith('iosLocal:') && !settings.selectedModel.startsWith('free:')) {
     const [apiName] = settings.selectedModel.split(':');
     const data = await getStorage(['authErrorApis']);
     const authErrorApis = { ...(data.authErrorApis || {}) };
@@ -877,9 +924,6 @@ async function processBatch(): Promise<void> {
     return;
   }
 
-  const postData = { text: item.post, imageUrls };
-  const startTime = Date.now();
-
   // Build API config (only used when the filter path runs)
   let apiConfig: APIConfig;
 
@@ -892,33 +936,14 @@ async function processBatch(): Promise<void> {
     const modelConfig = PREDEFINED_MODELS.iosLocal?.find(m => m.name === modelName) || {} as LocalModelDef;
     apiConfig = { modelName, apiName: 'iosLocal', apiKey: null, modelConfig };
   } else {
-    const [apiName, ...nameParts] = settings.selectedModel.split(':');
-    const modelName = nameParts.join(':');
-    const apiKey = (settings[API_KEY_SETTINGS[apiName]] as string) || null;
-    apiConfig = { modelName, apiName, apiKey };
-
-    if (apiName === 'openai' && settings.openaiApiBase) {
-      apiConfig.apiBase = settings.openaiApiBase;
-    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
-      apiConfig.apiBase = settings.anthropicApiBase;
-    } else if (apiName === 'gemini' && settings.geminiApiBase) {
-      apiConfig.apiBase = settings.geminiApiBase;
-    }
-
-    let apiKwargs: Record<string, unknown> = {};
-    const predefinedModels = PREDEFINED_MODELS[apiName] || [];
-    const predefinedModel = predefinedModels.find(m => m.name === modelName);
-    if (predefinedModel) {
-      if (settings.selectedModel in settings.predefinedModelKwargs) {
-        apiKwargs = { ...settings.predefinedModelKwargs[settings.selectedModel] };
-      } else if (predefinedModel.apiKwargs) {
-        apiKwargs = { ...predefinedModel.apiKwargs };
-      }
-    }
-    const customModel = settings.customModels.find(m => m.api === apiName && m.name === modelName);
-    if (customModel?.apiKwargs) apiKwargs = customModel.apiKwargs;
-    if (Object.keys(apiKwargs).length > 0) apiConfig.apiKwargs = apiKwargs;
+    apiConfig = buildApiConfigForModel(settings.selectedModel, settings);
   }
+
+  const effectiveImageUrls = (settings.selectedModel?.startsWith('free:') && apiConfig.modelConfig?.supportsImages === false)
+    ? []
+    : imageUrls;
+  const postData = { text: item.post, imageUrls: effectiveImageUrls };
+  const startTime = Date.now();
 
   try {
     let result: DetectorResult;
@@ -1058,12 +1083,15 @@ async function processBatch(): Promise<void> {
     let reasoning = (error as Error).message;
 
     if (errorType === 'auth') {
-      const displayName = API_DISPLAY_NAMES[apiConfig.apiName] || apiConfig.apiName;
+      const isFreeModel = settings.selectedModel?.startsWith('free:');
+      const displayName = isFreeModel ? 'Sieve Cloud (Free)' : (API_DISPLAY_NAMES[apiConfig.apiName] || apiConfig.apiName);
       errorState.apiDisplayName = displayName;
-      const authData = await getStorage(['authErrorApis']);
-      const authErrorApis = { ...(authData.authErrorApis || {}) };
-      authErrorApis[apiConfig.apiName] = true;
-      await setStorage({ authErrorApis });
+      if (!isFreeModel) {
+        const authData = await getStorage(['authErrorApis']);
+        const authErrorApis = { ...(authData.authErrorApis || {}) };
+        authErrorApis[apiConfig.apiName] = true;
+        await setStorage({ authErrorApis });
+      }
     } else if (errorType === 'rate_limit') {
       const typeConfig = RATE_LIMIT_TYPE_CONFIG[subType!];
       reasoning = typeConfig?.reasoning || 'Rate limited - will retry when model is switched or after 1 minute of inactivity';
@@ -1218,19 +1246,9 @@ async function validateFilterPhrase(postText: string, imageUrls: string[], phras
     const result = await iosLocalClassify(postData, [phrase], iosModelConfig);
     return result.shouldHide === true;
   } else {
-    const [apiName, ...nameParts] = settings.selectedModel.split(':');
-    const modelName = nameParts.join(':');
-    const apiKey = (settings[API_KEY_SETTINGS[apiName]] as string) || null;
-    const apiConfig: APIConfig = { modelName, apiName, apiKey };
-    if (apiName === 'openai' && settings.openaiApiBase) {
-      apiConfig.apiBase = settings.openaiApiBase;
-    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
-      apiConfig.apiBase = settings.anthropicApiBase;
-    } else if (apiName === 'gemini' && settings.geminiApiBase) {
-      apiConfig.apiBase = settings.geminiApiBase;
-    }
+    const apiConfig = buildApiConfigForModel(settings.selectedModel, settings);
     const messages = buildAPIMessages(postData, [phrase]);
-    const callFn = apiName === 'anthropic' ? callAnthropicAPI : callDirectAPI;
+    const callFn = apiConfig.apiName === 'anthropic' ? callAnthropicAPI : callDirectAPI;
     const rawContent = await callFn(messages, apiConfig);
     const parsed = parseAPIResponse(rawContent);
     return parsed.shouldHide === true;
@@ -1280,25 +1298,16 @@ async function generateCandidatePhrases(postText: string, imageUrls: string[], c
       .filter(l => l && l.length <= 40 && !l.startsWith('<'))
       .slice(0, count);
   } else {
-    const [apiName, ...nameParts] = settings.selectedModel.split(':');
-    const modelName = nameParts.join(':');
-    const apiKey = (settings[API_KEY_SETTINGS[apiName]] as string) || null;
-    const apiConfig: APIConfig = { modelName, apiName, apiKey };
-    if (apiName === 'openai' && settings.openaiApiBase) {
-      apiConfig.apiBase = settings.openaiApiBase;
-    } else if (apiName === 'anthropic' && settings.anthropicApiBase) {
-      apiConfig.apiBase = settings.anthropicApiBase;
-    } else if (apiName === 'gemini' && settings.geminiApiBase) {
-      apiConfig.apiBase = settings.geminiApiBase;
-    }
-    // Build multimodal user content when images are present
-    const userContent: ChatMessage['content'] = hasImages
+    const apiConfig = buildApiConfigForModel(settings.selectedModel, settings);
+    const supportsImages = apiConfig.modelConfig?.supportsImages !== false;
+    // Build multimodal user content when images are present and supported
+    const userContent: ChatMessage['content'] = hasImages && supportsImages
       ? [
           { type: 'text', text: postText },
           ...imageUrls.map(url => ({ type: 'image_url', image_url: { url } }))
         ]
       : postText;
-    const callFn = apiName === 'anthropic' ? callAnthropicAPI : callDirectAPI;
+    const callFn = apiConfig.apiName === 'anthropic' ? callAnthropicAPI : callDirectAPI;
     const rawText = await callFn([
       { role: 'system', content: simpleSystemPrompt },
       { role: 'user', content: userContent }

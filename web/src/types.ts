@@ -157,11 +157,21 @@ export interface LocalModelDef extends ModelDef {
   };
 }
 
+/** A free model configured via environment variable credentials. */
+export interface FreeModelDef extends ModelDef {
+  id: string;
+  provider: string;
+  apiKey: string;
+  baseUrl?: string;
+  apiBase?: string;
+}
+
 /** Typed map for PREDEFINED_MODELS — local models get extended fields. */
 export interface PredefinedModelsMap {
   local: LocalModelDef[];
   iosLocal: LocalModelDef[];
-  [provider: string]: (ModelDef | LocalModelDef)[];
+  free?: FreeModelDef[];
+  [provider: string]: (ModelDef | LocalModelDef | FreeModelDef)[] | undefined;
 }
 
 /** Runtime config for making an API call. Built by processBatch from Settings + ModelDef. */

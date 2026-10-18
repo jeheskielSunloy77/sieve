@@ -1,6 +1,6 @@
 // Background script entry point: message handler, storage listener, startup, tab tracking
 
-import { PREDEFINED_MODELS } from '../shared/models';
+import { PREDEFINED_MODELS, getFreeModel } from '../shared/models';
 import { cacheKeyFor } from '../shared/utils';
 import { getStorage, setStorage, removeStorage, phraseSetKey } from '../shared/storage';
 import type { AiFilterIntentState, ContentToBackgroundMessage, LocalModelStatus } from '../types';
@@ -83,6 +83,14 @@ async function migrateStaleLocalSelection(): Promise<void> {
   const { selectedModel } = await getStorage(['selectedModel']);
   if (selectedModel === 'cloud' || selectedModel === 'imbue') {
     await removeStorage(['selectedModel']);
+    return;
+  }
+  if (typeof selectedModel === 'string' && selectedModel.startsWith('free:')) {
+    const freeId = selectedModel.slice(5);
+    if (!getFreeModel(freeId)) {
+      console.log('[Migration] Cleared stale free model selection:', freeId);
+      await removeStorage(['selectedModel']);
+    }
     return;
   }
   if (typeof selectedModel !== 'string' || !selectedModel.startsWith('local:')) return;

@@ -27,10 +27,11 @@ vi.mock('../../src/background/providers.js', () => ({
   callDirectAPI: vi.fn(),
 }));
 
-import { classifyError, enqueuePost, isKeyPending, clearTabQueue, setActiveTab, scheduleBatch, getSettings } from '../../src/background/pipeline.js';
+import { classifyError, enqueuePost, isKeyPending, clearTabQueue, setActiveTab, scheduleBatch, getSettings, buildApiConfigForModel } from '../../src/background/pipeline.js';
 import { AI_DETECTION_SEED_PHRASE } from '../../src/shared/utils.js';
+import { FREE_MODELS } from '../../src/shared/models.js';
 import { localEngine, callLocalInference } from '../../src/background/local-model.js';
-import type { PendingEvaluation } from '../../src/types.js';
+import type { PendingEvaluation, Settings } from '../../src/types.js';
 
 const mockCallLocalInference = vi.mocked(callLocalInference);
 
@@ -322,3 +323,69 @@ describe('getSettings effectiveDescriptions', () => {
     expect(settings.effectiveDescriptions).toEqual(['politics']);
   });
 });
+
+describe('buildApiConfigForModel', () => {
+  const dummySettings: Settings = {
+    openaiApiKey: 'sk-user-key',
+    openaiApiBase: 'https://user.openai.base',
+    openrouterApiKey: 'sk-or-user-key',
+    geminiApiKey: 'gemini-user-key',
+    geminiApiBase: '',
+    anthropicApiKey: 'anthropic-user-key',
+    anthropicApiBase: '',
+    enabled: true,
+    descriptions: [],
+    effectiveDescriptions: [],
+    selectedModel: '',
+    customModels: [],
+    predefinedModelKwargs: {},
+    aiTextDetectionThreshold: 0.5,
+    aiTextReplyDetectionThreshold: 0.5,
+    aiImageDetectionThreshold: 0.5,
+    aiFilterIntentActive: false,
+    filterReplies: true,
+    platformEnabled: true,
+    youtubeShowPlaceholder: false,
+  };
+
+  it('builds API config for standard BYOK models', () => {
+    const config = buildApiConfigForModel('openai:gpt-4o-mini', dummySettings);
+    expect(config.apiName).toBe('openai');
+    expect(config.modelName).toBe('gpt-4o-mini');
+    expect(config.apiKey).toBe('sk-user-key');
+    expect(config.apiBase).toBe('https://user.openai.base');
+  });
+
+  it('builds API config for Free AI models', () => {
+    // Temporarily add a model to FREE_MODELS for testing
+    FREE_MODELS.push({
+      id: 'test-free-gemini',
+      name: 'gemini-2.0-flash',
+      display: 'Gemini 2.0 Flash (Free)',
+      provider: 'gemini',
+      apiKey: 'test-free-gemini-key',
+      apiBase: 'https://free.gemini.endpoint',
+      apiKwargs: { temperature: 0.1 },
+      supportsImages: false,
+    });
+
+    try {
+      const config = buildApiConfigForModel('free:test-free-gemini', dummySettings);
+      expect(config.apiName).toBe('gemini');
+      expect(config.modelName).toBe('gemini-2.0-flash');
+      expect(config.apiKey).toBe('test-free-gemini-key');
+      expect(config.apiBase).toBe('https://free.gemini.endpoint');
+      expect(config.apiKwargs).toEqual({ temperature: 0.1 });
+      expect(config.modelConfig?.supportsImages).toBe(false);
+    } finally {
+      FREE_MODELS.pop();
+    }
+  });
+
+  it('throws an error if a free model ID is not found', () => {
+    expect(() => {
+      buildApiConfigForModel('free:unknown-id', dummySettings);
+    }).toThrow('Free model not found: unknown-id');
+  });
+});
+

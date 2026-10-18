@@ -1,7 +1,115 @@
 // Shared model definitions for Sieve
 // Used by both background and popup (via esbuild bundling)
 
-import type { PredefinedModelsMap } from '../types';
+import type { PredefinedModelsMap, FreeModelDef } from '../types';
+
+export function parseFreeModels(raw?: string): FreeModelDef[] {
+  if (!raw || typeof raw !== 'string') return [];
+  let str = raw.trim();
+  if (!str) return [];
+
+  // Strip wrapping quotes if present
+  if ((str.startsWith("'") && str.endsWith("'")) || (str.startsWith('"') && str.endsWith('"'))) {
+    str = str.slice(1, -1).trim();
+  }
+
+  // Base64 fallback if not starting with JSON array/object brackets
+  if (!str.startsWith('[') && !str.startsWith('{')) {
+    try {
+      const decoded: string = typeof atob === 'function' ? atob(str) : '';
+      if (decoded && (decoded.trim().startsWith('[') || decoded.trim().startsWith('{'))) {
+        str = decoded.trim();
+      }
+    } catch {
+      // Not base64
+    }
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(str);
+  } catch (err) {
+    console.warn('[models] Failed to parse FREE_MODELS JSON:', err);
+    return [];
+  }
+
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      // Ignore
+    }
+  }
+
+  const items = Array.isArray(parsed) ? parsed : (typeof parsed === 'object' && parsed !== null ? [parsed] : []);
+  const result: FreeModelDef[] = [];
+  const seenIds = new Set<string>();
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i] as Record<string, unknown>;
+    if (!item || typeof item !== 'object') continue;
+
+    const name = typeof item.name === 'string' ? item.name.trim() : '';
+    const provider = typeof item.provider === 'string' ? item.provider.trim()
+      : typeof item.api === 'string' ? item.api.trim() : '';
+    const apiKey = typeof item.apiKey === 'string' ? item.apiKey.trim()
+      : typeof item.key === 'string' ? item.key.trim() : '';
+
+    if (!name || !provider || !apiKey) {
+      console.warn(`[models] Free model at index ${i} is missing name, provider, or apiKey`);
+      continue;
+    }
+
+    const display = typeof item.display === 'string' && item.display.trim()
+      ? item.display.trim()
+      : name;
+
+    let id = typeof item.id === 'string' && item.id.trim()
+      ? item.id.trim()
+      : `${provider}:${name}`;
+
+    if (seenIds.has(id)) {
+      id = `${id}-${i}`;
+    }
+    seenIds.add(id);
+
+    const baseUrl = typeof item.baseUrl === 'string' && item.baseUrl.trim()
+      ? item.baseUrl.trim()
+      : typeof item.apiBase === 'string' && item.apiBase.trim()
+        ? item.apiBase.trim()
+        : undefined;
+
+    const apiKwargs = item.apiKwargs && typeof item.apiKwargs === 'object'
+      ? item.apiKwargs as Record<string, unknown>
+      : undefined;
+
+    const supportsImages = typeof item.supportsImages === 'boolean'
+      ? item.supportsImages
+      : true;
+
+    result.push({
+      id,
+      name,
+      display,
+      provider,
+      apiKey,
+      baseUrl,
+      apiBase: baseUrl,
+      apiKwargs,
+      supportsImages,
+      isFree: true,
+    });
+  }
+
+  return result;
+}
+
+const freeModelsEnv = process.env.FREE_MODELS || '';
+export const FREE_MODELS: FreeModelDef[] = parseFreeModels(freeModelsEnv);
+
+export function getFreeModel(idOrName: string): FreeModelDef | undefined {
+  return FREE_MODELS.find(m => m.id === idOrName || m.name === idOrName);
+}
 
 // iOS on-device model catalog, injected by the native app: FilteredWebView
 // prepends `var __iosLocalModels = [...]` (serialized from the Swift
@@ -36,6 +144,7 @@ if (inApp && injectedIosModels.length === 0) {
 }
 
 export const PREDEFINED_MODELS: PredefinedModelsMap = {
+  free: FREE_MODELS,
   local: [
     {
       name: "gemma-4-E2B-it-web",
@@ -97,9 +206,9 @@ export const PREDEFINED_MODELS: PredefinedModelsMap = {
   })),
 };
 
-// Default model: empty string represents "no model configured" and
-// triggers the model picker / OpenRouter auto-switch.
-export const DEFAULT_MODEL = '';
+// Default model: if free AI models are configured, default to the first one;
+// otherwise empty string represents "no model configured" and triggers the model picker.
+export const DEFAULT_MODEL = FREE_MODELS.length > 0 ? `free:${FREE_MODELS[0].id}` : '';
 
 export const API_DISPLAY_NAMES: Record<string, string> = {
   openai: 'OpenAI',
@@ -107,7 +216,8 @@ export const API_DISPLAY_NAMES: Record<string, string> = {
   anthropic: 'Anthropic',
   openrouter: 'OpenRouter',
   local: 'Local',
-  iosLocal: 'On-device (iOS)'
+  iosLocal: 'On-device (iOS)',
+  free: 'Sieve Cloud (Free)'
 };
 
 export const API_BASE_URLS: Record<string, string> = {

@@ -13,24 +13,35 @@ const target = targetArg ? targetArg.split('=')[1] : 'chrome';
 const ENV_KEYS = [
   'SIEVE_ENV',
   'POSTPATROL_ENV',
+  'FREE_MODELS',
 ];
 
 function loadEnvFile(envName) {
+  const baseEnvPath = path.join(__dirname, '.env');
   const envPath = path.join(__dirname, `.env.${envName}`);
   const result = { SIEVE_ENV: envName, POSTPATROL_ENV: envName };
 
-  // Read from .env file if it exists
-  if (fs.existsSync(envPath)) {
-    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const eqIndex = trimmed.indexOf('=');
-      if (eqIndex === -1) continue;
-      result[trimmed.slice(0, eqIndex).trim()] = trimmed.slice(eqIndex + 1).trim();
+  function parseEnvFile(filePath) {
+    if (fs.existsSync(filePath)) {
+      const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex === -1) continue;
+        result[trimmed.slice(0, eqIndex).trim()] = trimmed.slice(eqIndex + 1).trim();
+      }
+      return true;
     }
-  } else {
-    console.warn(`Warning: ${envPath} not found. Copy .env.example to .env.${envName} and fill in your values.`);
+    return false;
+  }
+
+  // Read from .env if it exists, then override with .env.<envName>
+  const foundBase = parseEnvFile(baseEnvPath);
+  const foundEnv = parseEnvFile(envPath);
+
+  if (!foundBase && !foundEnv) {
+    console.warn(`Warning: neither .env nor ${envPath} found. Copy .env.example to .env.${envName} and fill in your values.`);
   }
 
   // Allow process.env overrides (for CI or Docker)
