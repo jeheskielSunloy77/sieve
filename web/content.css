@@ -923,10 +923,10 @@ html[dark] {
   justify-content: center !important;
   width: 18px !important;
   height: 18px !important;
-  color: rgb(29, 155, 240) !important;
+  color: inherit !important;
   margin-left: 12px !important;
   flex-shrink: 0 !important;
-  opacity: 0.9 !important;
+  opacity: 0.75 !important;
   transition: opacity 0.15s ease !important;
 }
 
