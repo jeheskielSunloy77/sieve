@@ -207,10 +207,10 @@ export async function init() {
 
 
 
-  const logoSvg = document.querySelector<SVGSVGElement>('.sieve-logo-prefix svg.logo');
-  if (logoSvg) {
+  const logoSvgs = document.querySelectorAll<SVGSVGElement>('.sieve-logo-prefix svg.logo');
+  logoSvgs.forEach(logoSvg => {
     initLogoAnimation(logoSvg);
-  }
+  });
 
   console.log('[Popup] About to loadSettings');
   await loadSettings();
@@ -656,11 +656,10 @@ function updateDisplayModeUI(mode: DisplayMode) {
     btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
   });
 
-  // Only show the Filter Topics section in settings on hidden and compact mode.
-  // On full mode, topics are already clearly visible and managed directly in the feed.
+  // Keep showing the Filter Topics card in all UI modes (including full mode).
   const feedFiltersSection = document.getElementById('popupFeedFiltersSection');
   if (feedFiltersSection) {
-    feedFiltersSection.style.display = (mode === 'hidden' || mode === 'compact') ? '' : 'none';
+    feedFiltersSection.style.display = '';
   }
 }
 
@@ -704,43 +703,44 @@ async function renderPopupPhrases(siteId: SiteId): Promise<void> {
 
   const descKey = descriptionsStorageKey(siteId);
   const phrases = await getDescriptions(descKey);
+  listEl.replaceChildren();
+
   if (!phrases || phrases.length === 0) {
-    listEl.replaceChildren(parseHTML('<div class="popup-phrases-empty">No filter topics yet. Add one below to hide matching posts.</div>'));
     return;
   }
 
-  const chipsFragment = document.createDocumentFragment();
-  for (const phrase of phrases) {
-    const chip = document.createElement('div');
-    chip.className = 'popup-phrase-chip';
-    chip.setAttribute('data-phrase', phrase);
+  const len = phrases.length;
+  phrases.forEach((desc, index) => {
+    const phrase = document.createElement('span');
+    phrase.className = 'filter-phrase-inline';
+    phrase.textContent = desc;
+    phrase.title = 'Click to remove';
 
-    const textSpan = document.createElement('span');
-    textSpan.className = 'popup-phrase-text';
-    textSpan.textContent = phrase;
-
-    const delBtn = document.createElement('button');
-    delBtn.type = 'button';
-    delBtn.className = 'popup-phrase-del-btn';
-    delBtn.setAttribute('aria-label', `Delete filter topic ${phrase}`);
-    delBtn.textContent = '×';
-
-    delBtn.addEventListener('click', (e) => {
+    phrase.addEventListener('click', (e) => {
       e.stopPropagation();
       (async () => {
         const current = await getDescriptions(descKey);
-        const updated = current.filter(p => p.trim().toLowerCase() !== phrase.trim().toLowerCase());
+        const updated = current.filter(p => p.trim().toLowerCase() !== desc.trim().toLowerCase());
         await setDescriptions(descKey, updated);
         await renderPopupPhrases(siteId);
       })().catch(err => console.error('[Popup] Failed to delete phrase:', err));
     });
 
-    chip.appendChild(textSpan);
-    chip.appendChild(delBtn);
-    chipsFragment.appendChild(chip);
-  }
+    listEl.appendChild(phrase);
 
-  listEl.replaceChildren(chipsFragment);
+    if (index < len - 1) {
+      const separator = document.createElement('span');
+      separator.className = 'filter-phrase-separator';
+      separator.textContent = ', ';
+      listEl.appendChild(separator);
+    } else if (len > 1) {
+      // Oxford comma before "and"
+      const separator = document.createElement('span');
+      separator.className = 'filter-phrase-separator';
+      separator.textContent = ', ';
+      listEl.appendChild(separator);
+    }
+  });
 }
 
 async function handleAddPopupPhrase(): Promise<void> {
@@ -749,15 +749,40 @@ async function handleAddPopupPhrase(): Promise<void> {
   const rawText = inputEl.value.trim();
   if (!rawText) return;
 
+  const newPhrases = rawText
+    .split(',')
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+
+  if (newPhrases.length === 0) return;
+
   const currentKey = descriptionsStorageKey(currentPopupSiteId);
   const current = await getDescriptions(currentKey);
-  const exists = current.some(p => p.trim().toLowerCase() === rawText.toLowerCase());
-  if (!exists) {
-    const updated = [...current, rawText];
+  let changed = false;
+  const updated = [...current];
+
+  for (const phrase of newPhrases) {
+    const exists = updated.some(p => p.trim().toLowerCase() === phrase.toLowerCase());
+    if (!exists) {
+      updated.push(phrase);
+      changed = true;
+    }
+  }
+
+  if (changed) {
     await setDescriptions(currentKey, updated);
     await renderPopupPhrases(currentPopupSiteId);
   }
   inputEl.value = '';
+  updatePopupPlaceholderVisibility();
+}
+
+function updatePopupPlaceholderVisibility(): void {
+  const cycle = document.getElementById('popupPlaceholderCycle');
+  const input = document.getElementById('popupAddPhraseInput') as HTMLInputElement | null;
+  if (!cycle || !input) return;
+  const hasText = input.value.trim().length > 0;
+  cycle.classList.toggle('hidden', hasText);
 }
 
 async function updatePopupSiteSwitch(siteId: SiteId): Promise<void> {
@@ -782,7 +807,7 @@ async function updatePopupFilteredStats(): Promise<void> {
         if (matched && matched.id === currentPopupSiteId) {
           const response: unknown = await chrome.tabs.sendMessage(tab.id, { type: 'getFilteredStats' });
           if (response && typeof response === 'object' && 'count' in response && typeof response.count === 'number') {
-            badgeEl.textContent = String(response.count);
+            badgeEl.textContent = `(${response.count})`;
             return;
           }
         }
@@ -791,7 +816,7 @@ async function updatePopupFilteredStats(): Promise<void> {
   } catch {
     // Inactive tab or tab content script not ready
   }
-  badgeEl.textContent = '0';
+  badgeEl.textContent = '(0)';
 }
 
 async function handleViewFilteredPosts(): Promise<void> {
@@ -822,25 +847,127 @@ async function handleViewFilteredPosts(): Promise<void> {
   alert('Please open or focus a supported social feed tab (X/Twitter, Threads, LinkedIn, YouTube) to view filtered posts.');
 }
 
+const PLATFORM_ICONS: Record<SiteId, string> = {
+  twitter: '<svg viewBox="0 0 300 271" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="m236 0h46l-101 115 118 156h-92.6l-72.5-94.8-83 94.8h-46l107-123-113-148h94.9l65.5 86.6zm-16.1 244h25.5l-165-218h-27.4z"/></svg>',
+  threads: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z"/></svg>',
+  linkedin: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#FFFFFF" d="M19 19h-3.143v-4.92c0-1.173-.022-2.682-1.634-2.682-1.635 0-1.886 1.277-1.886 2.597V19H9.194V8.87h3.018v1.385h.043c.42-.796 1.447-1.635 2.977-1.635 3.184 0 3.771 2.096 3.771 4.821V19zM5.337 7.433a1.824 1.824 0 1 1 0-3.648 1.824 1.824 0 0 1 0 3.648zM6.909 19H3.766V8.87h3.143V19z"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+};
+
+const PLATFORM_NAMES: Record<SiteId, string> = {
+  twitter: 'X (Twitter)',
+  threads: 'Threads',
+  linkedin: 'LinkedIn',
+  youtube: 'YouTube',
+};
+
+function updatePlatformSelectUI(siteId: SiteId): void {
+  const iconEl = document.getElementById('platformSelectCurrentIcon');
+  const nameEl = document.getElementById('platformSelectCurrentName');
+  const selectEl = document.getElementById('popupPlatformSelect') as HTMLSelectElement | null;
+  const btn = document.getElementById('platformSelectBtn');
+
+  if (iconEl && PLATFORM_ICONS[siteId]) {
+    iconEl.replaceChildren(parseHTML(PLATFORM_ICONS[siteId]));
+  }
+  if (nameEl && PLATFORM_NAMES[siteId]) {
+    nameEl.textContent = PLATFORM_NAMES[siteId];
+  }
+  if (selectEl) {
+    selectEl.value = siteId;
+  }
+  if (btn) {
+    btn.setAttribute('aria-label', `Selected platform: ${PLATFORM_NAMES[siteId] || siteId}`);
+  }
+
+  const items = document.querySelectorAll<HTMLButtonElement>('.platform-select-item');
+  items.forEach(item => {
+    const isCurrent = item.dataset.platform === siteId;
+    item.classList.toggle('active', isCurrent);
+    item.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+    const checkEl = item.querySelector<HTMLElement>('.platform-select-item-check');
+    if (checkEl) checkEl.style.display = isCurrent ? '' : 'none';
+  });
+}
+
+function setupPlatformSelectDropdown(): void {
+  const dropdown = document.getElementById('platformSelectDropdown');
+  const btn = document.getElementById('platformSelectBtn');
+  const menu = document.getElementById('platformSelectMenu');
+  if (!dropdown || !btn || !menu) return;
+
+  function closeMenu() {
+    dropdown?.classList.remove('open');
+    if (menu) menu.style.display = 'none';
+    btn?.setAttribute('aria-expanded', 'false');
+  }
+
+  function openMenu() {
+    dropdown?.classList.add('open');
+    if (menu) menu.style.display = 'flex';
+    btn?.setAttribute('aria-expanded', 'true');
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.contains('open');
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target as Node)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+      closeMenu();
+      btn.focus();
+    }
+  });
+
+  const items = dropdown.querySelectorAll<HTMLButtonElement>('.platform-select-item');
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const siteId = item.dataset.platform as SiteId;
+      if (siteId && siteId !== currentPopupSiteId) {
+        currentPopupSiteId = siteId;
+        updatePlatformSelectUI(siteId);
+        void renderPopupPhrases(currentPopupSiteId);
+        void updatePopupSiteSwitch(currentPopupSiteId);
+        void updatePopupFilteredStats();
+      }
+      closeMenu();
+    });
+  });
+}
+
 async function loadPopupFeedFilters(): Promise<void> {
   currentPopupSiteId = await detectActiveTabPlatform();
-  const selectEl = document.getElementById('popupPlatformSelect') as HTMLSelectElement | null;
-  if (selectEl) {
-    selectEl.value = currentPopupSiteId;
-  }
+  updatePlatformSelectUI(currentPopupSiteId);
   await renderPopupPhrases(currentPopupSiteId);
   await updatePopupSiteSwitch(currentPopupSiteId);
   await updatePopupFilteredStats();
+  updatePopupPlaceholderVisibility();
 }
 
 function setupFeedFiltersListeners() {
+  setupPlatformSelectDropdown();
+
   const selectEl = document.getElementById('popupPlatformSelect') as HTMLSelectElement | null;
   if (selectEl) {
     selectEl.addEventListener('change', () => {
       currentPopupSiteId = selectEl.value as SiteId;
+      updatePlatformSelectUI(currentPopupSiteId);
       void renderPopupPhrases(currentPopupSiteId);
       void updatePopupSiteSwitch(currentPopupSiteId);
       void updatePopupFilteredStats();
+      updatePopupPlaceholderVisibility();
     });
   }
 
@@ -858,8 +985,10 @@ function setupFeedFiltersListeners() {
   const addBtn = document.getElementById('popupAddPhraseBtn') as HTMLButtonElement | null;
 
   if (addInput) {
+    addInput.addEventListener('input', updatePopupPlaceholderVisibility);
+    addInput.addEventListener('blur', updatePopupPlaceholderVisibility);
     addInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === ',') {
         e.preventDefault();
         void handleAddPopupPhrase();
       }

@@ -46,6 +46,126 @@
       </defs>
     </svg>
 
+    <!-- Feed Filter Topics Card -->
+    <section class="filter-phrases-container popup-filter-phrases-container" id="popupFeedFiltersSection">
+      <div class="filter-phrases-title-row">
+        <div class="platform-select-dropdown" id="platformSelectDropdown">
+          <button type="button" class="platform-select-btn" id="platformSelectBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Select platform">
+            <span class="platform-select-current-icon" id="platformSelectCurrentIcon">
+              <svg viewBox="0 0 300 271" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="m236 0h46l-101 115 118 156h-92.6l-72.5-94.8-83 94.8h-46l107-123-113-148h94.9l65.5 86.6zm-16.1 244h25.5l-165-218h-27.4z"/>
+              </svg>
+            </span>
+            <span class="platform-select-current-name" id="platformSelectCurrentName">X (Twitter)</span>
+            <svg class="platform-select-arrow" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m4 6 4 4 4-4"/>
+            </svg>
+          </button>
+          <div class="platform-select-menu" id="platformSelectMenu" role="listbox" style="display: none;">
+            <button type="button" class="platform-select-item active" data-platform="twitter" role="option" aria-selected="true">
+              <div class="platform-select-item-left">
+                <span class="platform-select-item-icon">
+                  <svg viewBox="0 0 300 271" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="m236 0h46l-101 115 118 156h-92.6l-72.5-94.8-83 94.8h-46l107-123-113-148h94.9l65.5 86.6zm-16.1 244h25.5l-165-218h-27.4z"/>
+                  </svg>
+                </span>
+                <span class="platform-select-item-name">X (Twitter)</span>
+              </div>
+              <svg class="platform-select-item-check" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3.5 8.5l3 3 6-6"/>
+              </svg>
+            </button>
+            <button type="button" class="platform-select-item" data-platform="threads" role="option" aria-selected="false">
+              <div class="platform-select-item-left">
+                <span class="platform-select-item-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z"/>
+                  </svg>
+                </span>
+                <span class="platform-select-item-name">Threads</span>
+              </div>
+              <svg class="platform-select-item-check" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+                <path d="M3.5 8.5l3 3 6-6"/>
+              </svg>
+            </button>
+            <button type="button" class="platform-select-item" data-platform="linkedin" role="option" aria-selected="false">
+              <div class="platform-select-item-left">
+                <span class="platform-select-item-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                    <rect width="24" height="24" rx="4" fill="#0A66C2"/>
+                    <path fill="#FFFFFF" d="M19 19h-3.143v-4.92c0-1.173-.022-2.682-1.634-2.682-1.635 0-1.886 1.277-1.886 2.597V19H9.194V8.87h3.018v1.385h.043c.42-.796 1.447-1.635 2.977-1.635 3.184 0 3.771 2.096 3.771 4.821V19zM5.337 7.433a1.824 1.824 0 1 1 0-3.648 1.824 1.824 0 0 1 0 3.648zM6.909 19H3.766V8.87h3.143V19z"/>
+                  </svg>
+                </span>
+                <span class="platform-select-item-name">LinkedIn</span>
+              </div>
+              <svg class="platform-select-item-check" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+                <path d="M3.5 8.5l3 3 6-6"/>
+              </svg>
+            </button>
+            <button type="button" class="platform-select-item" data-platform="youtube" role="option" aria-selected="false">
+              <div class="platform-select-item-left">
+                <span class="platform-select-item-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                    <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
+                    <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </span>
+                <span class="platform-select-item-name">YouTube</span>
+              </div>
+              <svg class="platform-select-item-check" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+                <path d="M3.5 8.5l3 3 6-6"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Hidden select for programmatic compatibility -->
+          <select id="popupPlatformSelect" style="display: none;" aria-hidden="true" tabindex="-1">
+            <option value="twitter">X (Twitter)</option>
+            <option value="threads">Threads</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="youtube">YouTube</option>
+          </select>
+        </div>
+        <label class="filter-platform-switch" id="popupPlatformSwitchLabel" title="Enable filtering on this site">
+          <input class="filter-platform-switch-input" id="popupPlatformSwitchInput" type="checkbox" role="switch" aria-label="Enable filtering on this site">
+          <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
+        </label>
+      </div>
+      <div class="filter-phrases-header">
+        <span class="filter-phrases-label">Filter out</span>
+        <span class="filter-phrases-list" id="popupPhrasesList"></span>
+        <span class="filter-phrases-and-input" id="popupPhrasesAndInput">
+          <span class="filter-phrases-and" id="popupPhrasesAnd">and</span>
+          <span class="filter-input-wrapper">
+            <input type="text" id="popupAddPhraseInput" class="filter-phrases-input" autocomplete="off" spellcheck="false">
+            <span class="filter-placeholder-cycle" id="popupPlaceholderCycle" aria-hidden="true">
+              <span class="filter-placeholder-track">
+                <span>AI slop</span>
+                <span>politics</span>
+                <span>negativity</span>
+                <span>pessimism</span>
+                <span>political outrage</span>
+                <span>posts written by AI</span>
+                <span>ragebait</span>
+                <span>humblebragging</span>
+                <span>virtue signaling</span>
+                <span>idolizing elites</span>
+                <span>Elon Musk</span>
+                <span>AI slop</span>
+              </span>
+            </span>
+          </span>
+        </span>
+      </div>
+      <div class="filter-phrases-actions">
+        <div class="filter-phrases-actions-left">
+          <button type="button" id="popupViewFilteredBtn" class="filtered-toggle-btn">
+            <span class="filtered-toggle-text">View filtered</span>
+            <span class="filtered-toggle-count" id="popupFilteredCountBadge">(0)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Display Mode Segmented Control -->
     <section class="display-mode-section" id="displayModeSection">
       <div class="display-mode-header">
@@ -72,42 +192,6 @@
             <path d="M2 2l12 12M6.7 6.7a3 3 0 0 0 4.2 4.2M3.5 8c1.5-3 4.5-5 8.5-5a11 11 0 0 1 2 .2M8 13c-4 0-7-2-8.5-5a12 12 0 0 1 3.2-3.8"/>
           </svg>
           <span>Hidden</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Active Feed Filtering Management (Shown in Hidden & Compact Modes) -->
-    <section class="popup-feed-filters-section" id="popupFeedFiltersSection" style="display: none;">
-      <div class="popup-feed-filters-header">
-        <div class="popup-feed-platform-select-wrap">
-          <label for="popupPlatformSelect">Filter Topics</label>
-          <select id="popupPlatformSelect" class="popup-platform-select" aria-label="Select platform to manage filter topics">
-            <option value="twitter">X (Twitter)</option>
-            <option value="threads">Threads</option>
-            <option value="linkedin">LinkedIn</option>
-            <option value="youtube">YouTube</option>
-          </select>
-        </div>
-        <div class="popup-feed-actions-header">
-          <label class="filter-platform-switch" id="popupPlatformSwitchLabel" title="Enable filtering on this site">
-            <input class="filter-platform-switch-input" id="popupPlatformSwitchInput" type="checkbox" role="switch" aria-label="Enable filtering on this site">
-            <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
-          </label>
-        </div>
-      </div>
-      <div class="popup-phrases-box">
-        <div class="popup-phrases-list" id="popupPhrasesList">
-          <!-- Populated by JS -->
-        </div>
-        <div class="popup-add-phrase-row">
-          <input type="text" id="popupAddPhraseInput" class="popup-add-phrase-input" placeholder="Add filter topic (press Enter)..." autocomplete="off" spellcheck="false">
-          <button type="button" id="popupAddPhraseBtn" class="popup-add-phrase-btn">Add</button>
-        </div>
-      </div>
-      <div class="popup-filtered-view-row" id="popupFilteredViewRow">
-        <button type="button" id="popupViewFilteredBtn" class="popup-view-filtered-btn">
-          <span class="popup-view-filtered-label">View Filtered Posts</span>
-          <span class="popup-view-filtered-badge" id="popupFilteredCountBadge">0</span>
         </button>
       </div>
     </section>
