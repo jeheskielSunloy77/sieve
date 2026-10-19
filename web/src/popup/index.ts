@@ -649,6 +649,10 @@ function updateDisplayModeUI(mode: DisplayMode) {
   if (descEl) {
     descEl.textContent = DISPLAY_MODE_DESCRIPTIONS[mode] || DISPLAY_MODE_DESCRIPTIONS.full;
   }
+  const segmented = document.querySelector<HTMLElement>('.display-mode-segmented');
+  if (segmented) {
+    segmented.dataset.activeMode = mode;
+  }
   const buttons = document.querySelectorAll<HTMLButtonElement>('.display-mode-btn');
   buttons.forEach(btn => {
     const isActive = btn.dataset.mode === mode;

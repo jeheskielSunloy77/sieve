@@ -406,15 +406,74 @@ label {
 }
 
 .display-mode-segmented {
+  position: relative;
   display: flex;
+  align-items: center;
   background: var(--surface-secondary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-  gap: 3px;
+  border-radius: var(--radius-md);
+  padding: 2.5px;
+  user-select: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .display-mode-segmented,
+body.dim-mode .display-mode-segmented,
+:root:not(.light-mode) .display-mode-segmented {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating sliding pill indicator */
+.display-mode-slider {
+  position: absolute;
+  top: 2.5px;
+  bottom: 2.5px;
+  left: 2.5px;
+  width: calc((100% - 5px) / 3);
+  border-radius: calc(var(--radius-md) - 2px);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1);
+}
+
+body.dark-mode .display-mode-slider,
+body.dim-mode .display-mode-slider,
+:root:not(.light-mode) .display-mode-slider {
+  background: var(--surface-hover);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1.5px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+body.light-mode .display-mode-slider {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.08);
+}
+
+.display-mode-segmented[data-active-mode="full"] .display-mode-slider {
+  transform: translateX(0%);
+}
+
+.display-mode-segmented[data-active-mode="compact"] .display-mode-slider {
+  transform: translateX(100%);
+}
+
+.display-mode-segmented[data-active-mode="hidden"] .display-mode-slider {
+  transform: translateX(200%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .display-mode-slider {
+    transition: none;
+  }
 }
 
 .display-mode-btn {
+  position: relative;
+  z-index: 2;
   flex: 1;
   display: flex;
   align-items: center;
@@ -422,45 +481,51 @@ label {
   gap: 6px;
   padding: 6px 10px;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-xs);
+  border: none;
+  border-radius: calc(var(--radius-md) - 2px);
   color: var(--text-muted);
   font-family: inherit;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 0.18s ease;
 }
 
 .display-mode-btn svg {
   flex-shrink: 0;
   stroke: currentColor;
+  transition: stroke 0.18s ease;
 }
 
 .display-mode-btn:hover {
   color: var(--text);
-  background: var(--surface-hover);
+  background: transparent;
 }
 
 .display-mode-btn.active {
-  background: var(--primary);
-  color: var(--primary-contrast);
-  border-color: var(--primary);
-  font-weight: 600;
+  color: var(--text);
+  background: transparent !important;
+  border: none !important;
 }
 
-/* Feed Filters Management Card in Popup (Mirrors on-page embedded Sieve card) */
+.display-mode-btn:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* Feed Filters Management in Popup (Directly embedded into modal) */
 .popup-filter-phrases-container,
 .popup-feed-filters-section {
   display: flex;
   flex-direction: column;
-  padding: 12px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   color: var(--text);
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.15s ease;
+  box-shadow: none;
 }
 
 .popup-filter-phrases-container .filter-phrases-title-row {
@@ -468,7 +533,7 @@ label {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 /* Custom Platform Select Dropdown with Official Logos */

@@ -46,7 +46,7 @@
       </defs>
     </svg>
 
-    <!-- Feed Filter Topics Card -->
+    <!-- Feed Filter Topics (Embedded) -->
     <section class="filter-phrases-container popup-filter-phrases-container" id="popupFeedFiltersSection">
       <div class="filter-phrases-title-row">
         <div class="platform-select-dropdown" id="platformSelectDropdown">
@@ -172,7 +172,8 @@
         <label>Feed Display</label>
         <span class="display-mode-current-desc hint" id="displayModeDesc">Docked sidebar or banner in feed (compact on mobile)</span>
       </div>
-      <div class="display-mode-segmented" role="radiogroup" aria-label="Feed Display Mode">
+      <div class="display-mode-segmented" data-active-mode="full" role="radiogroup" aria-label="Feed Display Mode">
+        <div class="display-mode-slider" aria-hidden="true"></div>
         <button type="button" class="display-mode-btn active" data-mode="full" role="radio" aria-checked="true">
           <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="2" width="12" height="12" rx="2"/>
