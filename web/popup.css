@@ -515,17 +515,18 @@ body.light-mode .display-mode-slider {
   box-shadow: var(--focus-ring);
 }
 
-/* Feed Filters Management in Popup (Directly embedded into modal) */
+/* Feed Filters Management Card in Popup */
 .popup-filter-phrases-container,
 .popup-feed-filters-section {
   display: flex;
   flex-direction: column;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   color: var(--text);
-  box-shadow: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease;
 }
 
 .popup-filter-phrases-container .filter-phrases-title-row {
@@ -533,7 +534,7 @@ body.light-mode .display-mode-slider {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
 /* Custom Platform Select Dropdown with Official Logos */
