@@ -2387,10 +2387,9 @@ input[type="range"]::-moz-range-thumb {
   padding-top: 10px;
   border-top: 1px solid var(--border);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
+  gap: 12px;
 }
 
 .contact-footer-text {
