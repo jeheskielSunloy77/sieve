@@ -1,10 +1,14 @@
 // Sieve - Popup Script
 
-import type { ModelDef, LocalModelDef, LocalModelStatus, StorageSchema } from '../types';
+import type { ModelDef, LocalModelDef, LocalModelStatus, StorageSchema, DisplayMode } from '../types';
 import { PREDEFINED_MODELS, DEFAULT_MODEL, FREE_MODELS, getFreeModel } from '../shared/models';
 import { fetchProviderModels, isExcludedModel } from '../shared/model-fetcher';
 import { escapeHtml, parseHTML } from '../shared/utils';
-import { getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold, aiIntentAutoActive } from '../shared/storage';
+import {
+  getStorage, setStorage, removeStorage, clampThreshold, clampImageThreshold, clampReplyThreshold,
+  aiIntentAutoActive, getDescriptions, setDescriptions, DEFAULT_DISPLAY_MODE,
+} from '../shared/storage';
+import { platformFromHost, enabledStorageKey, descriptionsStorageKey, SiteId } from '../shared/platforms';
 import { asyncHandler } from '../shared/async';
 import { encodeFilterPackCode, buildFilterPackShareUrl } from '../shared/share-encoding';
 import { initLogoAnimation } from '../shared/logo';
@@ -315,12 +319,29 @@ function setupStorageListener() {
       const valueEl = document.getElementById('aiImageThresholdValue');
       if (valueEl) valueEl.textContent = `${Math.round(v * 100)}%`;
     }
+    if (areaName === 'local' && changes.displayMode) {
+      const newMode = (changes.displayMode.newValue as DisplayMode) || 'full';
+      updateDisplayModeUI(newMode);
+    }
+    if (areaName === 'local' && Object.keys(changes).some(k => k.startsWith('descriptions_'))) {
+      renderPopupPhrases(currentPopupSiteId).catch(err =>
+        console.error('[Popup] renderPopupPhrases failed:', err)
+      );
+    }
+    const currentSiteEnabledKey = enabledStorageKey(currentPopupSiteId);
+    if (areaName === 'local' && changes[currentSiteEnabledKey]) {
+      const switchInput = document.getElementById('popupPlatformSwitchInput') as HTMLInputElement | null;
+      if (switchInput) {
+        switchInput.checked = changes[currentSiteEnabledKey].newValue !== false;
+      }
+    }
   });
 }
 
 async function loadSettings() {
   const data = await getStorage([
     'enabled',
+    'displayMode',
     'selectedModel',
     'customModels',
     'cachedDynamicModels',
@@ -427,6 +448,12 @@ async function loadSettings() {
 
   // Update local model section visibility
   updateLocalModelSectionVisibility();
+
+  // Display mode
+  updateDisplayModeUI(data.displayMode || DEFAULT_DISPLAY_MODE);
+
+  // Popup feed filters (standalone / hidden mode topic manager)
+  await loadPopupFeedFilters();
 }
 
 // Storage keys that feed the AI-detection status UI. Kept in one place so the
@@ -609,7 +636,250 @@ function updateApiProviderStates(data: Partial<StorageSchema>) {
   }
 }
 
+// ==================== Display Mode Segmented Control ====================
+
+const DISPLAY_MODE_DESCRIPTIONS: Record<DisplayMode, string> = {
+  full: 'Docked sidebar in feed (compact on mobile)',
+  compact: 'Floating micro-pill; tap to expand',
+  hidden: 'No feed UI; manage filters from popup',
+};
+
+function updateDisplayModeUI(mode: DisplayMode) {
+  const descEl = document.getElementById('displayModeDesc');
+  if (descEl) {
+    descEl.textContent = DISPLAY_MODE_DESCRIPTIONS[mode] || DISPLAY_MODE_DESCRIPTIONS.full;
+  }
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.display-mode-btn');
+  buttons.forEach(btn => {
+    const isActive = btn.dataset.mode === mode;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+  });
+}
+
+function setupDisplayModeListeners() {
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.display-mode-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = (btn.dataset.mode as DisplayMode) || 'full';
+      updateDisplayModeUI(mode);
+      setStorage({ displayMode: mode }).catch(err =>
+        console.error('[Popup] Failed to save displayMode:', err)
+      );
+    });
+  });
+}
+
+// ==================== Feed Filter Topics & Hidden Mode Manager ====================
+
+let currentPopupSiteId: SiteId = 'twitter';
+
+async function detectActiveTabPlatform(): Promise<SiteId> {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.tabs?.query) {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      if (tab?.url) {
+        const url = new URL(tab.url);
+        const matched = platformFromHost(url.hostname);
+        if (matched) return matched.id;
+      }
+    }
+  } catch (err) {
+    console.debug('[Popup] Failed to detect active tab platform:', err);
+  }
+  return 'twitter';
+}
+
+async function renderPopupPhrases(siteId: SiteId): Promise<void> {
+  const listEl = document.getElementById('popupPhrasesList');
+  if (!listEl) return;
+
+  const descKey = descriptionsStorageKey(siteId);
+  const phrases = await getDescriptions(descKey);
+  if (!phrases || phrases.length === 0) {
+    listEl.replaceChildren(parseHTML('<div class="popup-phrases-empty">No filter topics yet. Add one below to hide matching posts.</div>'));
+    return;
+  }
+
+  const chipsFragment = document.createDocumentFragment();
+  for (const phrase of phrases) {
+    const chip = document.createElement('div');
+    chip.className = 'popup-phrase-chip';
+    chip.setAttribute('data-phrase', phrase);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'popup-phrase-text';
+    textSpan.textContent = phrase;
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'popup-phrase-del-btn';
+    delBtn.setAttribute('aria-label', `Delete filter topic ${phrase}`);
+    delBtn.textContent = '×';
+
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      (async () => {
+        const current = await getDescriptions(descKey);
+        const updated = current.filter(p => p.trim().toLowerCase() !== phrase.trim().toLowerCase());
+        await setDescriptions(descKey, updated);
+        await renderPopupPhrases(siteId);
+      })().catch(err => console.error('[Popup] Failed to delete phrase:', err));
+    });
+
+    chip.appendChild(textSpan);
+    chip.appendChild(delBtn);
+    chipsFragment.appendChild(chip);
+  }
+
+  listEl.replaceChildren(chipsFragment);
+}
+
+async function handleAddPopupPhrase(): Promise<void> {
+  const inputEl = document.getElementById('popupAddPhraseInput') as HTMLInputElement | null;
+  if (!inputEl) return;
+  const rawText = inputEl.value.trim();
+  if (!rawText) return;
+
+  const currentKey = descriptionsStorageKey(currentPopupSiteId);
+  const current = await getDescriptions(currentKey);
+  const exists = current.some(p => p.trim().toLowerCase() === rawText.toLowerCase());
+  if (!exists) {
+    const updated = [...current, rawText];
+    await setDescriptions(currentKey, updated);
+    await renderPopupPhrases(currentPopupSiteId);
+  }
+  inputEl.value = '';
+}
+
+async function updatePopupSiteSwitch(siteId: SiteId): Promise<void> {
+  const switchInput = document.getElementById('popupPlatformSwitchInput') as HTMLInputElement | null;
+  if (!switchInput) return;
+  const key = enabledStorageKey(siteId);
+  const data = await getStorage([key]);
+  switchInput.checked = data[key] !== false;
+}
+
+async function updatePopupFilteredStats(): Promise<void> {
+  const badgeEl = document.getElementById('popupFilteredCountBadge');
+  if (!badgeEl) return;
+
+  try {
+    if (typeof chrome !== 'undefined' && chrome.tabs?.query) {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      if (tab?.id && tab.url) {
+        const url = new URL(tab.url);
+        const matched = platformFromHost(url.hostname);
+        if (matched && matched.id === currentPopupSiteId) {
+          const response: unknown = await chrome.tabs.sendMessage(tab.id, { type: 'getFilteredStats' });
+          if (response && typeof response === 'object' && 'count' in response && typeof response.count === 'number') {
+            badgeEl.textContent = String(response.count);
+            return;
+          }
+        }
+      }
+    }
+  } catch {
+    // Inactive tab or tab content script not ready
+  }
+  badgeEl.textContent = '0';
+}
+
+async function handleViewFilteredPosts(): Promise<void> {
+  const isModal = window.self !== window.top;
+  if (isModal) {
+    window.parent.postMessage({ type: 'openFilteredModal' }, '*');
+    return;
+  }
+
+  try {
+    if (typeof chrome !== 'undefined' && chrome.tabs?.query) {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      if (tab?.id && tab.url) {
+        const url = new URL(tab.url);
+        const matched = platformFromHost(url.hostname);
+        if (matched) {
+          await chrome.tabs.sendMessage(tab.id, { type: 'openFilteredModal' });
+          window.close();
+          return;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[Popup] Failed to send openFilteredModal message:', err);
+  }
+
+  alert('Please open or focus a supported social feed tab (X/Twitter, Threads, LinkedIn, YouTube) to view filtered posts.');
+}
+
+async function loadPopupFeedFilters(): Promise<void> {
+  currentPopupSiteId = await detectActiveTabPlatform();
+  const selectEl = document.getElementById('popupPlatformSelect') as HTMLSelectElement | null;
+  if (selectEl) {
+    selectEl.value = currentPopupSiteId;
+  }
+  await renderPopupPhrases(currentPopupSiteId);
+  await updatePopupSiteSwitch(currentPopupSiteId);
+  await updatePopupFilteredStats();
+}
+
+function setupFeedFiltersListeners() {
+  const selectEl = document.getElementById('popupPlatformSelect') as HTMLSelectElement | null;
+  if (selectEl) {
+    selectEl.addEventListener('change', () => {
+      currentPopupSiteId = selectEl.value as SiteId;
+      void renderPopupPhrases(currentPopupSiteId);
+      void updatePopupSiteSwitch(currentPopupSiteId);
+      void updatePopupFilteredStats();
+    });
+  }
+
+  const switchInput = document.getElementById('popupPlatformSwitchInput') as HTMLInputElement | null;
+  if (switchInput) {
+    switchInput.addEventListener('change', () => {
+      const key = enabledStorageKey(currentPopupSiteId);
+      setStorage({ [key]: switchInput.checked }).catch(err =>
+        console.error('[Popup] Failed to update site enabled:', err)
+      );
+    });
+  }
+
+  const addInput = document.getElementById('popupAddPhraseInput') as HTMLInputElement | null;
+  const addBtn = document.getElementById('popupAddPhraseBtn') as HTMLButtonElement | null;
+
+  if (addInput) {
+    addInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        void handleAddPopupPhrase();
+      }
+    });
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      void handleAddPopupPhrase();
+    });
+  }
+
+  const viewFilteredBtn = document.getElementById('popupViewFilteredBtn') as HTMLButtonElement | null;
+  if (viewFilteredBtn) {
+    viewFilteredBtn.addEventListener('click', () => {
+      void handleViewFilteredPosts();
+    });
+  }
+}
+
 function setupEventListeners() {
+
+  // Display mode segmented control
+  setupDisplayModeListeners();
+
+  // Feed filter topics and actions (in-feed / hidden mode management)
+  setupFeedFiltersListeners();
 
   // Headline model radios (On-Device vs API Model)
   setupModelRadios();

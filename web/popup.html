@@ -46,6 +46,72 @@
       </defs>
     </svg>
 
+    <!-- Display Mode Segmented Control -->
+    <section class="display-mode-section" id="displayModeSection">
+      <div class="display-mode-header">
+        <label>Feed Display</label>
+        <span class="display-mode-current-desc hint" id="displayModeDesc">Docked sidebar or banner in feed (compact on mobile)</span>
+      </div>
+      <div class="display-mode-segmented" role="radiogroup" aria-label="Feed Display Mode">
+        <button type="button" class="display-mode-btn active" data-mode="full" role="radio" aria-checked="true">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="12" height="12" rx="2"/>
+            <path d="M10 2v12"/>
+          </svg>
+          <span>Full</span>
+        </button>
+        <button type="button" class="display-mode-btn" data-mode="compact" role="radio" aria-checked="false">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="12" height="12" rx="2"/>
+            <circle cx="11" cy="11" r="1.5" fill="currentColor"/>
+          </svg>
+          <span>Compact</span>
+        </button>
+        <button type="button" class="display-mode-btn" data-mode="hidden" role="radio" aria-checked="false">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 2l12 12M6.7 6.7a3 3 0 0 0 4.2 4.2M3.5 8c1.5-3 4.5-5 8.5-5a11 11 0 0 1 2 .2M8 13c-4 0-7-2-8.5-5a12 12 0 0 1 3.2-3.8"/>
+          </svg>
+          <span>Hidden</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Active Feed Filtering Management (Standalone / Hidden Mode) -->
+    <section class="popup-feed-filters-section" id="popupFeedFiltersSection">
+      <div class="popup-feed-filters-header">
+        <div class="popup-feed-platform-select-wrap">
+          <label for="popupPlatformSelect">Filter Topics</label>
+          <select id="popupPlatformSelect" class="popup-platform-select" aria-label="Select platform to manage filter topics">
+            <option value="twitter">X (Twitter)</option>
+            <option value="threads">Threads</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="youtube">YouTube</option>
+          </select>
+        </div>
+        <div class="popup-feed-actions-header">
+          <label class="filter-platform-switch" id="popupPlatformSwitchLabel" title="Enable filtering on this site">
+            <input class="filter-platform-switch-input" id="popupPlatformSwitchInput" type="checkbox" role="switch" aria-label="Enable filtering on this site">
+            <span class="filter-platform-switch-track" aria-hidden="true"><span class="filter-platform-switch-thumb"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="popup-phrases-box">
+        <div class="popup-phrases-list" id="popupPhrasesList">
+          <!-- Populated by JS -->
+        </div>
+        <div class="popup-add-phrase-row">
+          <input type="text" id="popupAddPhraseInput" class="popup-add-phrase-input" placeholder="Add filter topic (press Enter)..." autocomplete="off" spellcheck="false">
+          <button type="button" id="popupAddPhraseBtn" class="popup-add-phrase-btn">Add</button>
+        </div>
+      </div>
+      <div class="popup-filtered-view-row" id="popupFilteredViewRow">
+        <button type="button" id="popupViewFilteredBtn" class="popup-view-filtered-btn">
+          <span class="popup-view-filtered-label">View Filtered Posts</span>
+          <span class="popup-view-filtered-badge" id="popupFilteredCountBadge">0</span>
+        </button>
+      </div>
+    </section>
+
     <!-- Model selection: headline searchable combobox grouped by provider -->
     <section id="modelSelectSection" class="model-select-section">
       <div id="selectModelNotice" class="select-model-notice" style="display: none;" role="alert">

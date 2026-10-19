@@ -9,8 +9,11 @@ import {
   encodeFilterPackCode, decodeFilterPackCode, buildFilterPackShareUrl,
   FILTER_PACK_SHARE_URL_REGEX,
 } from '../shared/share-encoding';
-import type { ContentUIDeps, FilteredPost, PostContent, LocalModelStatus } from '../types';
-import { getStorage, setStorage, getDescriptions, setDescriptions, aiIntentActiveForSite } from '../shared/storage';
+import type { ContentUIDeps, FilteredPost, PostContent, LocalModelStatus, DisplayMode } from '../types';
+import {
+  getStorage, setStorage, getDescriptions, setDescriptions,
+  aiIntentActiveForSite, resolveEffectiveDisplayMode, DEFAULT_DISPLAY_MODE,
+} from '../shared/storage';
 import { enabledStorageKey } from '../shared/platforms';
 import { getReleaseNote } from './release-notes';
 import { runIOSImportAnimation } from './ios';
@@ -29,7 +32,7 @@ export function initUI(deps: ContentUIDeps) {
   // injection guards think no box exists — resulting in duplicate UI.
   // Proactively remove any leftover boxes from a prior injection.
   const stale = document.querySelectorAll(
-    '.filter-phrases-sidebar, .filter-phrases-bottom, .filter-phrases-mobile, .filter-phrases-banner'
+    '.filter-phrases-sidebar, .filter-phrases-bottom, .filter-phrases-mobile, .filter-phrases-banner, .filter-compact-pill, .filter-compact-sheet-backdrop'
   );
   console.log('[Sieve] initUI: clearing', stale.length, 'stale filter box(es) from prior injection');
   stale.forEach((el) => el.remove());
@@ -55,7 +58,9 @@ let filteredModalBackdrop: HTMLElement | null = null;
 let filteredViewContainer: HTMLElement | null = null;
 let filterPhrasesContainer: HTMLElement | null = null;
 let bottomFilterContainer: HTMLElement | null = null;
-let mobileFilterContainer: HTMLElement | null = null;
+let compactPillContainer: HTMLElement | null = null;
+let compactSheetBackdrop: HTMLElement | null = null;
+let currentDisplayMode: DisplayMode = DEFAULT_DISPLAY_MODE;
 let bottomFilterExpanded = true;
 let settingsModal: HTMLElement | null = null;
 
@@ -205,7 +210,11 @@ export function updateTheme() {
   const theme = _deps.adapter.getThemeMode();
   const iosFilteredModal = document.querySelector('.ff-ios-filtered-modal-backdrop');
   const iosPageContainer = _deps.getIOSPageContainer();
-  const elements = [filterPhrasesContainer, filteredViewContainer, bottomFilterContainer, mobileFilterContainer, iosPageContainer, iosFilteredModal].filter(Boolean) as Element[];
+  const elements = [
+    filterPhrasesContainer, filteredViewContainer, bottomFilterContainer,
+    compactPillContainer, compactSheetBackdrop,
+    iosPageContainer, iosFilteredModal,
+  ].filter(Boolean) as Element[];
 
   for (const el of elements) {
     el.classList.remove('light-mode', 'dim-mode', 'dark-mode');
@@ -729,56 +738,24 @@ export function injectBottomFilterBox() {
   });
 }
 
-// ==================== Mobile Filter ====================
+// ==================== Full Mode Teardown ====================
+// On smaller screens (mobile), full mode UI is removed in favor of compact mode (micro-pill).
 
-function updateMobileFilterVisibility() {
-  if (!mobileFilterContainer || !mobileFilterContainer.isConnected) return;
-
-  if (!_deps.adapter.shouldProcessCurrentPage()) {
-    mobileFilterContainer.remove();
-    mobileFilterContainer = null;
+function teardownFullModeUI() {
+  if (filterPhrasesContainer) {
+    filterPhrasesContainer.remove();
+    filterPhrasesContainer = null;
   }
+  if (bottomFilterContainer) {
+    bottomFilterContainer.remove();
+    bottomFilterContainer = null;
+  }
+  document.querySelectorAll('.filter-phrases-sidebar, .filter-phrases-bottom, .filter-phrases-mobile, .filter-phrases-banner').forEach(el => el.remove());
 }
 
 export function injectMobileFilterBox() {
-  if (_deps.IS_IOS) return;
-  const existingInDom = document.querySelectorAll('.filter-phrases-mobile').length;
-  // Adopt any existing node left by a previous injection
-  if (!mobileFilterContainer || !mobileFilterContainer.isConnected) {
-    mobileFilterContainer = document.querySelector<HTMLElement>('.filter-phrases-mobile');
-  }
-  if (mobileFilterContainer && mobileFilterContainer.isConnected) {
-    console.log('[Sieve] injectMobileFilterBox: adopting existing box (DOM count=', existingInDom, ')');
-    updateMobileFilterVisibility();
-    return;
-  }
-
-  // Don't inject on non-applicable pages
-  if (!_deps.adapter.shouldProcessCurrentPage()) return;
-
-  // Find the navigation element
-  const nav = document.querySelector(_deps.adapter.selectors.nav);
-  if (!nav) return;
-
-  // Create the mobile filter container
-  mobileFilterContainer = document.createElement('div');
-  mobileFilterContainer.className = 'filter-phrases-mobile';
-
-  mobileFilterContainer.replaceChildren(parseHTML(buildFilterContainerHTML()));
-
-  // Insert before the navigation element
-  nav.parentNode!.insertBefore(mobileFilterContainer, nav);
-
-  // Apply theme and update count
-  updateTheme();
-  updateFilteredTabCount();
-
-  setupFilterBoxEventHandlers(mobileFilterContainer);
-  maybeRenderUpdateBanner(mobileFilterContainer).catch(err =>
-    console.error('[UI] maybeRenderUpdateBanner failed (mobile):', err));
-
-  // Update visibility based on current page
-  updateMobileFilterVisibility();
+  // Deprecated: full mode UI is removed on mobile screens in favor of compact mode.
+  document.querySelectorAll('.filter-phrases-mobile').forEach(el => el.remove());
 }
 
 // ==================== Banner Filter ====================
@@ -856,13 +833,224 @@ export function injectBannerFilterBox() {
   updateBannerFilterVisibility();
 }
 
+// ==================== Compact Filter Pill & Quick Sheet ====================
+
+function updateCompactPillVisibility() {
+  if (!compactPillContainer || !compactPillContainer.isConnected) return;
+  if (!_deps.adapter.shouldProcessCurrentPage()) {
+    compactPillContainer.style.display = 'none';
+  } else {
+    compactPillContainer.style.display = '';
+  }
+}
+
+export function injectCompactFilterPill() {
+  if (_deps.IS_IOS) return;
+  const existingInDom = document.querySelector<HTMLElement>('.filter-compact-pill');
+  if (!compactPillContainer || !compactPillContainer.isConnected) {
+    compactPillContainer = existingInDom;
+  }
+  if (compactPillContainer && compactPillContainer.isConnected) {
+    updateCompactPillVisibility();
+    return;
+  }
+
+  if (!_deps.adapter.shouldProcessCurrentPage()) return;
+
+  const count = filteredPosts.length;
+  compactPillContainer = document.createElement('div');
+  compactPillContainer.className = 'filter-compact-pill';
+  compactPillContainer.setAttribute('role', 'button');
+  compactPillContainer.setAttribute('aria-label', 'Open Sieve filter controls');
+  compactPillContainer.setAttribute('tabindex', '0');
+
+  const html = `
+    <span class="filter-compact-pill-logo" aria-hidden="true">${getSieveLogoHTML()}</span>
+    <span class="filter-compact-pill-label">Sieve</span>
+    <span class="filter-compact-pill-badge ${count > 0 ? 'has-filtered' : ''}">${count}</span>
+  `;
+  compactPillContainer.replaceChildren(parseHTML(html));
+
+  const logoSvg = compactPillContainer.querySelector<SVGSVGElement>('svg.logo');
+  if (logoSvg) initLogoAnimation(logoSvg);
+
+  compactPillContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleCompactSheet(true);
+  });
+  compactPillContainer.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleCompactSheet(true);
+    }
+  });
+
+  document.body.appendChild(compactPillContainer);
+  updateTheme();
+  updateCompactPillVisibility();
+}
+
+export function removeCompactFilterPill() {
+  if (compactPillContainer) {
+    compactPillContainer.remove();
+    compactPillContainer = null;
+  }
+  if (compactSheetBackdrop) {
+    compactSheetBackdrop.remove();
+    compactSheetBackdrop = null;
+  }
+}
+
+export function toggleCompactSheet(open: boolean) {
+  if (open) {
+    if (!compactSheetBackdrop || !compactSheetBackdrop.isConnected) {
+      compactSheetBackdrop = document.createElement('div');
+      compactSheetBackdrop.className = 'filter-compact-sheet-backdrop';
+
+      const sheet = document.createElement('div');
+      sheet.className = 'filter-compact-sheet';
+
+      sheet.replaceChildren(parseHTML(`
+        <div class="filter-phrases-container">
+          <div class="sieve-update-banner-slot postpatrol-update-banner-slot"></div>
+          <div class="filter-phrases-title-row">
+            <span class="filter-phrases-box-name">
+              <span class="sieve-logo-prefix" aria-hidden="true">${getSieveLogoHTML()}</span>
+              <span>Sieve</span>
+            </span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${platformFilterSwitchHTML}
+              <button class="filter-compact-sheet-close" type="button" aria-label="Close sheet">&times;</button>
+            </div>
+          </div>
+          <div class="filter-phrases-header">
+            <span class="filter-phrases-label">Filter out</span>
+            <span class="filter-phrases-list"></span>
+            <span class="filter-phrases-and-input">
+              <span class="filter-phrases-and">and</span>
+              ${placeholderHTML}
+            </span>
+          </div>
+          <div class="filter-model-loading" style="display: none;">
+            <div class="model-loading-text">Loading model...</div>
+            <div class="model-loading-progress">
+              <div class="model-loading-progress-fill"></div>
+            </div>
+          </div>
+          <div class="filter-phrases-actions">
+            <div class="filter-phrases-actions-left">
+              <button class="filtered-toggle-btn">
+                <span class="filtered-toggle-text">View filtered</span>
+                <span class="filtered-toggle-count">(${filteredPosts.length})</span>
+              </button>
+            </div>
+            <div class="filter-phrases-actions-right">
+              <button class="filter-settings-btn" type="button" aria-label="Settings">${settingsIconSVG}</button>
+            </div>
+          </div>
+        </div>
+      `));
+
+      compactSheetBackdrop.appendChild(sheet);
+      document.body.appendChild(compactSheetBackdrop);
+
+      const closeBtn = sheet.querySelector('.filter-compact-sheet-close');
+      closeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCompactSheet(false);
+      });
+      compactSheetBackdrop.addEventListener('click', (e) => {
+        if (e.target === compactSheetBackdrop) {
+          toggleCompactSheet(false);
+        }
+      });
+
+      setupFilterBoxEventHandlers(sheet);
+      updateTheme();
+      syncFilterPhrases();
+    }
+
+    requestAnimationFrame(() => {
+      compactSheetBackdrop?.classList.add('visible');
+    });
+  } else {
+    if (compactSheetBackdrop) {
+      compactSheetBackdrop.classList.remove('visible');
+    }
+  }
+}
+
+// ==================== Display Mode Routing ====================
+
+export function setDisplayMode(mode: DisplayMode) {
+  currentDisplayMode = mode;
+  applyDisplayMode();
+}
+
+export function getDisplayMode(): DisplayMode {
+  return currentDisplayMode;
+}
+
+export function isMobileScreen(): boolean {
+  return window.innerWidth < 500 || (typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 499px)').matches);
+}
+
+export function applyDisplayMode() {
+  if (_deps.IS_IOS) return;
+  const isMobile = isMobileScreen();
+  const effectiveMode = resolveEffectiveDisplayMode(currentDisplayMode, isMobile);
+
+  if (effectiveMode === 'hidden') {
+    teardownFullModeUI();
+    removeCompactFilterPill();
+    return;
+  }
+
+  if (effectiveMode === 'compact') {
+    teardownFullModeUI();
+    injectCompactFilterPill();
+    return;
+  }
+
+  // effectiveMode === 'full' (desktop / tablet only: width >= 500px)
+  removeCompactFilterPill();
+  document.querySelectorAll('.filter-phrases-mobile').forEach(el => el.remove());
+
+  if (_deps.adapter.filterBoxPlacement === 'banner') {
+    if (_deps.adapter.siteId === 'threads') {
+      if (!bottomFilterContainer) injectBottomFilterBox();
+      else {
+        updateBottomFilterPosition();
+        updateBottomFilterVisibility();
+      }
+    } else if (!filterPhrasesContainer) {
+      injectBannerFilterBox();
+    } else {
+      updateBannerFilterVisibility();
+    }
+    return;
+  }
+  // Inject filter phrases input if not present
+  if (!filterPhrasesContainer && document.querySelector(_deps.adapter.selectors.sidebar)) {
+    injectFilterPhrasesInput();
+  } else {
+    updateSidebarFilterVisibility();
+  }
+  // Inject bottom filter box if not present
+  if (!bottomFilterContainer) {
+    injectBottomFilterBox();
+  } else {
+    updateBottomFilterVisibility();
+  }
+}
+
 // ==================== Filter Phrases ====================
 
 export function syncFilterPhrases() {
   getDescriptions(_deps.descriptionsKey).then((descriptions) => {
 
-    // Update desktop/tablet/mobile containers
-    [filterPhrasesContainer, bottomFilterContainer, mobileFilterContainer].forEach(container => {
+    // Update desktop/tablet/compact containers
+    [filterPhrasesContainer, bottomFilterContainer, compactSheetBackdrop].forEach(container => {
       if (container && container.isConnected) {
         const phrasesListContainer = container.querySelector('.filter-phrases-list');
         if (phrasesListContainer) {
@@ -1627,6 +1815,10 @@ export function showSettingsModal(section?: 'local' | 'select-model') {
     if (event.data.type === 'closeSettingsModal') {
       closeSettingsModal();
       window.removeEventListener('message', messageHandler);
+    } else if (event.data.type === 'openFilteredModal') {
+      closeSettingsModal();
+      window.removeEventListener('message', messageHandler);
+      toggleFilteredTab(true);
     } else if (event.data.type === 'settingsResize' && iframe) {
       if (!hasResized) {
         // First resize: set height without transition, then fade in
@@ -1682,7 +1874,7 @@ function closeSettingsModal() {
 // ==================== Filtered Toggle Buttons ====================
 
 export function updateFilteredToggleButtons() {
-  const containers = [filterPhrasesContainer, bottomFilterContainer, mobileFilterContainer];
+  const containers = [filterPhrasesContainer, bottomFilterContainer, compactSheetBackdrop];
   containers.forEach(container => {
     if (container && container.isConnected) {
       const toggleBtn = container.querySelector('.filtered-toggle-btn:not(.filter-pack-toggle-btn)');
@@ -1720,7 +1912,7 @@ export function updateFilteredTabCount() {
     detail: { count: newCount, animate: shouldAnimate },
   }));
 
-  const containers = [filterPhrasesContainer, bottomFilterContainer, mobileFilterContainer];
+  const containers = [filterPhrasesContainer, bottomFilterContainer, compactSheetBackdrop];
   containers.forEach(container => {
     if (container && container.isConnected) {
       const countEl = container.querySelector('.filtered-toggle-count');
@@ -1734,6 +1926,14 @@ export function updateFilteredTabCount() {
       }
     }
   });
+
+  if (compactPillContainer && compactPillContainer.isConnected) {
+    const badge = compactPillContainer.querySelector<HTMLElement>('.filter-compact-pill-badge');
+    if (badge) {
+      badge.textContent = String(newCount);
+      badge.classList.toggle('has-filtered', newCount > 0);
+    }
+  }
 
   // Also update iOS overlay "View filtered (N)" button
   _deps.updateIOSFilteredCount();
@@ -1757,7 +1957,7 @@ export function updateFilteredTabCount() {
 // ==================== Model Loading Progress ====================
 
 export function updateModelLoadingProgress(statuses: Record<string, LocalModelStatus>, selectedModel: string) {
-  const containers = [filterPhrasesContainer, bottomFilterContainer, mobileFilterContainer];
+  const containers = [filterPhrasesContainer, bottomFilterContainer];
 
   const isLocalModel = selectedModel && selectedModel.startsWith('local:');
   if (!isLocalModel) {
@@ -2889,7 +3089,7 @@ export function showApiKeyWarning() {
 
 function showCategoryLimitWarning() {
   // Show warning in all filter box containers
-  const containers = [filterPhrasesContainer, bottomFilterContainer, mobileFilterContainer].filter(Boolean) as HTMLElement[];
+  const containers = [filterPhrasesContainer, bottomFilterContainer].filter(Boolean) as HTMLElement[];
   for (const container of containers) {
     // Don't add duplicate warnings
     if (container.querySelector('.ff-category-limit-warning')) continue;
@@ -3588,39 +3788,11 @@ export function handleDOMMutation() {
     bottomFilterContainer = null;
     bottomFilterExpanded = true;
   }
-  if (mobileFilterContainer && !mobileFilterContainer.isConnected) {
-    mobileFilterContainer = null;
+  if (compactPillContainer && !compactPillContainer.isConnected) {
+    compactPillContainer = null;
   }
-  if (_deps.adapter.filterBoxPlacement === 'banner') {
-    if (_deps.adapter.siteId === 'threads') {
-      if (!bottomFilterContainer) injectBottomFilterBox();
-      else {
-        updateBottomFilterPosition();
-        updateBottomFilterVisibility();
-      }
-    } else if (!filterPhrasesContainer) {
-      injectBannerFilterBox();
-    } else {
-      updateBannerFilterVisibility();
-    }
-    return;
+  if (compactSheetBackdrop && !compactSheetBackdrop.isConnected) {
+    compactSheetBackdrop = null;
   }
-  // Inject filter phrases input if not present
-  if (!filterPhrasesContainer && document.querySelector(_deps.adapter.selectors.sidebar)) {
-    injectFilterPhrasesInput();
-  } else {
-    updateSidebarFilterVisibility();
-  }
-  // Inject bottom filter box if not present
-  if (!bottomFilterContainer) {
-    injectBottomFilterBox();
-  } else {
-    updateBottomFilterVisibility();
-  }
-  // Inject mobile filter box if not present
-  if (!mobileFilterContainer && document.querySelector(_deps.adapter.selectors.nav)) {
-    injectMobileFilterBox();
-  } else {
-    updateMobileFilterVisibility();
-  }
+  applyDisplayMode();
 }

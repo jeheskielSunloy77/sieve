@@ -117,11 +117,6 @@ div[data-testid="BottomBar"] {
   border-bottom-color: rgb(56, 68, 77);
 }
 
-/* Mobile filter box */
-.filter-phrases-mobile.dim-mode .filter-phrases-container {
-  background-color: rgb(21, 32, 43);
-}
-
 /* ======================================
    iOS Sieve page — dim mode
    ====================================== */

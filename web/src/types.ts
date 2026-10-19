@@ -224,7 +224,14 @@ interface SettingsBase {
   // as a "Filtered by Sieve" placeholder card (see youtube.css). Default
   // false — remove the card outright, matching Twitter's behavior.
   youtubeShowPlaceholder: boolean;
+  // Controls how Sieve UI is rendered on the host platform:
+  // - 'full': docked sidebar / top banner
+  // - 'compact': floating micro-pill with expandable quick-sheet
+  // - 'hidden': zero in-feed injected UI, managed via popup
+  displayMode?: DisplayMode;
 }
+
+export type DisplayMode = 'full' | 'compact' | 'hidden';
 
 export interface Settings extends SettingsBase {
   descriptions: string[];
@@ -389,7 +396,9 @@ export type BackgroundToContentMessage =
   | { type: 'annoyingProgress'; verified: number; total: number }
   | { type: 'evaluationStarted'; evaluationId: string; detectorNames: string[] }
   | { type: 'detectorResponse'; evaluationId: string; detectorName: string; shouldHide?: boolean; reasoning?: string; category?: string | null; error?: string; skipped?: boolean; skipReason?: string }
-  | { type: 'triggerShareFilterPack' };
+  | { type: 'triggerShareFilterPack' }
+  | { type: 'openFilteredModal' }
+  | { type: 'getFilteredStats' };
 
 // ==================== Dependency Injection ====================
 

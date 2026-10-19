@@ -1,7 +1,7 @@
 // Sieve - Content Script
 // Entry point: post processing, observers, init, storage/message listeners
 
-import type { PlatformAdapter, PostContent, PipelineResponse, BackgroundToContentMessage, DescriptionKey, AiFilterIntentState } from '../types';
+import type { PlatformAdapter, PostContent, PipelineResponse, BackgroundToContentMessage, DescriptionKey, AiFilterIntentState, DisplayMode } from '../types';
 import { getStorage, removeStorage, getDescriptions, setDescriptions, phraseSetKey } from '../shared/storage';
 import { enabledStorageKey } from '../shared/platforms';
 import { FILTER_PACK_CODE_PREFIX } from '../shared/share-encoding';
@@ -17,8 +17,6 @@ import {
   initUI,
   getFilteredPosts, getFilteredTabActive,
   updateTheme,
-  injectFilterPhrasesInput, injectBottomFilterBox, injectMobileFilterBox,
-  injectBannerFilterBox,
   syncFilterPhrases, addFilterPhrase, removeFilterPhrase, clearFilteredPosts,
   showSettingsModal, renderFilteredPostsView,
   initModelLoadingListener,
@@ -34,6 +32,9 @@ import {
   refreshAiIndicatorUI,
   restoreAllFilteredPosts,
   setDropdownFilteringEnabled,
+  setDisplayMode,
+  applyDisplayMode,
+  toggleFilteredTab,
 } from './ui';
 
 import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/utils';
@@ -661,15 +662,11 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     // users should be able to import shared filter packs from anywhere.
     observeImportCodes();
 
-    if (adapter.filterBoxPlacement === 'banner') {
-      // Threads uses the same editor surface at every breakpoint and moves
-      // it into the right gutter on desktop.
-      if (adapter.siteId === 'threads') injectBottomFilterBox();
-      else injectBannerFilterBox();
+    const { displayMode } = await getStorage(['displayMode']);
+    if (displayMode) {
+      setDisplayMode(displayMode);
     } else {
-      injectFilterPhrasesInput();
-      injectBottomFilterBox();
-      injectMobileFilterBox();
+      applyDisplayMode();
     }
 
     initModelLoadingListener();
@@ -681,6 +678,12 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
     });
     uiObserver.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', handleDOMMutation, { passive: true });
+    if (typeof window.matchMedia === 'function') {
+      const mobileBreakpointMql = window.matchMedia('(max-width: 499px)');
+      mobileBreakpointMql.addEventListener?.('change', () => {
+        handleDOMMutation();
+      });
+    }
 
     // Hide Sieve sidebar when Twitter's search bar is focused
     setupSearchBarHide();
@@ -829,6 +832,10 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
           });
         }
       }
+      if (changes.displayMode) {
+        const nextMode = (changes.displayMode.newValue as DisplayMode) || 'full';
+        setDisplayMode(nextMode);
+      }
     });
 
     // Fallback recovery: periodically check for posts stuck in pending state
@@ -911,6 +918,19 @@ import { formatPostForEvaluation, phraseAddNeedsReEvaluation } from '../shared/u
       case 'ping':
         sendResponse({ alive: true });
         return;
+      case 'openFilteredModal': {
+        toggleFilteredTab(true);
+        sendResponse({ success: true });
+        return;
+      }
+      case 'getFilteredStats': {
+        sendResponse({
+          success: true,
+          count: getFilteredPosts().length,
+          siteId: adapter.siteId,
+        });
+        return;
+      }
       case 'triggerShareFilterPack': {
         shareFilterPack().then(() => {
           sendResponse({ success: true });

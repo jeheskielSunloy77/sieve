@@ -1,6 +1,7 @@
 import type {
   AiFilterIntentState,
   DescriptionKey,
+  DisplayMode,
   SiteId,
   StorageSchema,
 } from '../types';
@@ -151,4 +152,23 @@ export function aiIntentActiveForSite(
   if (!Array.isArray(aiPhrases) || aiPhrases.length === 0) return false;
   const aiKeys = new Set(aiPhrases.map(p => p.trim().toLowerCase()));
   return sitePhrases.some(p => aiKeys.has(p.trim().toLowerCase()));
+}
+
+export const DEFAULT_DISPLAY_MODE: DisplayMode = 'full';
+
+/**
+ * Resolves the effective display mode.
+ * If user selected 'full' but screen is small (< 500px mobile viewport),
+ * adapt automatically to 'compact' to avoid screen clutter.
+ * Explicit 'compact' or 'hidden' settings are strictly respected.
+ */
+export function resolveEffectiveDisplayMode(
+  mode: DisplayMode | undefined,
+  isMobile: boolean
+): DisplayMode {
+  const selected = mode || DEFAULT_DISPLAY_MODE;
+  if (selected === 'full' && isMobile) {
+    return 'compact';
+  }
+  return selected;
 }

@@ -111,6 +111,10 @@ html[dark] {
 .filter-phrases-bottom *,
 .filter-phrases-mobile,
 .filter-phrases-mobile *,
+.filter-compact-pill,
+.filter-compact-pill *,
+.filter-compact-sheet,
+.filter-compact-sheet *,
 .filtered-view-container,
 .filtered-view-container *,
 .post-verification-bar,
@@ -2086,33 +2090,14 @@ article {
    ====================================== */
 
 .filter-phrases-mobile {
-  display: none;
-  padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-.filter-phrases-mobile .filter-phrases-container {
-  background-color: var(--pp-bg-glass);
-  border: 1px solid var(--pp-border);
-  border-radius: 12px;
-  padding: 12px 14px;
-}
-
-/* Light mode for mobile filter box */
-.filter-phrases-mobile.light-mode .filter-phrases-container {
-  background-color: var(--pp-bg-glass);
-}
-
-/* Dark mode for mobile filter box */
-.filter-phrases-mobile.dark-mode .filter-phrases-container {
-  background-color: var(--pp-bg-glass);
+  display: none !important;
 }
 
 /* ======================================
    Responsive breakpoints:
    - > 1024px: sidebar filter only
    - 500px - 1024px: bottom fixed filter
-   - < 500px: mobile filter (before nav)
+   - < 500px: smaller screen (mobile) - full mode UI is removed in favor of compact mode
    ====================================== */
 
 /* Wide window (> 1024px) - show sidebar filter only */
@@ -2141,19 +2126,182 @@ article {
   }
 }
 
-/* Mobile window (< 500px) - show mobile filter before nav */
+/* Mobile window (< 500px) - full mode UI is removed on smaller screens in favor of compact mode */
 @media (max-width: 499px) {
-  .filter-phrases-sidebar {
+  .filter-phrases-sidebar,
+  .filter-phrases-bottom,
+  .filter-phrases-mobile,
+  .filter-phrases-banner {
     display: none !important;
   }
+}
 
-  .filter-phrases-bottom {
-    display: none !important;
+/* ======================================
+   Compact Display Mode: Floating Micro-Pill & Quick Sheet
+   ====================================== */
+
+.filter-compact-pill {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border-radius: 9999px;
+  background-color: var(--pp-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--pp-border);
+  box-shadow: var(--pp-shadow);
+  color: var(--pp-text);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-compact-pill:hover {
+  background-color: var(--pp-surface-hover);
+  border-color: var(--pp-border-strong);
+  transform: translateY(-1px);
+}
+
+.filter-compact-pill:active {
+  transform: translateY(0);
+}
+
+.filter-compact-pill-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.filter-compact-pill-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.filter-compact-pill-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--pp-text);
+}
+
+.filter-compact-pill-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  background: var(--pp-surface-subtle);
+  border: 1px solid var(--pp-border);
+  color: var(--pp-text-muted);
+  line-height: 1.4;
+  transition: all 0.15s ease;
+}
+
+.filter-compact-pill-badge.has-filtered {
+  background: var(--pp-primary);
+  border-color: var(--pp-primary);
+  color: var(--pp-primary-contrast);
+}
+
+@media (max-width: 499px) {
+  .filter-compact-pill {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
+}
+
+/* Compact Sheet Backdrop */
+.filter-compact-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.filter-compact-sheet-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Compact Quick Sheet Card */
+.filter-compact-sheet {
+  position: fixed;
+  bottom: 68px;
+  right: 20px;
+  width: 350px;
+  max-width: calc(100vw - 32px);
+  background: var(--pp-bg);
+  border: 1px solid var(--pp-border);
+  border-radius: 12px;
+  box-shadow: var(--pp-shadow);
+  z-index: 10002;
+  overflow: hidden;
+  transform: translateY(12px) scale(0.97);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.filter-compact-sheet-backdrop.visible .filter-compact-sheet {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 499px) {
+  .filter-compact-sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
   }
 
-  .filter-phrases-mobile {
-    display: block !important;
+  .filter-compact-sheet-backdrop.visible .filter-compact-sheet {
+    transform: translateY(0);
   }
+}
+
+.filter-compact-sheet .filter-phrases-container {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 14px 16px;
+}
+
+.filter-compact-sheet-close {
+  background: none;
+  border: none;
+  color: var(--pp-text-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.filter-compact-sheet-close:hover {
+  color: var(--pp-text);
+  background-color: var(--pp-surface-hover);
 }
 
 /* Filter phrases actions row */
@@ -2538,7 +2686,9 @@ div.settings-modal-iframe.dim-mode {
 /* On iOS, suppress the desktop sidebar, bottom, and mobile filter boxes */
 body.ff-ios .filter-phrases-sidebar,
 body.ff-ios .filter-phrases-bottom,
-body.ff-ios .filter-phrases-mobile {
+body.ff-ios .filter-phrases-mobile,
+body.ff-ios .filter-compact-pill,
+body.ff-ios .filter-compact-sheet-backdrop {
   display: none !important;
 }
 

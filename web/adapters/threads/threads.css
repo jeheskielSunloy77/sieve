@@ -21,13 +21,11 @@ body.postpatrol-disabled .ff-why-annoying-btn--threads {
   color: var(--pp-text);
 }
 
-/* On mobile/narrow screens, suppress the before-nav mobile box in favor of the bottom sheet */
-body.site-threads .filter-phrases-mobile {
-  display: none !important;
-}
-
-body.site-threads .filter-phrases-bottom {
-  display: block !important;
+/* On desktop/tablet (>= 500px), Threads displays the bottom sheet / gutter box */
+@media (min-width: 500px) {
+  body.site-threads .filter-phrases-bottom {
+    display: block !important;
+  }
 }
 
 /* On desktop (>= 1280px), the filter box sits in the right gutter beside the feed.
