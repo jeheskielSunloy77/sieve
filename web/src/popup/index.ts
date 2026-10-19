@@ -655,6 +655,13 @@ function updateDisplayModeUI(mode: DisplayMode) {
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
   });
+
+  // Only show the Filter Topics section in settings on hidden and compact mode.
+  // On full mode, topics are already clearly visible and managed directly in the feed.
+  const feedFiltersSection = document.getElementById('popupFeedFiltersSection');
+  if (feedFiltersSection) {
+    feedFiltersSection.style.display = (mode === 'hidden' || mode === 'compact') ? '' : 'none';
+  }
 }
 
 function setupDisplayModeListeners() {
