@@ -969,19 +969,13 @@ async function processBatch(): Promise<void> {
           ? () => { void sendToTab(batchTabId, { type: 'processingPost', postUrl }); }
           : undefined;
 
-        let effectiveModelConfig = apiConfig.modelConfig as LocalModelDef | null;
-        let effectiveModelName = apiConfig.modelName;
-
-        // Multimodal routing: if post contains images and local model lacks vision, route to SmolVLM
-        if (effectiveImageUrls.length > 0 && !effectiveModelConfig?.supportsImages) {
-          const vlmDef = PREDEFINED_MODELS.local?.find(m => m.name === 'smolvlm-500m-instruct');
-          if (vlmDef) {
-            effectiveModelConfig = vlmDef;
-            effectiveModelName = 'smolvlm-500m-instruct';
-          }
-        }
-
-        return await callLocalInference(postData, settings.effectiveDescriptions, effectiveModelConfig, effectiveModelName, { onInferenceStart });
+        return await callLocalInference(
+          postData,
+          settings.effectiveDescriptions,
+          apiConfig.modelConfig as LocalModelDef | null,
+          apiConfig.modelName,
+          { onInferenceStart }
+        );
       } else if (apiConfig.apiName === 'iosLocal') {
         return await iosLocalClassify(postData, settings.effectiveDescriptions, apiConfig.modelConfig as LocalModelDef | null);
       } else if (apiConfig.apiName === 'anthropic') {

@@ -112,9 +112,13 @@ const LOCAL_ERROR_MESSAGES: Record<string, { display: string; hint: string }> = 
     display: 'GPU memory issue',
     hint: 'Try a smaller model or close other GPU-intensive tabs.'
   },
-  'webgpu not': {
-    display: 'WebGPU not supported',
-    hint: 'Your browser or device does not support on-device AI models.'
+  'bad_alloc': {
+    display: 'Out of memory (WebGPU required)',
+    hint: 'WebGPU is required for on-device LLMs. On Linux, enable "Unsafe WebGPU" in chrome://flags and relaunch.'
+  },
+  'webgpu': {
+    display: 'WebGPU required',
+    hint: 'On Linux, enable "Unsafe WebGPU" in chrome://flags and relaunch, or switch to a cloud model.'
   },
   'network': {
     display: 'Network error',

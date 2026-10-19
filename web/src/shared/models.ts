@@ -163,7 +163,7 @@ export const PREDEFINED_MODELS: PredefinedModelsMap = {
       sizeGB: 0.38,
       inferenceParams: { temperature: 0.0 },
       transformersConfig: {
-        modelId: "Qwen/Qwen2.5-0.5B-Instruct",
+        modelId: "onnx-community/Qwen2.5-0.5B-Instruct",
         task: "text-generation",
         dtype: "q4",
         maxTokens: 1024,
@@ -178,7 +178,7 @@ export const PREDEFINED_MODELS: PredefinedModelsMap = {
       sizeGB: 0.8,
       inferenceParams: { temperature: 0.0 },
       transformersConfig: {
-        modelId: "Qwen/Qwen2.5-1.5B-Instruct",
+        modelId: "onnx-community/Qwen2.5-1.5B-Instruct",
         task: "text-generation",
         dtype: "q4",
         maxTokens: 1024,

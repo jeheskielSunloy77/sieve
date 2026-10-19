@@ -33,11 +33,23 @@ export class EmbedderRuntime {
 
   private async getPipeline(): Promise<FeatureExtractionPipeline> {
     if (!this.pipelinePromise) {
-      const isWebGpuSupported = typeof navigator !== 'undefined' && !!navigator.gpu;
+      let isWebGpuSupported = false;
+      const navGpu = typeof navigator !== 'undefined'
+        ? (navigator as unknown as { gpu?: { requestAdapter?: () => Promise<unknown> } }).gpu
+        : undefined;
+      if (navGpu?.requestAdapter) {
+        try {
+          const adapter = await navGpu.requestAdapter();
+          isWebGpuSupported = !!adapter;
+        } catch {
+          isWebGpuSupported = false;
+        }
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const opts: any = {
         device: isWebGpuSupported ? 'webgpu' : 'wasm',
         local_files_only: true,
+        dtype: 'fp32',
       };
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.pipelinePromise = pipeline('feature-extraction', BUNDLED_MODEL_NAME, opts);

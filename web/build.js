@@ -105,19 +105,9 @@ function copyOrtAssets() {
     return;
   }
   fs.mkdirSync(dstDir, { recursive: true });
-  const neededFiles = [
-    'ort-wasm-simd-threaded.wasm',
-    'ort-wasm-simd-threaded.jsep.wasm',
-    'ort-wasm-simd-threaded.mjs',
-    'ort-wasm-simd-threaded.jsep.mjs',
-    'ort-wasm.wasm',
-    'ort-wasm.min.js',
-    'ort.webgpu.bundle.min.mjs',
-  ];
-  for (const name of neededFiles) {
-    const srcFile = path.join(srcDir, name);
-    if (fs.existsSync(srcFile)) {
-      fs.copyFileSync(srcFile, path.join(dstDir, name));
+  for (const name of fs.readdirSync(srcDir)) {
+    if ((name.startsWith('ort-wasm') || name.startsWith('ort.webgpu')) && !name.endsWith('.map')) {
+      fs.copyFileSync(path.join(srcDir, name), path.join(dstDir, name));
     }
   }
   console.log('Copied ONNX Runtime Web assets into dist/ort-wasm/');
@@ -129,6 +119,12 @@ function copyBundledModels() {
   const dstDir = path.join(__dirname, 'dist/models');
   if (!fs.existsSync(srcDir)) return;
   fs.cpSync(srcDir, dstDir, { recursive: true });
+  const onnxDir = path.join(dstDir, 'all-MiniLM-L6-v2', 'onnx');
+  const modelFile = path.join(onnxDir, 'model.onnx');
+  const quantFile = path.join(onnxDir, 'model_quantized.onnx');
+  if (fs.existsSync(modelFile) && !fs.existsSync(quantFile)) {
+    fs.copyFileSync(modelFile, quantFile);
+  }
   console.log('Copied bundled model assets into dist/models/');
 }
 

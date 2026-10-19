@@ -30,7 +30,7 @@ export class TransformersRuntime {
     _abortSignal: AbortSignal
   ): Promise<void> {
     const config = modelDef.transformersConfig;
-    const modelId = config?.modelId ?? 'Qwen/Qwen2.5-0.5B-Instruct';
+    const modelId = config?.modelId ?? 'onnx-community/Qwen2.5-0.5B-Instruct';
     const task = config?.task ?? 'text-generation';
     const dtype = config?.dtype ?? 'q4';
 
@@ -48,8 +48,23 @@ export class TransformersRuntime {
 
     onProgress({ progress: 0.05, text: `Preparing ${modelDef.display}...` });
 
-    const isWebGpu = typeof navigator !== 'undefined' && !!navigator.gpu;
-    const device = isWebGpu ? 'webgpu' : 'wasm';
+    let isWebGpu = false;
+    const navGpu = typeof navigator !== 'undefined'
+      ? (navigator as unknown as { gpu?: { requestAdapter?: () => Promise<unknown> } }).gpu
+      : undefined;
+    if (navGpu?.requestAdapter) {
+      try {
+        const adapter = await navGpu.requestAdapter();
+        isWebGpu = !!adapter;
+      } catch {
+        isWebGpu = false;
+      }
+    }
+
+    if (!isWebGpu) {
+      throw new Error('WebGPU is required for on-device models. On Linux, please enable "Unsafe WebGPU" in chrome://flags and relaunch your browser.');
+    }
+    const device = 'webgpu';
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const pipe = await pipeline(task as any, modelId, {
