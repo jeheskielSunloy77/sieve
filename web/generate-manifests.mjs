@@ -74,6 +74,25 @@ function platformsToManifestSlice(target) {
   };
 }
 
+// Recursively strip pseudo-comment keys (e.g. `_comment...` or `//...`) so
+// documentation notes in manifest source templates never leak into manifest.json.
+function stripComments(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(stripComments);
+  }
+  const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+  if (isPlainObject(obj)) {
+    const result = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (!key.startsWith('_comment') && !key.startsWith('//')) {
+        result[key] = stripComments(value);
+      }
+    }
+    return result;
+  }
+  return obj;
+}
+
 export function generateManifest(target = 'chrome') {
   if (!VALID_TARGETS.has(target)) {
     throw new Error(`Unknown target: ${target}. Expected one of: ${[...VALID_TARGETS].join(', ')}`);
@@ -84,7 +103,7 @@ export function generateManifest(target = 'chrome') {
   // template doesn't have to repeat them for every platform. Filtered to the
   // platforms whose `targets` include this build target.
   const platformSlice = platformsToManifestSlice(target);
-  const merged = deepMerge(deepMerge(base, platformSlice), override);
+  const merged = stripComments(deepMerge(deepMerge(base, platformSlice), override));
   const outPath = path.join(ROOT, 'manifest.json');
   fs.writeFileSync(outPath, JSON.stringify(merged, null, 2) + '\n');
   console.log(`Generated manifest.json for target=${target}`);
